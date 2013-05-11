@@ -11,6 +11,7 @@ To be able to run and edit this program, please follow this steps:<br>
 1. If you don't have it, download and install NetBeans. You can use another IDE's, but GUI is made in NetBeans, so you need NetBeans if you want to make any changes in it.<br>
 2. Download and attach two libraries: latest version of LWJGL ( http://www.lwjgl.org/ ) and TWL PNGDecoder ( http://twl.l33tlabs.org/dist/PNGDecoder.jar )<br>
 3. download latest official release of DeedPlanner from program thread ( http://forum.wurmonline.com/index.php?/topic/79352-deedplanner-3d-house-and-deed-planner/ ) and place folder "Data" and file "version.txt" in program working directory.
+4. Set VM option in project properties: -Djava.library.path="absolute_path_to_your_system_LWJGL_natives"
 
 Code is not documented, but volunteers can document it, though the code should be the best documentation for itself. ;)
 
