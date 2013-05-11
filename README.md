@@ -7,7 +7,7 @@ Program official forum thread: http://forum.wurmonline.com/index.php?/topic/7935
 
 <b>This is Java 7 project - it will does not work with older versions of JDK!</b>
 
-To be able to run and edit this program, please follow this steps:<br>
+<b>To be able to run and edit this program, please follow this steps:</b><br>
 1. If you don't have it, download and install NetBeans. You can use another IDE's, but GUI is made in NetBeans, so you need NetBeans if you want to make any changes in it.<br>
 2. Download and attach two libraries: latest version of LWJGL ( http://www.lwjgl.org/ ) and TWL PNGDecoder ( http://twl.l33tlabs.org/dist/PNGDecoder.jar )<br>
 3. download latest official release of DeedPlanner from program thread ( http://forum.wurmonline.com/index.php?/topic/79352-deedplanner-3d-house-and-deed-planner/ ) and place folder "Data" and file "version.txt" in program working directory.<br>
@@ -15,7 +15,7 @@ To be able to run and edit this program, please follow this steps:<br>
 
 Code is not documented, but volunteers can document it, though the code should be the best documentation for itself. ;)
 
-Project goals:
+<b>Project goals:</b><br>
 1. Creation of the most advanced, professional-looking deed planner for Wurm Online<br>
 2. Access to the widest possible audience - as little platform-dependend code as possible<br>
 3. The program usage should be as simple as possible<br>
