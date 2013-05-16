@@ -36,8 +36,14 @@ public class SaveWindow extends javax.swing.JFrame {
     
     private void saveMaker() {
         StringBuilder maps = new StringBuilder();
-        maps.append("0.5|");
+        maps.append("0.6|");
         maps.append(Mapper.width).append(",").append(Mapper.height).append(",");
+        
+        for (int x=0; x<=Mapper.width; x++) {
+            for (int y=0; y<=Mapper.height; y++) {
+                maps.append((int)Mapper.heightmap[x][y]).append(",");
+            }
+        }
         
         for (int x=0; x<Mapper.width; x++) {
             for (int y=0; y<Mapper.height; y++) {

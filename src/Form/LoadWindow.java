@@ -5,6 +5,7 @@ import Lib.Object.Data;
 import Lib.Object.Writ;
 import Mapper.Data.D;
 import Mapper.FPPCamera;
+import Mapper.Logic.HeightUpdater;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,7 +34,11 @@ public class LoadWindow extends javax.swing.JFrame {
         String version = readVersion(load);
         load = load.substring(load.indexOf("|")+1);
         ver = version;
+        HouseCalc.reset();
         switch(version) {
+            case "0.6":
+                load0_6(load);
+                break;
             case "0.5":
                 load0_5(load);
                 break;
@@ -49,6 +54,76 @@ public class LoadWindow extends javax.swing.JFrame {
         }
         UpCamera.reset();
         FPPCamera.reset();
+    }
+    
+    private static void load0_6(String load) {
+        InputStream is = new ByteArrayInputStream(load.getBytes());
+	BufferedReader br = new BufferedReader(new InputStreamReader(is));
+        
+        Mapper.updater.writUpdater.model.clear();
+        
+        int width = Integer.parseInt(readToChar(br, ','));
+        int height = Integer.parseInt(readToChar(br, ','));
+        
+        float[][] heightmap = new float[width+1][height+1];
+        Ground[][] ground = new Ground[width][height];
+        Data[][][] tiles = new Data[width][height][15];
+        Data[][][] bordersx = new Data[width][height][15];
+        Data[][][] bordersy = new Data[width][height][15];
+        
+        for (int x=0; x<=width; x++) {
+            for (int y=0; y<=height; y++) {
+                heightmap[x][y] = Integer.parseInt(readToChar(br, ','));
+            }
+        }
+        
+        for (int x=0; x<width; x++) {
+            for (int y=0; y<height; y++) {
+                String name = readToChar(br, ',');
+                ground[x][y] = getGround(name, x, y);
+            }
+        }
+        
+        for (int z=0; z<15; z++) {
+            for (int x=0; x<width; x++) {
+                for (int y=0; y<height; y++) {
+                    String name = readToChar(br, ',');
+                    tiles[x][y][z] = getData(name);
+                    name = readToChar(br, ',');
+                    bordersx[x][y][z] = getData(name);
+                    name = readToChar(br, ',');
+                    bordersy[x][y][z] = getData(name);
+                }
+            }
+        }
+        
+        int writs = Integer.parseInt(readToChar(br, ','));
+        String writRead;
+        
+        for (int i=0; i<writs; i++) {
+            Writ w = new Writ(readToChar(br, ';'));
+            while (!(writRead=readToChar(br, ';')).equals("end")) {
+                int gx=Integer.parseInt(writRead.substring(0, writRead.indexOf(".")));
+                int gy=Integer.parseInt(writRead.substring(writRead.indexOf(".")+1));
+                w.tiles.add(ground[gx][gy]);
+                ground[gx][gy].writ = w;
+            }
+            Mapper.updater.writUpdater.model.addElement(w);
+        }
+        
+        Mapper.heightmap = heightmap;
+        Mapper.ground = ground;
+        Mapper.tiles = tiles;
+        Mapper.bordersx = bordersx;
+        Mapper.bordersy = bordersy;
+        Mapper.width = width;
+        Mapper.height = height;
+        
+        int cap = Mapper.updater.writUpdater.model.getSize()+1;
+        HouseCalc.jTextField1.setText("Writ "+cap);
+        
+        Mapper.updater.roofUpdater.roofsRefit();
+        HeightUpdater.checkElevations();
     }
     
     private static void load0_5(String load) {

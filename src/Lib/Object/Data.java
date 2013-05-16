@@ -62,7 +62,7 @@ public class Data {
         return data;
     }
     
-    public void render(int sx, int sy, int sz) {
+    public void render(int sx, int sy, int sz, Rotation rotation) {
         if (Mapper.fpsView || ((sz-Mapper.z)<=0 && (sz-Mapper.z)>-3)) {
             GL11.glBindTexture(GL11.GL_TEXTURE_2D, texture.ID);
             if (type==Type.wall && !Mapper.fpsView) {
@@ -107,11 +107,37 @@ public class Data {
                 GL11.glColor3d(rPaint, gPaint, bPaint);
             }
             
+            float height=0;
+            if (type==Type.floor || type==Type.roof) {
+                height = (Mapper.heightmap[-sx-1][sy]+Mapper.heightmap[-sx-1][sy+1]+Mapper.heightmap[-sx][sy]+Mapper.heightmap[-sx][sy+1])/4f/35f*3f;
+            }
+            
             GL11.glBegin(GL11.GL_TRIANGLES);
                 for (int i=0; i<object.size; i++) {
                     GL11.glTexCoord2f(object.texU[object.coord[i]], 1-object.texV[object.coord[i]]);
                     if (type==Type.wall && !Mapper.fpsView) {
-                        GL11.glVertex3f(object.x[object.vert[i]]-sx*4, object.y[object.vert[i]]+object.y[object.vert[i]]*renderMultiplier-sy*4, object.z[object.vert[i]]-sz*3);
+                        if (rotation==Rotation.horizontal) {
+                            float ratio = -object.x[object.vert[i]]/4;
+                            float addHeight = (Mapper.heightmap[-sx-1][sy]*ratio+Mapper.heightmap[-sx][sy]*(1-ratio))/35*3;
+                            GL11.glVertex3f(object.x[object.vert[i]]-sx*4, object.y[object.vert[i]]+object.y[object.vert[i]]*renderMultiplier-sy*4, object.z[object.vert[i]]-sz*3-addHeight);
+                        }
+                        else if (rotation==Rotation.vertical) {
+                            float ratio = -object.x[object.vert[i]]/4;
+                            float addHeight = (Mapper.heightmap[sy][sx+1]*ratio+Mapper.heightmap[sy][sx]*(1-ratio))/35*3;
+                            GL11.glVertex3f(object.x[object.vert[i]]-sx*4, object.y[object.vert[i]]+object.y[object.vert[i]]*renderMultiplier-sy*4, object.z[object.vert[i]]-sz*3-addHeight);
+                        }
+                    }
+                    else if (type==Type.wall) {
+                        if (rotation==Rotation.horizontal) {
+                            float ratio = -object.x[object.vert[i]]/4;
+                            float addHeight = (Mapper.heightmap[-sx-1][sy]*ratio+Mapper.heightmap[-sx][sy]*(1-ratio))/35*3;
+                            GL11.glVertex3f(object.x[object.vert[i]]-sx*4, object.y[object.vert[i]]-sy*4, object.z[object.vert[i]]-sz*3-addHeight);
+                        }
+                        else if (rotation==Rotation.vertical) {
+                            float ratio = -object.x[object.vert[i]]/4;
+                            float addHeight = (Mapper.heightmap[sy][sx+1]*ratio+Mapper.heightmap[sy][sx]*(1-ratio))/35*3;
+                            GL11.glVertex3f(object.x[object.vert[i]]-sx*4, object.y[object.vert[i]]-sy*4, object.z[object.vert[i]]-sz*3-addHeight);
+                        }
                     }
                     else if (type==Type.roof) {
                         switch (facing) {
@@ -130,7 +156,7 @@ public class Data {
                         }
                     }
                     else {
-                        GL11.glVertex3f(object.x[object.vert[i]]-sx*4, object.y[object.vert[i]]-sy*4, object.z[object.vert[i]]-sz*3);
+                        GL11.glVertex3f(object.x[object.vert[i]]-sx*4, object.y[object.vert[i]]-sy*4, object.z[object.vert[i]]-sz*3-height);
                     }
                 }
             GL11.glEnd();

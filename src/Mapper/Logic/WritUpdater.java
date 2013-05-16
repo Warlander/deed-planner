@@ -102,7 +102,7 @@ public class WritUpdater {
     }
     
     private void checkAndAdd(int x, int y) {
-        if (checkAlien(x, y)) {
+        if (isFlat(x, y) && checkAlien(x, y)) {
             if (Mapper.wData.tiles.isEmpty()) {
                 add(x, y);
                 return;
@@ -116,6 +116,13 @@ public class WritUpdater {
                 delete(x, y);
             }
         }
+    }
+    
+    private boolean isFlat(int x, int y) {
+        if (Mapper.heightmap[x][y]!=Mapper.heightmap[x][y+1]) {return false;}
+        else if (Mapper.heightmap[x][y]!=Mapper.heightmap[x+1][y]) {return false;}
+        else if (Mapper.heightmap[x][y]!=Mapper.heightmap[x+1][y+1]) {return false;}
+        return true;
     }
     
     private void checkAndDelete(int x, int y) {

@@ -54,7 +54,7 @@ public class UpCamera {
             }
         }
         else {
-            if (mouse.scrollUp || mouse.scrollDown) {
+            if ((mouse.scrollUp ^ mouse.scrollDown) && !(keyboard.hold[Keyboard.KEY_LSHIFT] || keyboard.hold[Keyboard.KEY_LCONTROL])) {
                 JScrollPane pane = (JScrollPane)HouseCalc.contextPane.getSelectedComponent();
                 JList list = (JList)((JViewport)pane.getComponent(0)).getView();
                 if (mouse.scrollUp) {
@@ -72,7 +72,7 @@ public class UpCamera {
             floorLabel.setText("Floor "+(Mapper.z+1));
         }
         else if (keyboard.pressed[Keyboard.KEY_E]) {
-            if (Mapper.z<15) {
+            if (Mapper.z<15-1) {
                 Mapper.z++;
             }
             floorLabel.setText("Floor "+(Mapper.z+1));

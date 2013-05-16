@@ -7,6 +7,7 @@ import Lib.Object.Writ;
 import Lib.Utils.WebTools;
 import Mapper.Data.D;
 import Mapper.FPPCamera;
+import Mapper.Logic.HeightUpdater;
 import Mapper.Mapper;
 import Mapper.UpCamera;
 import java.awt.Component;
@@ -33,6 +34,10 @@ public class HouseCalc extends javax.swing.JFrame {
     public static DrawMode drawMode = DrawMode.pencil;
     public static WritMode writMode = WritMode.add;
     public static PaintMode paintMode = PaintMode.type;
+    public static boolean renderHeight = false;
+    public static int elevationAdd = 1;
+    public static int elevationSetLeft = 0;
+    public static int elevationSetRight = 0;
     
     public static boolean lockAxis = false;
     
@@ -40,7 +45,7 @@ public class HouseCalc extends javax.swing.JFrame {
     public static double g=1;
     public static double b=1;
     
-    private final boolean release = false;
+    private final boolean release = true;
     private final boolean debug = false;
     private int version;
     private String visualVersion;
@@ -130,6 +135,7 @@ public class HouseCalc extends javax.swing.JFrame {
             Logger.getLogger(HouseCalc.class.getName()).log(Level.SEVERE, null, ex);
         }
         setTitle("DeedPlanner "+visualVersion);
+        elevationList.setSelectedIndex(0);
     }
 
     private void getProperties() {
@@ -188,6 +194,8 @@ public class HouseCalc extends javax.swing.JFrame {
         contextPane = new javax.swing.JTabbedPane();
         groundsPane = new javax.swing.JScrollPane();
         groundsList = new javax.swing.JList();
+        elevationPane = new javax.swing.JScrollPane();
+        elevationList = new javax.swing.JList();
         writsPane = new javax.swing.JScrollPane();
         writsList = new javax.swing.JList();
         floorsPane = new javax.swing.JScrollPane();
@@ -218,6 +226,18 @@ public class HouseCalc extends javax.swing.JFrame {
         jToggleButton2 = new javax.swing.JToggleButton();
         jButton8 = new javax.swing.JButton();
         jTextField1 = new javax.swing.JTextField();
+        elevationCreatorPane = new javax.swing.JPanel();
+        jLabel6 = new javax.swing.JLabel();
+        addSpinner = new javax.swing.JSpinner();
+        setLeftSpinner = new javax.swing.JSpinner();
+        jLabel7 = new javax.swing.JLabel();
+        jLabel8 = new javax.swing.JLabel();
+        setRightSpinner = new javax.swing.JSpinner();
+        upHeight = new javax.swing.JLabel();
+        leftHeight = new javax.swing.JLabel();
+        centerHeight = new javax.swing.JLabel();
+        rightHeight = new javax.swing.JLabel();
+        downHeight = new javax.swing.JLabel();
         programFrame = new java.awt.Canvas();
         jPanel1 = new javax.swing.JPanel();
         jButton4 = new javax.swing.JButton();
@@ -230,6 +250,7 @@ public class HouseCalc extends javax.swing.JFrame {
         jToggleButton5 = new javax.swing.JToggleButton();
         wallsButton = new javax.swing.JButton();
         helpLabel = new javax.swing.JLabel();
+        jButton9 = new javax.swing.JButton();
         statusBar = new Form.StatusBar();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -270,7 +291,6 @@ public class HouseCalc extends javax.swing.JFrame {
             floorLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
             floorLabel.setText("Floor 1");
 
-            contextPane.setTabLayoutPolicy(javax.swing.JTabbedPane.SCROLL_TAB_LAYOUT);
             contextPane.setFont(new java.awt.Font("Arial", 0, 10)); // NOI18N
             contextPane.addChangeListener(new javax.swing.event.ChangeListener() {
                 public void stateChanged(javax.swing.event.ChangeEvent evt) {
@@ -289,6 +309,23 @@ public class HouseCalc extends javax.swing.JFrame {
             groundsPane.setViewportView(groundsList);
 
             contextPane.addTab("Ground", groundsPane);
+
+            elevationList.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+            elevationList.setModel(new javax.swing.AbstractListModel() {
+                String[] strings = { "Increase height", "Decrease height", "Set height", "Select height", "Reset height" };
+                public int getSize() { return strings.length; }
+                public Object getElementAt(int i) { return strings[i]; }
+            });
+            elevationList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+            elevationList.setFixedCellHeight(20);
+            elevationList.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+                public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                    elevationListValueChanged(evt);
+                }
+            });
+            elevationPane.setViewportView(elevationList);
+
+            contextPane.addTab("Elevation", elevationPane);
 
             writsList.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
             writsList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
@@ -599,6 +636,126 @@ public class HouseCalc extends javax.swing.JFrame {
             writCreatorPane.setBounds(0, 0, 250, 120);
             toolkitPane.add(writCreatorPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
+            elevationCreatorPane.setBorder(javax.swing.BorderFactory.createMatteBorder(1, 0, 1, 0, new java.awt.Color(0, 0, 0)));
+
+            jLabel6.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+            jLabel6.setText("Increase/decrease amount:");
+
+            addSpinner.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+            addSpinner.setModel(new javax.swing.SpinnerNumberModel(1, 1, 1000, 1));
+            addSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
+                public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                    addSpinnerStateChanged(evt);
+                }
+            });
+
+            setLeftSpinner.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+            setLeftSpinner.setModel(new javax.swing.SpinnerNumberModel(0, -999, 1000, 1));
+            setLeftSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
+                public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                    setLeftSpinnerStateChanged(evt);
+                }
+            });
+
+            jLabel7.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+            jLabel7.setText("Set (LMB):");
+
+            jLabel8.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+            jLabel8.setText("Set (RMB):");
+
+            setRightSpinner.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+            setRightSpinner.setModel(new javax.swing.SpinnerNumberModel(0, -999, 1000, 1));
+            setRightSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
+                public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                    setRightSpinnerStateChanged(evt);
+                }
+            });
+
+            upHeight.setFont(new java.awt.Font("Arial", 0, 10)); // NOI18N
+            upHeight.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+            upHeight.setText("100");
+
+            leftHeight.setFont(new java.awt.Font("Arial", 0, 10)); // NOI18N
+            leftHeight.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+            leftHeight.setText("100");
+
+            centerHeight.setFont(new java.awt.Font("Arial", 0, 10)); // NOI18N
+            centerHeight.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+            centerHeight.setText("100");
+
+            rightHeight.setFont(new java.awt.Font("Arial", 0, 10)); // NOI18N
+            rightHeight.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+            rightHeight.setText("100");
+
+            downHeight.setFont(new java.awt.Font("Arial", 0, 10)); // NOI18N
+            downHeight.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+            downHeight.setText("100");
+
+            javax.swing.GroupLayout elevationCreatorPaneLayout = new javax.swing.GroupLayout(elevationCreatorPane);
+            elevationCreatorPane.setLayout(elevationCreatorPaneLayout);
+            elevationCreatorPaneLayout.setHorizontalGroup(
+                elevationCreatorPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(elevationCreatorPaneLayout.createSequentialGroup()
+                    .addContainerGap()
+                    .addGroup(elevationCreatorPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(elevationCreatorPaneLayout.createSequentialGroup()
+                            .addComponent(jLabel6)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(addSpinner))
+                        .addGroup(elevationCreatorPaneLayout.createSequentialGroup()
+                            .addGroup(elevationCreatorPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(elevationCreatorPaneLayout.createSequentialGroup()
+                                    .addGap(142, 142, 142)
+                                    .addComponent(leftHeight, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGroup(elevationCreatorPaneLayout.createSequentialGroup()
+                                    .addGroup(elevationCreatorPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(jLabel7)
+                                        .addComponent(jLabel8))
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addGroup(elevationCreatorPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addComponent(setLeftSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(setRightSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 1, Short.MAX_VALUE))))
+                            .addGap(15, 15, 15)
+                            .addGroup(elevationCreatorPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(downHeight, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(upHeight, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGroup(elevationCreatorPaneLayout.createSequentialGroup()
+                                    .addComponent(centerHeight, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGap(15, 15, 15)
+                                    .addComponent(rightHeight, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addGap(0, 0, Short.MAX_VALUE)))
+                    .addContainerGap())
+            );
+            elevationCreatorPaneLayout.setVerticalGroup(
+                elevationCreatorPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(elevationCreatorPaneLayout.createSequentialGroup()
+                    .addContainerGap()
+                    .addGroup(elevationCreatorPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel6)
+                        .addComponent(addSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                    .addGroup(elevationCreatorPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(setLeftSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(upHeight, javax.swing.GroupLayout.Alignment.TRAILING))
+                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                    .addGroup(elevationCreatorPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(elevationCreatorPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(setRightSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(elevationCreatorPaneLayout.createSequentialGroup()
+                            .addGroup(elevationCreatorPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(centerHeight)
+                                .addComponent(leftHeight)
+                                .addComponent(rightHeight))
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(downHeight)))
+                    .addContainerGap(19, Short.MAX_VALUE))
+            );
+
+            elevationCreatorPane.setBounds(0, 0, 250, 120);
+            toolkitPane.add(elevationCreatorPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
+
             javax.swing.GroupLayout interfacePaneLayout = new javax.swing.GroupLayout(interfacePane);
             interfacePane.setLayout(interfacePaneLayout);
             interfacePaneLayout.setHorizontalGroup(
@@ -624,7 +781,7 @@ public class HouseCalc extends javax.swing.JFrame {
                         .addComponent(floorDown, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(floorLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGap(140, 140, 140)
-                    .addComponent(contextPane, javax.swing.GroupLayout.DEFAULT_SIZE, 335, Short.MAX_VALUE)
+                    .addComponent(contextPane, javax.swing.GroupLayout.DEFAULT_SIZE, 339, Short.MAX_VALUE)
                     .addGap(0, 0, 0))
                 .addGroup(interfacePaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(interfacePaneLayout.createSequentialGroup()
@@ -680,7 +837,7 @@ public class HouseCalc extends javax.swing.JFrame {
 
             jButton6.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
             jButton6.setForeground(new java.awt.Color(255, 0, 0));
-            jButton6.setText("Clear project");
+            jButton6.setText("Clear");
             jButton6.setEnabled(false);
             jButton6.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -735,7 +892,7 @@ public class HouseCalc extends javax.swing.JFrame {
             });
 
             wallsButton.setFont(new java.awt.Font("Arial", 0, 10)); // NOI18N
-            wallsButton.setText("Walls: show type");
+            wallsButton.setText("Walls: type");
             wallsButton.setToolTipText("");
             wallsButton.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -745,28 +902,38 @@ public class HouseCalc extends javax.swing.JFrame {
 
             helpLabel.setFont(new java.awt.Font("Arial", 0, 10)); // NOI18N
 
+            jButton9.setFont(new java.awt.Font("Arial", 0, 10)); // NOI18N
+            jButton9.setText("Elevation: off");
+            jButton9.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    jButton9ActionPerformed(evt);
+                }
+            });
+
             javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
             jPanel1.setLayout(jPanel1Layout);
             jPanel1Layout.setHorizontalGroup(
                 jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jPanel1Layout.createSequentialGroup()
-                    .addContainerGap()
+                    .addGap(0, 0, 0)
                     .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                    .addGap(2, 2, 2)
                     .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                    .addGap(2, 2, 2)
                     .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                    .addGap(2, 2, 2)
                     .addComponent(jToggleButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                    .addGap(2, 2, 2)
                     .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                    .addGap(2, 2, 2)
                     .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGap(2, 2, 2)
+                    .addComponent(wallsButton, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGap(2, 2, 2)
+                    .addComponent(jButton9, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(wallsButton, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(helpLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                    .addComponent(helpLabel)
+                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jCheckBox1)
                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                     .addComponent(jButton6)
@@ -775,10 +942,11 @@ public class HouseCalc extends javax.swing.JFrame {
             jPanel1Layout.setVerticalGroup(
                 jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jPanel1Layout.createSequentialGroup()
-                    .addGap(9, 9, 9)
+                    .addGap(8, 8, 8)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(wallsButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(helpLabel)))
+                        .addComponent(helpLabel)
+                        .addComponent(jButton9)))
                 .addGroup(jPanel1Layout.createSequentialGroup()
                     .addContainerGap()
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
@@ -809,7 +977,7 @@ public class HouseCalc extends javax.swing.JFrame {
                     .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGap(0, 0, 0)
                     .addComponent(programFrame, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addComponent(interfacePane, javax.swing.GroupLayout.DEFAULT_SIZE, 526, Short.MAX_VALUE)
+                .addComponent(interfacePane, javax.swing.GroupLayout.DEFAULT_SIZE, 530, Short.MAX_VALUE)
             );
 
             javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -861,6 +1029,7 @@ public class HouseCalc extends javax.swing.JFrame {
             flatsPane.setVisible(true);
             colorablePane.setVisible(false);
             writCreatorPane.setVisible(false);
+            elevationCreatorPane.setVisible(false);
             if (groundsList.getSelectedValue() instanceof Ground) {
                 Mapper.deleting=false;
                 Mapper.gData = (Ground)groundsList.getSelectedValue();
@@ -869,11 +1038,23 @@ public class HouseCalc extends javax.swing.JFrame {
                 Mapper.deleting=true;
             }
         }
+        else if (pane==elevationPane) {
+            Mapper.currType=Lib.Object.Type.elevation;
+            flatsPane.setVisible(false);
+            colorablePane.setVisible(false);
+            writCreatorPane.setVisible(false);
+            elevationCreatorPane.setVisible(true);
+            if (elevationList.getSelectedValue() instanceof String) {
+                Mapper.deleting=false;
+                Mapper.eAction = (String)elevationList.getSelectedValue();
+            }
+        }
         else if (pane==writsPane) {
             Mapper.currType=Lib.Object.Type.writ;
             flatsPane.setVisible(false);
             colorablePane.setVisible(false);
             writCreatorPane.setVisible(true);
+            elevationCreatorPane.setVisible(false);
             if (writsList.getSelectedValue() instanceof Writ) {
                 Mapper.deleting=false;
                 Mapper.wData = (Writ)writsList.getSelectedValue();
@@ -887,6 +1068,7 @@ public class HouseCalc extends javax.swing.JFrame {
             flatsPane.setVisible(true);
             colorablePane.setVisible(false);
             writCreatorPane.setVisible(false);
+            elevationCreatorPane.setVisible(false);
             if (floorsList.getSelectedValue() instanceof Data) {
                 Mapper.deleting=false;
                 Mapper.data = (Data)floorsList.getSelectedValue();
@@ -900,6 +1082,7 @@ public class HouseCalc extends javax.swing.JFrame {
             flatsPane.setVisible(false);
             colorablePane.setVisible(true);
             writCreatorPane.setVisible(false);
+            elevationCreatorPane.setVisible(false);
             if (wallsList.getSelectedValue() instanceof Data) {
                 Mapper.deleting=false;
                 Mapper.data = (Data)wallsList.getSelectedValue();
@@ -913,6 +1096,7 @@ public class HouseCalc extends javax.swing.JFrame {
             flatsPane.setVisible(true);
             colorablePane.setVisible(false);
             writCreatorPane.setVisible(false);
+            elevationCreatorPane.setVisible(false);
             if (roofsList.getSelectedValue() instanceof Data) {
                 Mapper.deleting=false;
                 Mapper.data = (Data)roofsList.getSelectedValue();
@@ -976,6 +1160,12 @@ public class HouseCalc extends javax.swing.JFrame {
     }//GEN-LAST:event_jCheckBox1ActionPerformed
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+        reset();
+        jCheckBox1.setSelected(false);
+        jButton6.setEnabled(false);
+    }//GEN-LAST:event_jButton6ActionPerformed
+
+    public static void reset() {
         for (int i=0; i<Mapper.width; i++) {
             for (int i2=0; i2<Mapper.height; i2++) {
                 Mapper.ground[i][i2] = D.grounds.get(0).copy(i, i2);
@@ -986,13 +1176,17 @@ public class HouseCalc extends javax.swing.JFrame {
                 }
             }
         }
+        for (int i=0; i<=Mapper.width; i++) {
+            for (int i2=0; i2<=Mapper.height; i2++) {
+                Mapper.heightmap[i][i2]=0;
+            }
+        }
         Mapper.updater.writUpdater.model.clear();
         Mapper.wData=null;
         HouseCalc.jTextField1.setText("Writ 1");
-        jCheckBox1.setSelected(false);
-        jButton6.setEnabled(false);
-    }//GEN-LAST:event_jButton6ActionPerformed
-
+        HeightUpdater.checkElevations();
+    }
+    
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
         SaveWindow.main(null);
     }//GEN-LAST:event_jButton5ActionPerformed
@@ -1014,7 +1208,7 @@ public class HouseCalc extends javax.swing.JFrame {
     }//GEN-LAST:event_floorDownActionPerformed
 
     private void floorUpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_floorUpActionPerformed
-        if (Mapper.z<15) {
+        if (Mapper.z<15-1) {
             Mapper.z++;
         }
         floorLabel.setText("Floor "+(Mapper.z+1));
@@ -1087,7 +1281,7 @@ public class HouseCalc extends javax.swing.JFrame {
     private void wallsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_wallsButtonActionPerformed
         switch (paintMode) {
             case type:
-                wallsButton.setText("Walls: show paint");
+                wallsButton.setText("Walls: paint");
                 paintMode = PaintMode.paint;
                 break;
             case paint:
@@ -1095,7 +1289,7 @@ public class HouseCalc extends javax.swing.JFrame {
                 paintMode = PaintMode.cycle;
                 break;
             case cycle:
-                wallsButton.setText("Walls: show type");
+                wallsButton.setText("Walls: type");
                 paintMode = PaintMode.type;
                 break;
         }
@@ -1179,6 +1373,39 @@ public class HouseCalc extends javax.swing.JFrame {
         lockAxis = jCheckBox2.isSelected();
     }//GEN-LAST:event_jCheckBox2ActionPerformed
 
+    private void elevationListValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_elevationListValueChanged
+        Mapper.currType=Lib.Object.Type.elevation;
+        if (elevationList.getSelectedValue() instanceof String) {
+            Mapper.deleting=false;
+            Mapper.eAction = (String)elevationList.getSelectedValue();
+        }
+        programFrame.requestFocus();
+    }//GEN-LAST:event_elevationListValueChanged
+
+    private void jButton9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton9ActionPerformed
+        if (renderHeight) {
+            jButton9.setText("Elevation: off");
+            renderHeight = false;
+        }
+        else {
+            jButton9.setText("Elevation: on");
+            renderHeight = true;
+        }
+        programFrame.requestFocus();
+    }//GEN-LAST:event_jButton9ActionPerformed
+
+    private void addSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_addSpinnerStateChanged
+        elevationAdd = (int)addSpinner.getModel().getValue();
+    }//GEN-LAST:event_addSpinnerStateChanged
+
+    private void setLeftSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_setLeftSpinnerStateChanged
+        elevationSetLeft = (int)setLeftSpinner.getModel().getValue();
+    }//GEN-LAST:event_setLeftSpinnerStateChanged
+
+    private void setRightSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_setRightSpinnerStateChanged
+        elevationSetRight = (int)setRightSpinner.getModel().getValue();
+    }//GEN-LAST:event_setRightSpinnerStateChanged
+
     public static void error() {
         if (!error) {
             error=true;
@@ -1220,9 +1447,15 @@ public class HouseCalc extends javax.swing.JFrame {
         });
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    public static javax.swing.JSpinner addSpinner;
     private javax.swing.JSpinner bSpinner;
+    public static javax.swing.JLabel centerHeight;
     private javax.swing.JPanel colorablePane;
     public static javax.swing.JTabbedPane contextPane;
+    public static javax.swing.JLabel downHeight;
+    private javax.swing.JPanel elevationCreatorPane;
+    public static javax.swing.JList elevationList;
+    public static javax.swing.JScrollPane elevationPane;
     public static javax.swing.JToggleButton fillToggle;
     private javax.swing.JPanel flatsPane;
     private javax.swing.JButton floorDown;
@@ -1243,6 +1476,7 @@ public class HouseCalc extends javax.swing.JFrame {
     private javax.swing.JButton jButton6;
     private javax.swing.JButton jButton7;
     private javax.swing.JButton jButton8;
+    private javax.swing.JButton jButton9;
     private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JCheckBox jCheckBox2;
     private javax.swing.JLabel jLabel1;
@@ -1250,21 +1484,29 @@ public class HouseCalc extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JSpinner jSpinner1;
     public static javax.swing.JTextField jTextField1;
     private javax.swing.JToggleButton jToggleButton1;
     private javax.swing.JToggleButton jToggleButton2;
     private javax.swing.JToggleButton jToggleButton5;
+    public static javax.swing.JLabel leftHeight;
     public static javax.swing.JPanel mainPane;
     public static javax.swing.JToggleButton pencilToggle;
     public static java.awt.Canvas programFrame;
     private javax.swing.JSpinner rSpinner;
+    public static javax.swing.JLabel rightHeight;
     public static javax.swing.JList roofsList;
     public static javax.swing.JScrollPane roofsPane;
     public static javax.swing.JToggleButton selectToggle;
+    public static javax.swing.JSpinner setLeftSpinner;
+    public static javax.swing.JSpinner setRightSpinner;
     public static Form.StatusBar statusBar;
     private javax.swing.JLayeredPane toolkitPane;
+    public static javax.swing.JLabel upHeight;
     private javax.swing.JButton wallsButton;
     public static javax.swing.JList wallsList;
     public static javax.swing.JScrollPane wallsPane;

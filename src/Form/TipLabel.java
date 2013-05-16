@@ -26,7 +26,6 @@ public class TipLabel extends JLabel {
         tipsList.add("You can calculate writ materials while writ is selected.");
         tipsList.add("You can post suggestions and bugs in program official thread.");
         tipsList.add("This program is made in Java and LWJGL!");
-        tipsList.add("You can tip the program author using PayPal.");
         setTip();
     }
     

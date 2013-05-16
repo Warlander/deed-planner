@@ -2,12 +2,15 @@ package Form;
 
 import Lib.Graphics.Ground;
 import Lib.Object.Data;
+import Mapper.Mapper;
 import org.lwjgl.input.Mouse;
+import org.lwjgl.util.Point;
 
 public class StatusBar extends javax.swing.JPanel {
 
-    public Ground ground;
-    public Data data;
+    private Ground ground;
+    private Data data;
+    private Point point;
     
     public StatusBar() {
         initComponents();
@@ -16,6 +19,7 @@ public class StatusBar extends javax.swing.JPanel {
         yLabel.setVisible(false);
         writName.setVisible(false);
         objectName.setVisible(false);
+        elevationShow.setVisible(false);
     }
     
     public void setGround(Ground ground) {
@@ -26,9 +30,13 @@ public class StatusBar extends javax.swing.JPanel {
         this.data = data;
     }
     
+    public void setPoint(Point point) {
+        this.point = point;
+    }
+    
     public void display() {
         if (!Mouse.isGrabbed()) {
-            if (ground!=null && !Mapper.Mapper.fpsView) {
+            if (ground!=null && !Mapper.fpsView) {
                 xLabel.setText("X "+ground.x);
                 yLabel.setText("Y "+ground.y);
                 xLabel.setVisible(true);
@@ -46,17 +54,67 @@ public class StatusBar extends javax.swing.JPanel {
                 yLabel.setVisible(false);
                 writName.setVisible(false);
             }
-            if (data!=null && !Mapper.Mapper.fpsView) {
+            if (data!=null && !Mapper.fpsView) {
                 objectName.setText(data.name);
                 objectName.setVisible(true);
             }
             else {
                 objectName.setVisible(false);
             }
+            if (point!=null && !Mapper.fpsView) {
+                elevationShow.setText("Elevation: "+(int)Mapper.heightmap[point.getX()][point.getY()]);
+                elevationShow.setVisible(true);
+                HouseCalc.centerHeight.setText(Integer.toString((int)Mapper.heightmap[point.getX()][point.getY()]));
+                HouseCalc.centerHeight.setVisible(true);
+                if (checkCorrectness(point.getX(), point.getY()+1)) {
+                    HouseCalc.upHeight.setText(Integer.toString((int)Mapper.heightmap[point.getX()][point.getY()+1]-(int)Mapper.heightmap[point.getX()][point.getY()]));
+                    HouseCalc.upHeight.setVisible(true);
+                }
+                else {
+                    HouseCalc.upHeight.setVisible(false);
+                }
+                if (checkCorrectness(point.getX(), point.getY()-1)) {
+                    HouseCalc.downHeight.setText(Integer.toString((int)Mapper.heightmap[point.getX()][point.getY()-1]-(int)Mapper.heightmap[point.getX()][point.getY()]));
+                    HouseCalc.downHeight.setVisible(true);
+                }
+                else {
+                    HouseCalc.downHeight.setVisible(false);
+                }
+                if (checkCorrectness(point.getX()-1, point.getY())) {
+                    HouseCalc.leftHeight.setText(Integer.toString((int)Mapper.heightmap[point.getX()-1][point.getY()]-(int)Mapper.heightmap[point.getX()][point.getY()]));
+                    HouseCalc.leftHeight.setVisible(true);
+                }
+                else {
+                    HouseCalc.leftHeight.setVisible(false);
+                }
+                if (checkCorrectness(point.getX()+1, point.getY())) {
+                    HouseCalc.rightHeight.setText(Integer.toString((int)Mapper.heightmap[point.getX()+1][point.getY()]-(int)Mapper.heightmap[point.getX()][point.getY()]));
+                    HouseCalc.rightHeight.setVisible(true);
+                }
+                else {
+                    HouseCalc.rightHeight.setVisible(false);
+                }
+            }
+            else {
+                elevationShow.setVisible(false);
+                HouseCalc.centerHeight.setVisible(false);
+                HouseCalc.upHeight.setVisible(false);
+                HouseCalc.downHeight.setVisible(false);
+                HouseCalc.leftHeight.setVisible(false);
+                HouseCalc.rightHeight.setVisible(false);
+            }
         }
         
         data = null;
         ground = null;
+        point = null;
+    }
+    
+    private boolean checkCorrectness(int x, int y) {
+        if (x<0 || y<0 || x>Mapper.width || y>Mapper.height) {
+            return false;
+        }
+        return true;
     }
 
     @SuppressWarnings("unchecked")
@@ -69,6 +127,7 @@ public class StatusBar extends javax.swing.JPanel {
         yLabel = new javax.swing.JLabel();
         writName = new javax.swing.JLabel();
         objectName = new javax.swing.JLabel();
+        elevationShow = new javax.swing.JLabel();
 
         setBorder(javax.swing.BorderFactory.createMatteBorder(2, 0, 0, 0, new java.awt.Color(0, 0, 0)));
         setMaximumSize(new java.awt.Dimension(32767, 38));
@@ -105,8 +164,14 @@ public class StatusBar extends javax.swing.JPanel {
         objectName.setText("X 1000");
         add(objectName);
         objectName.setBounds(401, 2, 150, 15);
+
+        elevationShow.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        elevationShow.setText("X 1000");
+        add(elevationShow);
+        elevationShow.setBounds(561, 2, 110, 15);
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel elevationShow;
     public static javax.swing.JLabel errorLabel;
     private javax.swing.JLabel objectName;
     public static Form.TipLabel tipLabel1;

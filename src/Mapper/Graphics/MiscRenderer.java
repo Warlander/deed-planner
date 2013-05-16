@@ -1,5 +1,7 @@
 package Mapper.Graphics;
 
+import Form.HouseCalc;
+import Lib.Object.Type;
 import Mapper.Camera;
 import Mapper.Mapper;
 import Mapper.Data.D;
@@ -39,19 +41,18 @@ public class MiscRenderer {
                     GL11.glColor3f(1-0.75f, 1-0.75f, 1-0.75f);
                     break;
             }
-            for (int i=Camera.visibleDownY; i<Camera.visibleUpY; i++) {
-                for (int i2=Camera.visibleDownX; i2<Camera.visibleUpX; i2++) {
-                    renderGroundTile(i, i2);
-                }
-            }
         }
         else if (fpsView) {
             GL11.glColor3f(1, 1, 1);
-                for (int i=Camera.visibleDownY; i<Camera.visibleUpY; i++) {
-                    for (int i2=Camera.visibleDownX; i2<Camera.visibleUpX; i2++) {
-                        renderGroundTile(i, i2);
-                    }
-                }
+        }
+        else {
+            return;
+        }
+        
+        for (int i=Camera.visibleDownY; i<Camera.visibleUpY; i++) {
+            for (int i2=Camera.visibleDownX; i2<Camera.visibleUpX; i2++) {
+                renderGroundTile(i, i2);
+            }
         }
     }
     
@@ -61,64 +62,119 @@ public class MiscRenderer {
         }
         
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, Mapper.ground[x][y].tex.ID);
-        GL11.glBegin(GL11.GL_TRIANGLES);
+        GL11.glBegin(GL11.GL_TRIANGLES);  
             GL11.glTexCoord2f(0, 0);
-            GL11.glVertex2f(x*4,-y*4-4);
+            GL11.glVertex3f(x*4,-y*4-4, -Mapper.heightmap[x][y+1]/(35f/3f));
             GL11.glTexCoord2f(1, 0);
-            GL11.glVertex2f(x*4+4,-y*4-4);
+            GL11.glVertex3f(x*4+4,-y*4-4, -Mapper.heightmap[x+1][y+1]/(35f/3f));
             GL11.glTexCoord2f(1, 1);
-            GL11.glVertex2f(x*4+4,-y*4);
+            GL11.glVertex3f(x*4+4,-y*4, -Mapper.heightmap[x+1][y]/(35f/3f));
 
             GL11.glTexCoord2f(0, 0);
-            GL11.glVertex2f(x*4,-y*4-4);
+            GL11.glVertex3f(x*4,-y*4-4, -Mapper.heightmap[x][y+1]/(35f/3f));
             GL11.glTexCoord2f(0, 1);
-            GL11.glVertex2f(x*4,-y*4);
+            GL11.glVertex3f(x*4,-y*4, -Mapper.heightmap[x][y]/(35f/3f));
             GL11.glTexCoord2f(1, 1);
-            GL11.glVertex2f(x*4+4,-y*4);
+            GL11.glVertex3f(x*4+4,-y*4, -Mapper.heightmap[x+1][y]/(35f/3f));
         GL11.glEnd();
     }
     
     private void renderGrid() {
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
-            for (int i=Camera.visibleDownY; i<Camera.visibleUpY; i++) {
-                for (int i2=Camera.visibleDownX; i2<Camera.visibleUpX; i2++) {
-                    if (i<0 || i2<0 || i>Mapper.width-1 || i2>Mapper.height-1) {}
+        if (Mapper.currType==Type.elevation) {
+            GL11.glPointSize(7);
+        }
+        else {
+            GL11.glLineWidth(1);
+        }
+        
+        for (int i=Camera.visibleDownY; i<Camera.visibleUpY; i++) {
+            for (int i2=Camera.visibleDownX; i2<Camera.visibleUpX; i2++) {
+                renderLines(i, i2);
+                renderPoint(i, i2);
+            }
+        }
+        
+        GL11.glColor3f(1, 1, 1);
+    }
+    
+    private void renderLines(int i, int i2) {
+        if (i<0 || i2<0 || i>Mapper.width-1 || i2>Mapper.height-1) {}
+        else {
+            if (!HouseCalc.renderHeight && !(Mapper.currType==Type.elevation)) {
+                if (i2>0 && (Mapper.ground[i][i2-1].writ==null ^ Mapper.ground[i][i2].writ==null)) {
+                    if ((Mapper.ground[i][i2-1].writ!=null && Mapper.ground[i][i2-1].writ==Mapper.wData) || (Mapper.ground[i][i2].writ!=null && Mapper.ground[i][i2].writ==Mapper.wData)) {
+                        GL11.glColor3f(1, 1, 1);
+                    }
                     else {
-                        if (i2>0 && (Mapper.ground[i][i2-1].writ==null ^ Mapper.ground[i][i2].writ==null)) {
-                            if ((Mapper.ground[i][i2-1].writ!=null && Mapper.ground[i][i2-1].writ==Mapper.wData) || (Mapper.ground[i][i2].writ!=null && Mapper.ground[i][i2].writ==Mapper.wData)) {
-                                GL11.glColor3f(1, 1, 1);
-                            }
-                            else {
-                                GL11.glColor3f(0.8f, 0.8f, 0.8f);
-                            }
-                        }
-                        else {
-                            GL11.glColor3f(0.4f, 0.4f, 0.4f);
-                        }
-                        GL11.glBegin(GL11.GL_LINES);
-                            GL11.glVertex3f(i*4,-i2*4, -99);
-                            GL11.glVertex3f(i*4+4,-i2*4, -99);
-                        GL11.glEnd();
-                        
-                        if (i>0 && (Mapper.ground[i-1][i2].writ==null ^ Mapper.ground[i][i2].writ==null)) {
-                            if ((Mapper.ground[i-1][i2].writ!=null && Mapper.ground[i-1][i2].writ==Mapper.wData) || (Mapper.ground[i][i2].writ!=null && Mapper.ground[i][i2].writ==Mapper.wData)) {
-                                GL11.glColor3f(1, 1, 1);
-                            }
-                            else {
-                                GL11.glColor3f(0.8f, 0.8f, 0.8f);
-                            }
-                        }
-                        else {
-                            GL11.glColor3f(0.4f, 0.4f, 0.4f);
-                        }
-                        GL11.glBegin(GL11.GL_LINES);
-                            GL11.glVertex3f(i*4,-i2*4, -99);
-                            GL11.glVertex3f(i*4,-i2*4-4, -99);
-                        GL11.glEnd();
+                        GL11.glColor3f(0.8f, 0.8f, 0.8f);
                     }
                 }
+                else {
+                    GL11.glColor3f(0.4f, 0.4f, 0.4f);
+                }
             }
-        GL11.glColor4f(1, 1, 1, 1);
+            
+            if (!HouseCalc.renderHeight && !(Mapper.currType==Type.elevation)) {
+                GL11.glBegin(GL11.GL_LINES);
+                    GL11.glVertex3f(i*4,-i2*4, -99);
+                    GL11.glVertex3f(i*4+4,-i2*4, -99);
+                GL11.glEnd();
+            }
+            else {
+                GL11.glBegin(GL11.GL_LINES);
+                    float color = (Mapper.heightmap[i][i2]-Mapper.minElevation)/Mapper.diffElevation;
+                    GL11.glColor3f(color, 1-color, 0);
+                    GL11.glVertex3f(i*4,-i2*4, -99);
+                    color = (Mapper.heightmap[i+1][i2]-Mapper.minElevation)/Mapper.diffElevation;
+                    GL11.glColor3f(color, 1-color, 0);
+                    GL11.glVertex3f(i*4+4,-i2*4, -99);
+                GL11.glEnd();
+            }
+
+            if (!HouseCalc.renderHeight && !(Mapper.currType==Type.elevation)) {
+                if (i>0 && (Mapper.ground[i-1][i2].writ==null ^ Mapper.ground[i][i2].writ==null)) {
+                    if ((Mapper.ground[i-1][i2].writ!=null && Mapper.ground[i-1][i2].writ==Mapper.wData) || (Mapper.ground[i][i2].writ!=null && Mapper.ground[i][i2].writ==Mapper.wData)) {
+                        GL11.glColor3f(1, 1, 1);
+                    }
+                    else {
+                        GL11.glColor3f(0.8f, 0.8f, 0.8f);
+                    }
+                }
+                else {
+                    GL11.glColor3f(0.4f, 0.4f, 0.4f);
+                }
+            }
+            
+            if (!HouseCalc.renderHeight && !(Mapper.currType==Type.elevation)) {
+                GL11.glBegin(GL11.GL_LINES);
+                    GL11.glVertex3f(i*4,-i2*4, -99);
+                    GL11.glVertex3f(i*4,-i2*4-4, -99);
+                GL11.glEnd();
+            }
+            else {
+                GL11.glLineWidth(3);
+                GL11.glBegin(GL11.GL_LINES);
+                    float color = (Mapper.heightmap[i][i2]-Mapper.minElevation)/Mapper.diffElevation;
+                    GL11.glColor3f(color, 1-color, 0);
+                    GL11.glVertex3f(i*4,-i2*4, -99);
+                    color = (Mapper.heightmap[i][i2+1]-Mapper.minElevation)/Mapper.diffElevation;
+                    GL11.glColor3f(color, 1-color, 0);
+                    GL11.glVertex3f(i*4,-i2*4-4, -99);
+                    GL11.glColor3f(1, 1, 1);
+                GL11.glEnd();
+            }
+        }
+    }
+    
+    private void renderPoint(int i, int i2) {
+        if (i<0 || i2<0 || i>Mapper.width || i2>Mapper.height) {}
+        else if (Mapper.currType==Type.elevation) {
+            GL11.glColor3f(1, 1, 1);
+            GL11.glBegin(GL11.GL_POINTS);
+                GL11.glVertex3f(i*4,-i2*4, -99.5f);
+            GL11.glEnd();
+        }
     }
     
     //<editor-fold defaultstate="collapsed" desc="Skybox rendering code">
@@ -219,7 +275,26 @@ public class MiscRenderer {
     //</editor-fold>
     
     private void renderWater() {
-        GL11.glColor4f(1, 1, 1, 0.5f);
+        if (!fpsView && Mapper.z<3) {
+            switch (Mapper.z) {
+                case 0: 
+                    GL11.glColor4f(1, 1, 1, 0.5f);
+                    break;
+                case 1:
+                    GL11.glColor4f(1-0.4f, 1-0.4f, 1-0.4f, 0.5f);
+                    break;
+                case 2:
+                    GL11.glColor4f(1-0.75f, 1-0.75f, 1-0.75f, 0.5f);
+                    break;
+            }
+        }
+        else if (fpsView) {
+            GL11.glColor4f(1, 1, 1, 0.5f);
+        }
+        else {
+            return;
+        }
+        
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, D.water.ID);
         for (int i=Camera.visibleDownY; i<Camera.visibleUpY; i++) {
             for (int i2=Camera.visibleDownX; i2<Camera.visibleUpX; i2++) {
@@ -235,18 +310,18 @@ public class MiscRenderer {
         
         GL11.glBegin(GL11.GL_TRIANGLES);
             GL11.glTexCoord2f(0, 0);
-            GL11.glVertex3f(x*4,-y*4-4, 0.01f);
+            GL11.glVertex3f(x*4,-y*4-4, 0.05f);
             GL11.glTexCoord2f(1, 0);
-            GL11.glVertex3f(x*4+4,-y*4-4, 0.01f);
+            GL11.glVertex3f(x*4+4,-y*4-4, 0.05f);
             GL11.glTexCoord2f(1, 1);
-            GL11.glVertex3f(x*4+4,-y*4, 0.01f);
+            GL11.glVertex3f(x*4+4,-y*4, 0.05f);
 
             GL11.glTexCoord2f(0, 0);
-            GL11.glVertex3f(x*4,-y*4-4, 0.01f);
+            GL11.glVertex3f(x*4,-y*4-4, 0.05f);
             GL11.glTexCoord2f(0, 1);
-            GL11.glVertex3f(x*4,-y*4, 0.01f);
+            GL11.glVertex3f(x*4,-y*4, 0.05f);
             GL11.glTexCoord2f(1, 1);
-            GL11.glVertex3f(x*4+4,-y*4, 0.01f);
+            GL11.glVertex3f(x*4+4,-y*4, 0.05f);
         GL11.glEnd();
     }
     

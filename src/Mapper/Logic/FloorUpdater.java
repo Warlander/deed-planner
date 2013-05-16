@@ -80,7 +80,7 @@ public class FloorUpdater {
         if (Mapper.tiles[tileX][tileY][Mapper.z]==null && !Mapper.deleting && mouse.hold.right) return;
         
         if (mouse.hold.left && !Mapper.deleting) {
-            Mapper.tiles[tileX][tileY][Mapper.z] = Mapper.data;
+            Mapper.tiles[tileX][tileY][Mapper.z] = Mapper.data.copy();
         }
         else {
             Mapper.tiles[tileX][tileY][Mapper.z] = null;

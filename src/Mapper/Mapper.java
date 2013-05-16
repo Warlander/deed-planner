@@ -8,6 +8,7 @@ import Lib.Graphics.GLInit;
 import Lib.Graphics.Ground;
 import Lib.Object.Data;
 import Lib.Object.DataLoader;
+import Lib.Object.Rotation;
 import Lib.Object.Type;
 import Lib.Object.Writ;
 import Mapper.Data.D;
@@ -16,8 +17,10 @@ import Mapper.Logic.MapUpdater;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.FloatBuffer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
@@ -32,6 +35,7 @@ public class Mapper {
     
     public static Ground gData=null;
     public static Writ wData=null;
+    public static String eAction=null;
     public static Data data=null;
     public static boolean deleting=false;
     public static Type currType=null;
@@ -50,6 +54,10 @@ public class Mapper {
     public static int height = 25;
     
     public static Ground[][] ground=new Ground[25][25];
+    public static float[][] heightmap = new float[25+1][25+1];
+    public static float minElevation = 0;
+    public static float maxElevation = 0;
+    public static float diffElevation = 0;
     public static Data[][][] tiles=new Data[25][25][15];
     public static Data[][][] bordersx=new Data[25][25][15];
     public static Data[][][] bordersy=new Data[25][25][15];
@@ -173,7 +181,7 @@ public class Mapper {
         }
         else {
             upcamera.update(keyboard, mouse);
-            updater.update(mouse);
+            updater.update(keyboard, mouse);
         }
     }
     
@@ -196,7 +204,7 @@ public class Mapper {
                     for (int i3=0; i3<15; i3++) {
                         if (i>=0 && i<width && i2>=0 && i2<height) {
                             if (bordersy[i][i2][i3]!=null) {
-                                bordersy[i][i2][i3].render(i2, i, i3);
+                                bordersy[i][i2][i3].render(i2, i, i3, Rotation.vertical);
                             }
                         }
                     }
@@ -212,10 +220,10 @@ public class Mapper {
                     for (int i3=0; i3<15; i3++) {
                         if (i>=0 && i<width && i2>=0 && i2<height) {
                             if (tiles[i][i2][i3]!=null && tiles[i][i2][i3].object!=null) {
-                                tiles[i][i2][i3].render(-i, i2, i3);
+                                tiles[i][i2][i3].render(-i, i2, i3, null);
                             }
                             if (bordersx[i][i2][i3]!=null) {
-                                bordersx[i][i2][i3].render(-i, i2, i3);
+                                bordersx[i][i2][i3].render(-i, i2, i3, Rotation.horizontal);
                             }
                         }
                     }

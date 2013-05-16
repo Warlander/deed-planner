@@ -108,12 +108,6 @@ public class FPPCamera {
             posz -= dirz * fraction;
             posy -= diry * fraction;
         }
-        if (posy<0.5f) {
-            posy=0.5f;
-        }
-        else if (posy>80) {
-            posy=80;
-        }
     }
     
     public void set() {

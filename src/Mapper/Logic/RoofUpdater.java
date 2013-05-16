@@ -39,7 +39,7 @@ public class RoofUpdater {
                 for (int i2=-HouseCalc.brushSize; i2<=HouseCalc.brushSize; i2++) {
                     realX = tileX+i;
                     realY = tileY+i2;
-                    if (realX<2 || realY<1 || realX>Mapper.width-1 || tileY>Mapper.height-1) {}
+                    if (realX<2 || realY<1 || realX>Mapper.width-2 || tileY>Mapper.height-1) {}
                     else if (Mapper.ground[realX-1][realY].writ==null) {}
                     else if (Mapper.deleting) Mapper.tiles[realX][realY][Mapper.z]=null;
                     else if (mouse.hold.left) Mapper.tiles[realX][realY][Mapper.z]=Mapper.data.copy();
@@ -50,7 +50,7 @@ public class RoofUpdater {
 
         roofsRefit();
         
-        if (tileX<2 || tileY<1 || tileX>Mapper.width-1 || tileY>Mapper.height-1) {return;}
+        if (tileX<2 || tileY<1 || tileX>Mapper.width-2 || tileY>Mapper.height-1) {return;}
         HouseCalc.statusBar.setData(Mapper.tiles[tileX][tileY][Mapper.z]);
     }
     
