@@ -1,5 +1,6 @@
 package Form;
 
+import Lib.Files.FileManager;
 import Lib.Graphics.Ground;
 import Lib.Object.Writ;
 import Mapper.Mapper;
@@ -20,17 +21,34 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.DefaultListModel;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 
 public class SaveWindow extends javax.swing.JFrame {
 
+    private final String slash = System.getProperty("file.separator");
     private static String previousDir;
+    
+    DefaultListModel list;
     
     private String save;
     
     public SaveWindow() {
         initComponents();
+        if (FileManager.fileExists("Saves")) {
+            list = new DefaultListModel();
+            File[] directories = FileManager.getFile("Saves/").listFiles();
+            FileWrapper[] wrap = new FileWrapper[directories.length];
+            for (int i=0; i<directories.length; i++) {
+                wrap[i] = new FileWrapper(directories[i]);
+                list.addElement(wrap[i]);
+            }
+            jList1.setModel(list);
+        }
+        else {
+            FileManager.createDirectory("Saves/");
+        }
         saveMaker();
     }
     
@@ -108,6 +126,13 @@ public class SaveWindow extends javax.swing.JFrame {
         jButton2 = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         jButton3 = new javax.swing.JButton();
+        jLabel2 = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jList1 = new javax.swing.JList();
+        jButton4 = new javax.swing.JButton();
+        jTextField1 = new javax.swing.JTextField();
+        jButton5 = new javax.swing.JButton();
+        jButton6 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Save map");
@@ -140,6 +165,41 @@ public class SaveWindow extends javax.swing.JFrame {
             }
         });
 
+        jLabel2.setFont(new java.awt.Font("Arial", 0, 18)); // NOI18N
+        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel2.setText("Quick save");
+
+        jList1.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        jList1.setFixedCellHeight(20);
+        jScrollPane1.setViewportView(jList1);
+
+        jButton4.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        jButton4.setText("Save");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
+
+        jTextField1.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        jTextField1.setText("Save name");
+
+        jButton5.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        jButton5.setText("Overwrite selected");
+        jButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton5ActionPerformed(evt);
+            }
+        });
+
+        jButton6.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        jButton6.setText("Delete selected");
+        jButton6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton6ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -149,8 +209,19 @@ public class SaveWindow extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jButton1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 611, Short.MAX_VALUE)
-                    .addComponent(jButton3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jButton3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton4)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton5)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton6)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -158,12 +229,22 @@ public class SaveWindow extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jButton3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jLabel2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton4)
+                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton5)
+                    .addComponent(jButton6))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 191, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -200,7 +281,7 @@ public class SaveWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        String slash = System.getProperty("file.separator");
+
         JFileChooser fc = new JFileChooser();
         FileFilter filter = new ExtensionFileFilter(".MAP file", new String[] { "MAP" });
         fc.setFileFilter(filter);
@@ -210,31 +291,52 @@ public class SaveWindow extends javax.swing.JFrame {
         int returnVal = fc.showSaveDialog(this);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             File file = fc.getSelectedFile();
-            if (!file.getPath().contains(".MAP")) {
-                file = new File(file.getPath()+".MAP");
-            }
-            try {
-                file.createNewFile();
-                PrintWriter out = new PrintWriter(new FileOutputStream(file));
-                out.print(save);
-                out.close();
-                String ph = fc.getSelectedFile().getPath();
-                previousDir = ph.substring(0, ph.lastIndexOf(slash)+1);
-                setVisible(false);
-                dispose();
-            } catch (IOException ex) {
-                Logger.getLogger(SaveWindow.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            
+            saveToFile(file);
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    private void saveToFile(File file) {
+        if (!file.getPath().contains(".MAP")) {
+            file = new File(file.getPath()+".MAP");
+        }
+        try {
+            file.createNewFile();
+            PrintWriter out = new PrintWriter(new FileOutputStream(file));
+            out.print(save);
+            out.close();
+            String ph = file.getPath();
+            previousDir = ph.substring(0, ph.lastIndexOf(slash)+1);
+            setVisible(false);
+            dispose();
+        } catch (IOException ex) {
+            Logger.getLogger(SaveWindow.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         StringSelection select = new StringSelection(save);
         Toolkit.getDefaultToolkit().getSystemClipboard().setContents(select, select);
         setVisible(false);
         dispose();
     }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        saveToFile(FileManager.getFile("Saves"+slash+jTextField1.getText()+".MAP"));
+    }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+        if (!jList1.isSelectionEmpty()) {
+            FileWrapper wrap = (FileWrapper)jList1.getSelectedValue();
+            list.removeElement(wrap);
+            wrap.file.delete();
+        }
+    }//GEN-LAST:event_jButton6ActionPerformed
+
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+        if (!jList1.isSelectionEmpty()) {
+            saveToFile(((FileWrapper)jList1.getSelectedValue()).file);
+        }
+    }//GEN-LAST:event_jButton5ActionPerformed
 
     private class ExtensionFileFilter extends FileFilter {
         String description;
@@ -281,11 +383,7 @@ public class SaveWindow extends javax.swing.JFrame {
         }
     }
     
-    /**
-     * @param args the command line arguments
-     */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
@@ -308,7 +406,6 @@ public class SaveWindow extends javax.swing.JFrame {
         }
         //</editor-fold>
 
-        /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new SaveWindow().setVisible(true);
@@ -319,6 +416,13 @@ public class SaveWindow extends javax.swing.JFrame {
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
+    private javax.swing.JButton jButton5;
+    private javax.swing.JButton jButton6;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JList jList1;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTextField jTextField1;
     // End of variables declaration//GEN-END:variables
 }

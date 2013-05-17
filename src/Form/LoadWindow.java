@@ -1,5 +1,6 @@
 package Form;
 
+import Lib.Files.FileManager;
 import Lib.Graphics.Ground;
 import Lib.Object.Data;
 import Lib.Object.Writ;
@@ -21,13 +22,29 @@ import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.FileReader;
 import java.io.InputStreamReader;
+import javax.swing.DefaultListModel;
 
 public class LoadWindow extends javax.swing.JFrame {
 
     private static String ver=null;
     
+    DefaultListModel list;
+    
     public LoadWindow() {
         initComponents();
+        if (FileManager.fileExists("Saves")) {
+            list = new DefaultListModel();
+            File[] directories = FileManager.getFile("Saves/").listFiles();
+            FileWrapper[] wrap = new FileWrapper[directories.length];
+            for (int i=0; i<directories.length; i++) {
+                wrap[i] = new FileWrapper(directories[i]);
+                list.addElement(wrap[i]);
+            }
+            jList1.setModel(list);
+        }
+        else {
+            FileManager.createDirectory("Saves/");
+        }
     }
 
     public static void loadManager(String load) {
@@ -174,6 +191,7 @@ public class LoadWindow extends javax.swing.JFrame {
             Mapper.updater.writUpdater.model.addElement(w);
         }
         
+        Mapper.heightmap = new float[width+1][height+1];
         Mapper.ground = ground;
         Mapper.tiles = tiles;
         Mapper.bordersx = bordersx;
@@ -219,6 +237,7 @@ public class LoadWindow extends javax.swing.JFrame {
             }
         }
         
+        Mapper.heightmap = new float[width+1][height+1];
         Mapper.ground = ground;
         Mapper.tiles = tiles;
         Mapper.bordersx = bordersx;
@@ -265,6 +284,7 @@ public class LoadWindow extends javax.swing.JFrame {
             }
         }
         
+        Mapper.heightmap = new float[width+1][height+1];
         Mapper.ground = ground;
         Mapper.tiles = tiles;
         Mapper.bordersx = bordersx;
@@ -368,6 +388,10 @@ public class LoadWindow extends javax.swing.JFrame {
         urlButton = new javax.swing.JButton();
         urlField = new javax.swing.JTextField();
         fileButton = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
+        jButton1 = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jList1 = new javax.swing.JList();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Load map");
@@ -403,22 +427,38 @@ public class LoadWindow extends javax.swing.JFrame {
             }
         });
 
+        jLabel1.setFont(new java.awt.Font("Arial", 0, 18)); // NOI18N
+        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel1.setText("Quick load");
+
+        jButton1.setText("Load selected");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
+        jScrollPane1.setViewportView(jList1);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(fileButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jScrollPane1)
+                    .addComponent(fileButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addComponent(codeField, javax.swing.GroupLayout.PREFERRED_SIZE, 208, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(codeButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addComponent(urlField, javax.swing.GroupLayout.PREFERRED_SIZE, 208, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(urlButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addComponent(urlButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jButton1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -434,7 +474,13 @@ public class LoadWindow extends javax.swing.JFrame {
                     .addComponent(urlButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(fileButton)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 229, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         pack();
@@ -498,6 +544,22 @@ public class LoadWindow extends javax.swing.JFrame {
         setVisible(false);
         dispose();
     }//GEN-LAST:event_fileButtonActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        if (!jList1.isSelectionEmpty()) {
+           File file = ((FileWrapper)jList1.getSelectedValue()).file;
+            try {
+                BufferedReader read = new BufferedReader(new FileReader(file));
+                String out = read.readLine();
+                read.close();
+                loadManager(out);
+                setVisible(false);
+                dispose();
+            } catch (IOException ex) {
+                Logger.getLogger(SaveWindow.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     private class ExtensionFileFilter extends FileFilter {
         String description;
@@ -579,6 +641,10 @@ public class LoadWindow extends javax.swing.JFrame {
     private javax.swing.JButton codeButton;
     private javax.swing.JTextField codeField;
     private javax.swing.JButton fileButton;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JList jList1;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JButton urlButton;
     private javax.swing.JTextField urlField;
     // End of variables declaration//GEN-END:variables

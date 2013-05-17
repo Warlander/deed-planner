@@ -142,16 +142,16 @@ public class Data {
                     else if (type==Type.roof) {
                         switch (facing) {
                             case up:
-                                GL11.glVertex3f(object.x[object.vert[i]]*modX-sx*4-2, object.y[object.vert[i]]*modY-sy*4-2, object.z[object.vert[i]]-sz*3-(roofLevel-1)*3.5f);
+                                GL11.glVertex3f(object.x[object.vert[i]]*modX-sx*4-2, object.y[object.vert[i]]*modY-sy*4-2, object.z[object.vert[i]]-sz*3-(roofLevel-1)*3.5f-height);
                                 break;
                             case right:
-                                GL11.glVertex3f(object.y[object.vert[i]]*modX-sx*4-2, -object.x[object.vert[i]]*modY-sy*4-2, object.z[object.vert[i]]-sz*3-(roofLevel-1)*3.5f);
+                                GL11.glVertex3f(object.y[object.vert[i]]*modX-sx*4-2, -object.x[object.vert[i]]*modY-sy*4-2, object.z[object.vert[i]]-sz*3-(roofLevel-1)*3.5f-height);
                                 break;
                             case down:
-                                GL11.glVertex3f(-object.x[object.vert[i]]*modX-sx*4-2, -object.y[object.vert[i]]*modY-sy*4-2, object.z[object.vert[i]]-sz*3-(roofLevel-1)*3.5f);
+                                GL11.glVertex3f(-object.x[object.vert[i]]*modX-sx*4-2, -object.y[object.vert[i]]*modY-sy*4-2, object.z[object.vert[i]]-sz*3-(roofLevel-1)*3.5f-height);
                                 break;
                             case left:
-                                GL11.glVertex3f(-object.y[object.vert[i]]*modX-sx*4-2, object.x[object.vert[i]]*modY-sy*4-2, object.z[object.vert[i]]-sz*3-(roofLevel-1)*3.5f);
+                                GL11.glVertex3f(-object.y[object.vert[i]]*modX-sx*4-2, object.x[object.vert[i]]*modY-sy*4-2, object.z[object.vert[i]]-sz*3-(roofLevel-1)*3.5f-height);
                                 break;
                         }
                     }

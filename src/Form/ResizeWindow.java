@@ -6,8 +6,6 @@ import Mapper.Data.D;
 import Mapper.Mapper;
 
 public class ResizeWindow extends javax.swing.JFrame {
-
-    
     
     public ResizeWindow() {
         initComponents();
@@ -131,6 +129,7 @@ public class ResizeWindow extends javax.swing.JFrame {
         Data[][][] bordersx = new Data[Mapper.width+right+left][Mapper.height+up+down][15];
         Data[][][] bordersy = new Data[Mapper.width+right+left][Mapper.height+up+down][15];
         Ground[][] ground = new Ground[Mapper.width+right+left][Mapper.height+up+down];
+        float[][] heightmap = new float[Mapper.width+right+left+1][Mapper.height+up+down+1];
         
         int xReg = 0;
         int yReg = 0;
@@ -151,6 +150,20 @@ public class ResizeWindow extends javax.swing.JFrame {
             yReg=0;
         }
         
+        xReg = 0;
+        yReg = 0;
+        
+        for (int i=-left; i<Mapper.width+right+1; i++) {
+            for (int i2=-down; i2<Mapper.height+up+1; i2++) {
+                if (i>=0 && i<Mapper.width+1 && i2>=0 && i2<Mapper.height+1) {
+                    heightmap[xReg][yReg] = Mapper.heightmap[i][i2];
+                }
+                yReg++;
+            }
+            xReg++;
+            yReg=0;
+        }
+        
         for (int i=0; i<Mapper.width+right+left; i++) {
             for (int i2=0; i2<Mapper.height+up+down; i2++) {
                 if (ground[i][i2]==null) {
@@ -163,6 +176,7 @@ public class ResizeWindow extends javax.swing.JFrame {
             }
         }
         
+        Mapper.heightmap = heightmap;
         Mapper.tiles = tiles;
         Mapper.bordersx = bordersx;
         Mapper.bordersy = bordersy;

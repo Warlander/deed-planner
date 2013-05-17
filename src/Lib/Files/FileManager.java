@@ -9,11 +9,9 @@ import java.util.logging.Logger;
 
 public class FileManager {
     
-
-    
-    private static String slash = System.getProperty("file.separator");
-    private static String br = System.getProperty("line.separator");
-    private static String home = System.getProperty("user.home");
+    private static final String slash = System.getProperty("file.separator");
+    private static final String br = System.getProperty("line.separator");
+    private static final String home = System.getProperty("user.home");
     
     public static void saveToFile(String path, String value) {
         path = path.replace("/", slash).replace("\\", slash);
@@ -36,10 +34,22 @@ public class FileManager {
         }
     }
     
+    public static void createDirectory(String path) {
+        path = path.replace("/", slash).replace("\\", slash);
+        path = home+slash+"HouseCalc"+slash+path;
+        new File(path).mkdirs();
+    }
+    
     public static File getFile(String path) {
         path = path.replace("/", slash).replace("\\", slash);
         path = home+slash+"HouseCalc"+slash+path;
         return new File(path);
+    }
+    
+    public static void deleteFile(String path) {
+        path = path.replace("/", slash).replace("\\", slash);
+        path = home+slash+"HouseCalc"+slash+path;
+        new File(path).delete();
     }
     
     public static boolean fileExists(String path) {

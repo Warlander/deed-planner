@@ -96,9 +96,9 @@ public class HeightUpdater {
     
     private boolean containsWrit(Point point) {
         if (Mapper.ground[point.getX()][point.getY()].writ!=null) {return true;}
-        else if (Mapper.ground[point.getX()-1][point.getY()].writ!=null) {return true;}
-        else if (Mapper.ground[point.getX()-1][point.getY()-1].writ!=null) {return true;}
-        else if (Mapper.ground[point.getX()][point.getY()-1].writ!=null) {return true;}
+        else if (point.getX()-1>=0 && Mapper.ground[point.getX()-1][point.getY()].writ!=null) {return true;}
+        else if (point.getX()-1>=0 && point.getY()-1>=0 && Mapper.ground[point.getX()-1][point.getY()-1].writ!=null) {return true;}
+        else if (point.getY()-1>=0 && Mapper.ground[point.getX()][point.getY()-1].writ!=null) {return true;}
         return false;
     }
     
