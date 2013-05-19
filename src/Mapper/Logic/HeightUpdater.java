@@ -58,7 +58,7 @@ public class HeightUpdater {
             HouseCalc.statusBar.setPoint(points[0]);
         }
         
-        if (mouse.pressed.left ^ mouse.pressed.right) {
+        if (mouse.hold.left ^ mouse.hold.right) {
             if (points==null) {
                 points = selectedBorder(tileX, tileY, xClip, yClip, tileSize);
             }
@@ -73,19 +73,30 @@ public class HeightUpdater {
                 if (!containsWrit(point)) {
                     switch ((String)HouseCalc.elevationList.getSelectedValue()) {
                         case "Increase height":
-                            increaseHeight(mouse, point);
+                            if (mouse.pressed.left ^ mouse.pressed.right) {
+                                increaseHeight(mouse, point);
+                            }
                             break;
                         case "Decrease height":
-                            decreaseHeight(mouse, point);
+                            if (mouse.pressed.left ^ mouse.pressed.right) {
+                                decreaseHeight(mouse, point);
+                            }
                             break;
                         case "Set height":
                             setHeight(mouse, point);
                             break;
                         case "Select height":
-                            selectHeight(mouse, point);
+                            if (mouse.pressed.left ^ mouse.pressed.right) {
+                                selectHeight(mouse, point);
+                            }
                             break;
                         case "Reset height":
                             resetHeight(point);
+                            break;
+                        case "Smooth height":
+                            if ((mouse.pressed.left ^ mouse.pressed.right) && points.length==1) {
+                                smoothHeight(point);
+                            }
                             break;
                     }
                 }
@@ -95,10 +106,10 @@ public class HeightUpdater {
     }
     
     private boolean containsWrit(Point point) {
-        if (Mapper.ground[point.getX()][point.getY()].writ!=null) {return true;}
-        else if (point.getX()-1>=0 && Mapper.ground[point.getX()-1][point.getY()].writ!=null) {return true;}
+        if (point.getX()<Mapper.width && point.getY()<Mapper.height && Mapper.ground[point.getX()][point.getY()].writ!=null) {return true;}
+        else if (point.getX()-1>=0 && point.getY()<Mapper.height && Mapper.ground[point.getX()-1][point.getY()].writ!=null) {return true;}
         else if (point.getX()-1>=0 && point.getY()-1>=0 && Mapper.ground[point.getX()-1][point.getY()-1].writ!=null) {return true;}
-        else if (point.getY()-1>=0 && Mapper.ground[point.getX()][point.getY()-1].writ!=null) {return true;}
+        else if (point.getY()-1>=0 && point.getX()<Mapper.width && Mapper.ground[point.getX()][point.getY()-1].writ!=null) {return true;}
         return false;
     }
     
@@ -196,7 +207,7 @@ public class HeightUpdater {
     }
     
     private void setHeight(MouseInput mouse, Point point) {
-        if (mouse.pressed.left) {
+        if (mouse.hold.left) {
             Mapper.heightmap[point.getX()][point.getY()]=HouseCalc.elevationSetLeft;
         }
         else {
@@ -217,7 +228,68 @@ public class HeightUpdater {
     
     private void resetHeight(Point point) {
         Mapper.heightmap[point.getX()][point.getY()]=0;
-        
+    }
+    
+    Point p2=null;
+    
+    private void smoothHeight(Point p1) {
+        if (p2==null) {
+            p2 = p1;
+        }
+        else {
+            if (p1.getX()==p2.getX() ^ p1.getY()==p2.getY()) {
+                float min = Math.min(getHeight(p1), getHeight(p2));
+                float max = Math.max(getHeight(p1), getHeight(p2));
+                float diff = max-min;
+                Point higher = getPoint(max, p1, p2);
+                Point lower = getPoint(min, p1, p2);
+                
+                int mult = 0;
+                
+                if (p1.getX()==p2.getX()) {
+                    diff/=Math.abs(higher.getY()-lower.getY());
+                    if (higher.getY()>lower.getY()) {
+                        for (int i=lower.getY(); i<higher.getY(); i++) {
+                            Mapper.heightmap[p1.getX()][i] = min + diff*mult;
+                            mult++;
+                        }
+                    }
+                    else if (lower.getY()>higher.getY()) {
+                        for (int i=lower.getY(); i>higher.getY(); i--) {
+                            Mapper.heightmap[p1.getX()][i] = min + diff*mult;
+                            mult++;
+                        }
+                    }
+                }
+                else if (p1.getY()==p2.getY()) {
+                    diff/=Math.abs(higher.getX()-lower.getX());
+                    if (higher.getX()>lower.getX()) {
+                        for (int i=lower.getX(); i<higher.getX(); i++) {
+                            Mapper.heightmap[i][p1.getY()] = min + diff*mult;
+                            mult++;
+                        }
+                    }
+                    else if (lower.getX()>higher.getX()) {
+                        for (int i=lower.getX(); i>higher.getX(); i--) {
+                            Mapper.heightmap[i][p1.getY()] = min + diff*mult;
+                            mult++;
+                        }
+                    }
+                }
+            }
+            p2=null;
+        }
+    }
+    
+    private float getHeight(Point p) {
+        return Mapper.heightmap[p.getX()][p.getY()];
+    }
+    
+    private Point getPoint(float height, Point p1, Point p2) {
+        if (Mapper.heightmap[p1.getX()][p1.getY()]==height) {
+            return p1;
+        }
+        return p2;
     }
     
     public static void checkElevations() {

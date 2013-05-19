@@ -14,7 +14,7 @@ public class TipLabel extends JLabel {
     public TipLabel() {
         tipsList = new ArrayList<>();
         tipsList.add("You can use shift and control keys to modify movement speed.");
-        tipsList.add("You cannot place floors outside writ.");
+        tipsList.add("You cannot place floors and roofs outside writ.");
         tipsList.add("Use fill option for floors to quickly fill the whole writ.");
         tipsList.add("If program is running slow turn off antialiasing and restart.");
         tipsList.add("Program will notify you when new version comes out.");
@@ -26,6 +26,7 @@ public class TipLabel extends JLabel {
         tipsList.add("You can calculate writ materials while writ is selected.");
         tipsList.add("You can post suggestions and bugs in program official thread.");
         tipsList.add("This program is made in Java and LWJGL!");
+        tipsList.add("You can edit tile, border or point height.");
         setTip();
     }
     

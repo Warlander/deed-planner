@@ -24,6 +24,7 @@ public class RoofUpdater {
             if (mouse.hold.left) {
                 for (int i=0; i<15; i++) {
                     if (i==Mapper.z) {}
+                    if (tileX<2 || tileY<1 || tileX>Mapper.width-2 || tileY>Mapper.height-1) {}
                     else if (Mapper.tiles[tileX][tileY][i]!=null && Mapper.tiles[tileX][tileY][i].type==Type.roof) {
                         if (i!=Mapper.z || Mapper.tiles[tileX][tileY][i].texture==Mapper.data.texture) {
                             return;
@@ -60,8 +61,8 @@ public class RoofUpdater {
         int tPos=0;
         int tNeg=0;
         
-        for (int i=0; i<Mapper.width; i++) {
-            for (int i2=0; i2<Mapper.height; i2++) {
+        for (int i=1; i<Mapper.width-1; i++) {
+            for (int i2=1; i2<Mapper.height-1; i2++) {
                 for (int i3=0; i3<15; i3++) {
                     if (Mapper.tiles[i][i2][i3]!=null) {
                         if (Mapper.tiles[i][i2][i3].type==Type.roof) {

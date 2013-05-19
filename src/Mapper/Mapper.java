@@ -11,17 +11,17 @@ import Lib.Object.DataLoader;
 import Lib.Object.Rotation;
 import Lib.Object.Type;
 import Lib.Object.Writ;
+import Lib.Utils.Screenshot;
 import Mapper.Data.D;
 import Mapper.Graphics.MiscRenderer;
 import Mapper.Logic.MapUpdater;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.FloatBuffer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
@@ -109,8 +109,8 @@ public class Mapper {
             mouse.update();
             keyboard.update();
             logic();
-            keyboard.reset();
             draw();
+            keyboard.reset();
             Display.update();
             HouseCalc.statusBar.display();
             Display.sync(30);
@@ -230,6 +230,9 @@ public class Mapper {
                 }
             }
         GL11.glPopMatrix();
+        if (keyboard.pressed[Keyboard.KEY_F11]) {
+            Screenshot.takeScreenshot();
+        }
     }
     
     public void resizeRequest() {

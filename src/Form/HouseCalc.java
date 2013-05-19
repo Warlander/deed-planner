@@ -7,7 +7,6 @@ import Lib.Object.Writ;
 import Lib.Utils.WebTools;
 import Mapper.Data.D;
 import Mapper.FPPCamera;
-import Mapper.Logic.HeightUpdater;
 import Mapper.Mapper;
 import Mapper.UpCamera;
 import java.awt.Component;
@@ -312,7 +311,7 @@ public class HouseCalc extends javax.swing.JFrame {
 
             elevationList.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
             elevationList.setModel(new javax.swing.AbstractListModel() {
-                String[] strings = { "Increase height", "Decrease height", "Set height", "Select height", "Reset height" };
+                String[] strings = { "Increase height", "Decrease height", "Set height", "Select height", "Reset height", "Smooth height" };
                 public int getSize() { return strings.length; }
                 public Object getElementAt(int i) { return strings[i]; }
             });
@@ -1161,8 +1160,6 @@ public class HouseCalc extends javax.swing.JFrame {
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
         reset();
-        jCheckBox1.setSelected(false);
-        jButton6.setEnabled(false);
     }//GEN-LAST:event_jButton6ActionPerformed
 
     public static void reset() {
@@ -1176,15 +1173,11 @@ public class HouseCalc extends javax.swing.JFrame {
                 }
             }
         }
-        for (int i=0; i<=Mapper.width; i++) {
-            for (int i2=0; i2<=Mapper.height; i2++) {
-                Mapper.heightmap[i][i2]=0;
-            }
-        }
         Mapper.updater.writUpdater.model.clear();
         Mapper.wData=null;
         HouseCalc.jTextField1.setText("Writ 1");
-        HeightUpdater.checkElevations();
+        jCheckBox1.setSelected(false);
+        jButton6.setEnabled(false);
     }
     
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
@@ -1473,11 +1466,11 @@ public class HouseCalc extends javax.swing.JFrame {
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
-    private javax.swing.JButton jButton6;
+    public static javax.swing.JButton jButton6;
     private javax.swing.JButton jButton7;
     private javax.swing.JButton jButton8;
     private javax.swing.JButton jButton9;
-    private javax.swing.JCheckBox jCheckBox1;
+    public static javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JCheckBox jCheckBox2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
