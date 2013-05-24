@@ -54,7 +54,7 @@ public class SaveWindow extends javax.swing.JFrame {
     
     private void saveMaker() {
         StringBuilder maps = new StringBuilder();
-        maps.append("0.6|");
+        maps.append("0.9|");
         maps.append(Mapper.width).append(",").append(Mapper.height).append(",");
         
         for (int x=0; x<=Mapper.width; x++) {
@@ -66,6 +66,21 @@ public class SaveWindow extends javax.swing.JFrame {
         for (int x=0; x<Mapper.width; x++) {
             for (int y=0; y<Mapper.height; y++) {
                 maps.append(Mapper.ground[x][y].shortName).append(",");
+                maps.append(Mapper.caveGround[x][y].shortName).append(",");
+            }
+        }
+        
+        for (int z=0; z<15; z++) {
+            for (int x=0; x<Mapper.width*4; x++) {
+                for (int y=0; y<Mapper.height*4; y++) {
+                    if (Mapper.objects[x][y][z]!=null) {
+                        maps.append(Mapper.objects[x][y][z].shortName).append(";").append(Mapper.objects[x][y][z].rPaint).append(";").append(Mapper.objects[x][y][z].gPaint).append(";").append(Mapper.objects[x][y][z].bPaint);
+                    }
+                    else {
+                        maps.append("0");
+                    }
+                    maps.append(",");
+                }
             }
         }
         

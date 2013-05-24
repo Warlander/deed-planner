@@ -71,7 +71,6 @@ public class MaterialsWindow extends javax.swing.JFrame {
         String br=System.getProperty("line.separator");
         calculateMaterialsMap();
         
-        res.append("WARNING - skill cost is based on both walls and floors, so calculations for structures without floors are wrong!").append(br).append(br);
         res.append("Results for the whole map:").append(br).append(br);
         res.append("Materials needed: ").append(br);
         if (!map.isEmpty()) {

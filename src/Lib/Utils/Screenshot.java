@@ -15,12 +15,15 @@ import org.lwjgl.opengl.GL11;
 public class Screenshot {
     
     public static void takeScreenshot() {
+        System.out.println("Taking screenshots");
         GL11.glReadBuffer(GL11.GL_FRONT);
         int width = Display.getWidth();
         int height= Display.getHeight();
         int bpp = 4;
         ByteBuffer buffer = BufferUtils.createByteBuffer(width * height * bpp);
+        System.out.println("Saving data from screen");
         GL11.glReadPixels(0, 0, width, height, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer );
+        System.out.println("Data from screen saved!");
         
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH mm ss");
         Calendar calendar = Calendar.getInstance();
@@ -39,7 +42,9 @@ public class Screenshot {
         }
 
         try {
-                ImageIO.write(image, format, file);
+            System.out.println("Saving to file");
+            ImageIO.write(image, format, file);
+            System.out.println("Screenshot saved!");
         } catch (IOException e) { e.printStackTrace(); }
     }
     

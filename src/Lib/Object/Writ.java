@@ -9,8 +9,12 @@ public class Writ {
     public String name;
     
     public Writ(String name) {
-        tiles = new ArrayList<>();
+        this();
         this.name = name;
+    }
+    
+    public Writ() {
+        tiles = new ArrayList<>();
     }
     
     public String toString() {

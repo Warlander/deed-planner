@@ -2,6 +2,7 @@ package Mapper;
 
 import Form.HouseCalc;
 import static Form.HouseCalc.floorLabel;
+import Lib.Object.DataLoader;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.JViewport;
@@ -69,11 +70,19 @@ public class UpCamera {
             if (Mapper.z>0) {
                 Mapper.z--;
             }
+            if (Mapper.z==-1) {
+                HouseCalc.groundsList.setModel(DataLoader.caveGrounds);
+                HouseCalc.groundsList.setSelectedIndex(0);
+            }
             floorLabel.setText("Floor "+(Mapper.z+1));
         }
         else if (keyboard.pressed[Keyboard.KEY_E]) {
             if (Mapper.z<15-1) {
                 Mapper.z++;
+            }
+            if (Mapper.z==0) {
+                HouseCalc.groundsList.setModel(DataLoader.grounds);
+                HouseCalc.groundsList.setSelectedIndex(0);
             }
             floorLabel.setText("Floor "+(Mapper.z+1));
         }

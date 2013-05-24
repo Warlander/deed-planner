@@ -11,41 +11,48 @@ import org.lwjgl.util.Point;
 public class MapUpdater {
     
     private GroundUpdater groundUpdater;
-    private HeightUpdater heightUpdater;
+    private CaveUpdater caveUpdater;
+    public HeightUpdater heightUpdater;
     public WritUpdater writUpdater;
     private FloorUpdater floorUpdater;
     private WallUpdater wallUpdater;
     public RoofUpdater roofUpdater;
+    private StructureUpdater structureUpdater;
     
     public MapUpdater() {
         groundUpdater = new GroundUpdater();
+        caveUpdater = new CaveUpdater();
         heightUpdater = new HeightUpdater();
         writUpdater = new WritUpdater();
         floorUpdater = new FloorUpdater();
         wallUpdater = new WallUpdater();
         roofUpdater = new RoofUpdater();
+        structureUpdater = new StructureUpdater();
     }
     
     public void update(KeyboardInput keyboard, MouseInput mouse) {
         switch (Mapper.currType) {
             case ground:
-                groundUpdater.update(mouse);
+                if (Mapper.z>=0) groundUpdater.update(mouse);
+                else caveUpdater.update(mouse);
                 break;
             case elevation:
-                heightUpdater.update(keyboard, mouse);
+                if (Mapper.z>=0) heightUpdater.update(keyboard, mouse);
                 break;
             case writ:
-                writUpdater.update(mouse);
+                if (Mapper.z>=0) writUpdater.update(mouse);
                 break;
             case floor:
-                floorUpdater.update(mouse);
+                if (Mapper.z>=0) floorUpdater.update(mouse);
                 break;
             case wall:
-                wallUpdater.update(mouse);
+                if (Mapper.z>=0) wallUpdater.update(mouse);
                 break;
             case roof:
-                roofUpdater.update(mouse);
+                if (Mapper.z>=0) roofUpdater.update(mouse);
                 break;
+            case structure:
+                if (Mapper.z>=0) structureUpdater.update(mouse);
         }
         
         double tileScaler = (double)Display.getWidth()/(double)Display.getHeight();
@@ -54,7 +61,7 @@ public class MapUpdater {
 
         int tileX = (int) (((double)mouse.x+(double)UpCamera.y*realSize)/((double)Display.getWidth()/(double)UpCamera.scale/tileScaler))+1;
         int tileY = (int) (((double)mouse.y+(double)UpCamera.x*realSize)/((double)Display.getHeight()/(double)UpCamera.scale));
-
+        
         if (tileX<0 || tileY<0 || tileX>Mapper.width || tileY>Mapper.height) {
             return;
         }

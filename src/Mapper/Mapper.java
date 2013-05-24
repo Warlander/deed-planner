@@ -9,6 +9,7 @@ import Lib.Graphics.Ground;
 import Lib.Object.Data;
 import Lib.Object.DataLoader;
 import Lib.Object.Rotation;
+import Lib.Object.Structure;
 import Lib.Object.Type;
 import Lib.Object.Writ;
 import Lib.Utils.Screenshot;
@@ -36,6 +37,8 @@ public class Mapper {
     public static Ground gData=null;
     public static Writ wData=null;
     public static String eAction=null;
+    public static Ground cData=null;
+    public static Structure sData=null;
     public static Data data=null;
     public static boolean deleting=false;
     public static Type currType=null;
@@ -53,12 +56,14 @@ public class Mapper {
     public static int width = 25;
     public static int height = 25;
     
+    public static Ground[][] caveGround=new Ground[25][25];
     public static Ground[][] ground=new Ground[25][25];
     public static float[][] heightmap = new float[25+1][25+1];
     public static float minElevation = 0;
     public static float maxElevation = 0;
     public static float diffElevation = 0;
     public static Data[][][] tiles=new Data[25][25][15];
+    public static Structure[][][] objects = new Structure[100][100][15];
     public static Data[][][] bordersx=new Data[25][25][15];
     public static Data[][][] bordersy=new Data[25][25][15];
     
@@ -76,22 +81,39 @@ public class Mapper {
                     GLInit.initDisplay(16);
                 }
                 GLInit.initOpenGL();
+                System.out.println("Initializing mouse input");
                 mouse = new MouseInput();
+                System.out.println("Done!");
+                System.out.println("Initializing keyboard input");
                 keyboard = new KeyboardInput();
+                System.out.println("Done!");
+                System.out.println("Initializing 3d and 2d view camera");
                 fpscamera = new FPPCamera();
                 upcamera = new UpCamera();
+                System.out.println("Done!");
+                System.out.println("Initializing program logic engine");
                 updater = new MapUpdater();
+                System.out.println("Done!");
+                System.out.println("Initializing program rendering engine");
                 miscRenderer = new MiscRenderer();
+                System.out.println("Done!");
                 try {
+                    System.out.println("Loading data from \"Objects.txt\"");
                     DataLoader.load();
+                    System.out.println("Done!");
+                    System.out.println("Preparing initial map");
                     for (int i=0; i<width; i++) {
                         for (int i2=0; i2<height; i2++) {
                             ground[i][i2] = D.grounds.get(0).copy(i, i2);
+                            caveGround[i][i2] = D.caveGrounds.get(0).copy(i, i2);
                         }
                     }
+                    System.out.println("Done!");
                 } catch (IOException ex) {
                     Logger.getLogger(Mapper.class.getName()).log(Level.SEVERE, null, ex);
                 }
+                System.out.println("Mapper core initialized");
+                System.out.println("Initializing program loop");
                 loop();
             }
         };
@@ -224,6 +246,13 @@ public class Mapper {
                             }
                             if (bordersx[i][i2][i3]!=null) {
                                 bordersx[i][i2][i3].render(-i, i2, i3, Rotation.horizontal);
+                            }
+                        }
+                        for (int i4=0; i4<4; i4++) {
+                            for (int i5=0; i5<4; i5++) {
+                                if (i*4+i4>=0 && i*4+i4<width*4 && i2*4+i5>=0 && i2*4+i5<height*4 && objects[i*4+i4][i2*4+i5][i3]!=null) {
+                                    objects[i*4+i4][i2*4+i5][i3].render(-(i*4+i4), i2*4+i5, i3);
+                                }
                             }
                         }
                     }

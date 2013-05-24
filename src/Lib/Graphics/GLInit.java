@@ -2,6 +2,7 @@ package Lib.Graphics;
 
 import Form.HouseCalc;
 import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
@@ -36,6 +37,8 @@ public class GLInit {
             }
             else {
                 System.out.println("Antialiasting is NOT supported!");
+                Display.destroy();
+                Display.create();
                 System.out.println("Trying to create display");
             }
             System.out.println("Display created");
@@ -73,6 +76,20 @@ public class GLInit {
         GLU.gluPerspective(70, width/height, 0.1f, 200.0f);
         GL11.glMatrixMode(GL11.GL_MODELVIEW);
         GL11.glLoadIdentity();
+    }
+    
+    private static IntBuffer arrayToBuffer(int[] arr) {
+        IntBuffer buff = BufferUtils.createIntBuffer(arr.length);
+        buff.put(arr);
+        buff.rewind();
+        return buff;
+    }
+    
+    private static FloatBuffer arrayToBuffer(float[] arr) {
+        FloatBuffer buff = BufferUtils.createFloatBuffer(arr.length);
+        buff.put(arr);
+        buff.rewind();
+        return buff;
     }
     
     public static void refit() {

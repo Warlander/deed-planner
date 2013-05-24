@@ -66,29 +66,27 @@ public class Data {
         if (Mapper.fpsView || ((sz-Mapper.z)<=0 && (sz-Mapper.z)>-3)) {
             GL11.glBindTexture(GL11.GL_TEXTURE_2D, texture.ID);
             if (type==Type.wall && !Mapper.fpsView) {
-                double showR;
-                double showG;
-                double showB;
+                double showR = 0;
+                double showG = 0;
+                double showB = 0;
                 switch (sz-Mapper.z) {
                     case 0:
                         showR = r*Mapper.tick+rPaint*(1-Mapper.tick);
                         showG = g*Mapper.tick+gPaint*(1-Mapper.tick);
                         showB = b*Mapper.tick+bPaint*(1-Mapper.tick);
-                        GL11.glColor3d(showR, showG, showB);
                         break;
                     case -1:
                         showR = (r-(floor1*r))*Mapper.tick+(rPaint-(floor1*rPaint))*(1-Mapper.tick);
                         showG = (g-(floor1*g))*Mapper.tick+(gPaint-(floor1*gPaint))*(1-Mapper.tick);
                         showB = (b-(floor1*b))*Mapper.tick+(bPaint-(floor1*bPaint))*(1-Mapper.tick);
-                        GL11.glColor3d(showR, showG, showB);
                         break;
                     case -2:
                         showR = (r-(floor2*r))*Mapper.tick+(rPaint-(floor2*rPaint))*(1-Mapper.tick);
                         showG = (g-(floor2*g))*Mapper.tick+(gPaint-(floor2*gPaint))*(1-Mapper.tick);
                         showB = (b-(floor2*b))*Mapper.tick+(bPaint-(floor2*bPaint))*(1-Mapper.tick);
-                        GL11.glColor3d(showR, showG, showB);
                         break;
                 }
+                GL11.glColor3d(showR, showG, showB);
             }
             else if (!Mapper.fpsView) {
                 switch (sz-Mapper.z) {

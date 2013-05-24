@@ -1,5 +1,6 @@
 package Lib.Graphics;
 
+import Lib.Object.Data;
 import Lib.Object.Writ;
 
 public class Ground {
@@ -25,9 +26,7 @@ public class Ground {
     }
     
     public Ground(Tex tex, String name, String shortName, int x , int y) {
-        this.tex = tex;
-        this.name = name;
-        this.shortName = shortName;
+        this(tex, name, shortName);
         this.x = x;
         this.y = y;
     }

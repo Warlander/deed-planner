@@ -4,12 +4,15 @@ import Lib.Graphics.Ground;
 import Lib.Graphics.Tex;
 import Lib.Object.Data;
 import Lib.Object.ObjectData;
+import Lib.Object.Structure;
 import java.util.ArrayList;
 
 public class D {
     
     public static ArrayList<Data> models = new ArrayList<>();
+    public static ArrayList<Structure> objects = new ArrayList<>();
     public static ArrayList<Ground> grounds = new ArrayList<>();
+    public static ArrayList<Ground> caveGrounds = new ArrayList<>();
     
     public static Tex skybox;
     public static Tex water;
@@ -35,6 +38,15 @@ public class D {
         for (Data d : models) {
             if (d.name.equals(name)) {
                 return d;
+            }
+        }
+        return null;
+    }
+    
+    public static Structure getStructureByName(String name) {
+        for (Structure s : objects) {
+            if (s.name.equals(name)) {
+                return s;
             }
         }
         return null;

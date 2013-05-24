@@ -19,10 +19,12 @@ public class DataLoader {
     private static ArrayList<ObjectData> models = new ArrayList<>();
     private static ArrayList<Materials> materials = new ArrayList<>();
     
-    private static DefaultListModel grounds = new DefaultListModel();
+    public static DefaultListModel grounds = new DefaultListModel();
+    public static DefaultListModel caveGrounds = new DefaultListModel();
     private static DefaultListModel floors = new DefaultListModel();
     private static DefaultListModel walls = new DefaultListModel();
     private static DefaultListModel roofs = new DefaultListModel();
+    private static DefaultListModel objects = new DefaultListModel();
     
     private static Tex getTex(int id) {
         for (Tex tex : textures) {
@@ -75,6 +77,7 @@ public class DataLoader {
         floors.addElement("Delete");
         walls.addElement("Delete");
         roofs.addElement("Delete");
+        objects.addElement("Delete");
         
         String slash = System.getProperty("file.separator");
         
@@ -85,6 +88,7 @@ public class DataLoader {
         int mid;
         int matid;
         Data data;
+        Structure structure;
         Ground ground;
         
         BufferedReader reader = new BufferedReader(new FileReader(list));
@@ -197,6 +201,33 @@ public class DataLoader {
                         grounds.addElement(ground);
                         D.grounds.add(ground);
                         break;
+                    case "Cave":
+                        temp = line.substring(line.indexOf("tid=")+4);
+                        tid = Integer.parseInt(spaceMax(temp));
+                        temp = line.substring(line.indexOf("name=\"")+6);
+                        name = temp.substring(0, temp.indexOf("\""));
+                        temp = line.substring(line.indexOf("shortname=\"")+11);
+                        shortName = temp.substring(0, temp.indexOf("\""));
+                        ground = new Ground(getTex(tid), name, shortName);
+                        caveGrounds.addElement(ground);
+                        D.caveGrounds.add(ground);
+                        break;
+                    case "Object":
+                        temp = line.substring(line.indexOf("tid=")+4);
+                        tid = Integer.parseInt(spaceMax(temp));
+                        temp = line.substring(line.indexOf("mid=")+4);
+                        mid = Integer.parseInt(spaceMax(temp));
+                        temp = line.substring(line.indexOf("matid=")+6);
+                        matid = Integer.parseInt(spaceMax(temp));
+                        temp = line.substring(line.indexOf("name=\"")+6);
+                        name = temp.substring(0, temp.indexOf("\""));
+                        temp = line.substring(line.indexOf("shortname=\"")+11);
+                        shortName = temp.substring(0, temp.indexOf("\""));
+                        structure = new Structure(name, shortName, getTex(tid), getModel(mid));
+                        structure.materials = getMaterials(matid);
+                        objects.addElement(structure);
+                        D.objects.add(structure);
+                        break;
                 }
             }
             
@@ -206,10 +237,12 @@ public class DataLoader {
         HouseCalc.floorsList.setModel(floors);
         HouseCalc.wallsList.setModel(walls);
         HouseCalc.roofsList.setModel(roofs);
+        HouseCalc.structuresList.setModel(objects);
         HouseCalc.groundsList.setSelectedIndex(0);
         HouseCalc.floorsList.setSelectedIndex(0);
         HouseCalc.wallsList.setSelectedIndex(0);
         HouseCalc.roofsList.setSelectedIndex(0);
+        HouseCalc.structuresList.setSelectedIndex(0);
         HouseCalc.groundsList.repaint();
     }
     

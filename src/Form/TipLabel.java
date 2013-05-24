@@ -19,7 +19,7 @@ public class TipLabel extends JLabel {
         tipsList.add("If program is running slow turn off antialiasing and restart.");
         tipsList.add("Program will notify you when new version comes out.");
         tipsList.add("You cannot plan roofs on the first floor.");
-        tipsList.add("Maximal allowed deed size is 1000X1000.");
+        tipsList.add("Maximal allowed deed size is 9999X9999.");
         tipsList.add("Minimal allowed deed size is 25X25.");
         tipsList.add("You can modify pallete through \"Objects.txt\" file.");
         tipsList.add("Try \"Wurm Assistant\" program by Aldur!");
@@ -27,6 +27,7 @@ public class TipLabel extends JLabel {
         tipsList.add("You can post suggestions and bugs in program official thread.");
         tipsList.add("This program is made in Java and LWJGL!");
         tipsList.add("You can edit tile, border or point height.");
+        tipsList.add("In FPP view, you can move up and down using r and f keys.");
         setTip();
     }
     

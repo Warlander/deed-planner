@@ -1,6 +1,7 @@
 package Mapper.Graphics;
 
 import Form.HouseCalc;
+import Lib.Graphics.Ground;
 import Lib.Object.Type;
 import Mapper.Camera;
 import Mapper.Mapper;
@@ -19,7 +20,9 @@ public class MiscRenderer {
             
             renderGround();
             if (!fpsView && UpCamera.showGrid) {
-                renderGrid();
+                if (Mapper.z>=0) {
+                    renderGrid();
+                }
             }
             else {
                 renderSkybox();
@@ -31,7 +34,7 @@ public class MiscRenderer {
     private void renderGround() {
         if (!fpsView && Mapper.z<3) {
             switch (Mapper.z) {
-                case 0: 
+                case -1: case 0: 
                     GL11.glColor3f(1, 1, 1);
                     break;
                 case 1:
@@ -51,17 +54,22 @@ public class MiscRenderer {
         
         for (int i=Camera.visibleDownY; i<Camera.visibleUpY; i++) {
             for (int i2=Camera.visibleDownX; i2<Camera.visibleUpX; i2++) {
-                renderGroundTile(i, i2);
+                if (Mapper.z>=0) {
+                    renderGroundTile(Mapper.ground, i, i2);
+                }
+                else {
+                    renderGroundTile(Mapper.caveGround, i, i2);
+                }
             }
         }
     }
     
-    private void renderGroundTile(int x, int y) {
+    private void renderGroundTile(Ground[][] source, int x, int y) {
         if (y>=Mapper.height || y<0 || x>=Mapper.width || x<0) {
             return;
         }
         
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, Mapper.ground[x][y].tex.ID);
+        GL11.glBindTexture(GL11.GL_TEXTURE_2D, source[x][y].tex.ID);
         GL11.glBegin(GL11.GL_TRIANGLES);  
             GL11.glTexCoord2f(0, 0);
             GL11.glVertex3f(x*4,-y*4-4, -Mapper.heightmap[x][y+1]/(35f/3f));
@@ -104,7 +112,7 @@ public class MiscRenderer {
             if (!HouseCalc.renderHeight && !(Mapper.currType==Type.elevation)) {
                 if (i2>0 && (Mapper.ground[i][i2-1].writ==null ^ Mapper.ground[i][i2].writ==null)) {
                     if ((Mapper.ground[i][i2-1].writ!=null && Mapper.ground[i][i2-1].writ==Mapper.wData) || (Mapper.ground[i][i2].writ!=null && Mapper.ground[i][i2].writ==Mapper.wData)) {
-                        GL11.glColor3f(1, 1, 1);
+                        GL11.glColor3f(0.1f, 1, 0.1f);
                     }
                     else {
                         GL11.glColor3f(0.8f, 0.8f, 0.8f);
@@ -135,7 +143,7 @@ public class MiscRenderer {
             if (!HouseCalc.renderHeight && !(Mapper.currType==Type.elevation)) {
                 if (i>0 && (Mapper.ground[i-1][i2].writ==null ^ Mapper.ground[i][i2].writ==null)) {
                     if ((Mapper.ground[i-1][i2].writ!=null && Mapper.ground[i-1][i2].writ==Mapper.wData) || (Mapper.ground[i][i2].writ!=null && Mapper.ground[i][i2].writ==Mapper.wData)) {
-                        GL11.glColor3f(1, 1, 1);
+                        GL11.glColor3f(0.1f, 1, 0.1f);
                     }
                     else {
                         GL11.glColor3f(0.8f, 0.8f, 0.8f);
@@ -183,93 +191,93 @@ public class MiscRenderer {
         GL11.glBegin(GL11.GL_TRIANGLES);
             //up
             GL11.glTexCoord2f(0.25f, 0);
-            GL11.glVertex3f(-150+FPPCamera.posz,150-FPPCamera.posx,-149-FPPCamera.posy);
+            GL11.glVertex3d(-150+FPPCamera.posz,150-FPPCamera.posx,-149-FPPCamera.posy);
             GL11.glTexCoord2f(0.25f, 1f/3f);
-            GL11.glVertex3f(-150+FPPCamera.posz,-150-FPPCamera.posx,-149-FPPCamera.posy);
+            GL11.glVertex3d(-150+FPPCamera.posz,-150-FPPCamera.posx,-149-FPPCamera.posy);
             GL11.glTexCoord2f(0.5f, 1f/3f);
-            GL11.glVertex3f(150+FPPCamera.posz,-150-FPPCamera.posx,-149-FPPCamera.posy);
+            GL11.glVertex3d(150+FPPCamera.posz,-150-FPPCamera.posx,-149-FPPCamera.posy);
 
             GL11.glTexCoord2f(0.5f, 1f/3f);
-            GL11.glVertex3f(150+FPPCamera.posz,-150-FPPCamera.posx,-149-FPPCamera.posy);
+            GL11.glVertex3d(150+FPPCamera.posz,-150-FPPCamera.posx,-149-FPPCamera.posy);
             GL11.glTexCoord2f(0.5f, 0);
-            GL11.glVertex3f(150+FPPCamera.posz,150-FPPCamera.posx,-149-FPPCamera.posy);
+            GL11.glVertex3d(150+FPPCamera.posz,150-FPPCamera.posx,-149-FPPCamera.posy);
             GL11.glTexCoord2f(0.25f, 0);
-            GL11.glVertex3f(-150+FPPCamera.posz,150-FPPCamera.posx,-149-FPPCamera.posy);
+            GL11.glVertex3d(-150+FPPCamera.posz,150-FPPCamera.posx,-149-FPPCamera.posy);
 
             //down
             GL11.glTexCoord2f(0.25f, 2f/3f);
-            GL11.glVertex3f(-150+FPPCamera.posz,150-FPPCamera.posx, 149-FPPCamera.posy);
+            GL11.glVertex3d(-150+FPPCamera.posz,150-FPPCamera.posx, 149-FPPCamera.posy);
             GL11.glTexCoord2f(0.25f, 1);
-            GL11.glVertex3f(-150+FPPCamera.posz,-150-FPPCamera.posx, 149-FPPCamera.posy);
+            GL11.glVertex3d(-150+FPPCamera.posz,-150-FPPCamera.posx, 149-FPPCamera.posy);
             GL11.glTexCoord2f(0.5f, 1);
-            GL11.glVertex3f(150+FPPCamera.posz,-150-FPPCamera.posx, 149-FPPCamera.posy);
+            GL11.glVertex3d(150+FPPCamera.posz,-150-FPPCamera.posx, 149-FPPCamera.posy);
 
             GL11.glTexCoord2f(0.5f, 1);
-            GL11.glVertex3f(150+FPPCamera.posz,-150-FPPCamera.posx, 149-FPPCamera.posy);
+            GL11.glVertex3d(150+FPPCamera.posz,-150-FPPCamera.posx, 149-FPPCamera.posy);
             GL11.glTexCoord2f(0.5f, 2f/3f);
-            GL11.glVertex3f(150+FPPCamera.posz,150-FPPCamera.posx, 149-FPPCamera.posy);
+            GL11.glVertex3d(150+FPPCamera.posz,150-FPPCamera.posx, 149-FPPCamera.posy);
             GL11.glTexCoord2f(0.25f, 2f/3f);
-            GL11.glVertex3f(-150+FPPCamera.posz,150-FPPCamera.posx, 149-FPPCamera.posy);
+            GL11.glVertex3d(-150+FPPCamera.posz,150-FPPCamera.posx, 149-FPPCamera.posy);
 
             //front
             GL11.glTexCoord2f(0.5f, 1f/3f);
-            GL11.glVertex3f(150+FPPCamera.posz,-149-FPPCamera.posx, -150-FPPCamera.posy);
+            GL11.glVertex3d(150+FPPCamera.posz,-149-FPPCamera.posx, -150-FPPCamera.posy);
             GL11.glTexCoord2f(0.5f, 2f/3f);
-            GL11.glVertex3f(150+FPPCamera.posz,-149-FPPCamera.posx, 150-FPPCamera.posy);
+            GL11.glVertex3d(150+FPPCamera.posz,-149-FPPCamera.posx, 150-FPPCamera.posy);
             GL11.glTexCoord2f(0.25f, 2f/3f);
-            GL11.glVertex3f(-150+FPPCamera.posz,-149-FPPCamera.posx, 150-FPPCamera.posy);
+            GL11.glVertex3d(-150+FPPCamera.posz,-149-FPPCamera.posx, 150-FPPCamera.posy);
 
             GL11.glTexCoord2f(0.25f, 2f/3f);
-            GL11.glVertex3f(-150+FPPCamera.posz,-149-FPPCamera.posx, 150-FPPCamera.posy);
+            GL11.glVertex3d(-150+FPPCamera.posz,-149-FPPCamera.posx, 150-FPPCamera.posy);
             GL11.glTexCoord2f(0.25f, 1f/3f);
-            GL11.glVertex3f(-150+FPPCamera.posz,-149-FPPCamera.posx, -150-FPPCamera.posy);
+            GL11.glVertex3d(-150+FPPCamera.posz,-149-FPPCamera.posx, -150-FPPCamera.posy);
             GL11.glTexCoord2f(0.5f, 1f/3f);
-            GL11.glVertex3f(150+FPPCamera.posz,-149-FPPCamera.posx, -150-FPPCamera.posy);
+            GL11.glVertex3d(150+FPPCamera.posz,-149-FPPCamera.posx, -150-FPPCamera.posy);
 
             //back
             GL11.glTexCoord2f(0.75f, 1f/3f);
-            GL11.glVertex3f(150+FPPCamera.posz,149-FPPCamera.posx, -150-FPPCamera.posy);
+            GL11.glVertex3d(150+FPPCamera.posz,149-FPPCamera.posx, -150-FPPCamera.posy);
             GL11.glTexCoord2f(0.75f, 2f/3f);
-            GL11.glVertex3f(150+FPPCamera.posz,149-FPPCamera.posx, 150-FPPCamera.posy);
+            GL11.glVertex3d(150+FPPCamera.posz,149-FPPCamera.posx, 150-FPPCamera.posy);
             GL11.glTexCoord2f(1, 2f/3f);
-            GL11.glVertex3f(-150+FPPCamera.posz,149-FPPCamera.posx, 150-FPPCamera.posy);
+            GL11.glVertex3d(-150+FPPCamera.posz,149-FPPCamera.posx, 150-FPPCamera.posy);
 
             GL11.glTexCoord2f(1, 2f/3f);
-            GL11.glVertex3f(-150+FPPCamera.posz,149-FPPCamera.posx, 150-FPPCamera.posy);
+            GL11.glVertex3d(-150+FPPCamera.posz,149-FPPCamera.posx, 150-FPPCamera.posy);
             GL11.glTexCoord2f(1, 1f/3f);
-            GL11.glVertex3f(-150+FPPCamera.posz,149-FPPCamera.posx, -150-FPPCamera.posy);
+            GL11.glVertex3d(-150+FPPCamera.posz,149-FPPCamera.posx, -150-FPPCamera.posy);
             GL11.glTexCoord2f(0.75f, 1f/3f);
-            GL11.glVertex3f(150+FPPCamera.posz,149-FPPCamera.posx, -150-FPPCamera.posy);
+            GL11.glVertex3d(150+FPPCamera.posz,149-FPPCamera.posx, -150-FPPCamera.posy);
 
             //left
             GL11.glTexCoord2f(0, 1f/3f);
-            GL11.glVertex3f(-149+FPPCamera.posz,150-FPPCamera.posx, -150-FPPCamera.posy);
+            GL11.glVertex3d(-149+FPPCamera.posz,150-FPPCamera.posx, -150-FPPCamera.posy);
             GL11.glTexCoord2f(0, 2f/3f);
-            GL11.glVertex3f(-149+FPPCamera.posz,150-FPPCamera.posx, 150-FPPCamera.posy);
+            GL11.glVertex3d(-149+FPPCamera.posz,150-FPPCamera.posx, 150-FPPCamera.posy);
             GL11.glTexCoord2f(0.25f, 2f/3f);
-            GL11.glVertex3f(-149+FPPCamera.posz,-150-FPPCamera.posx, 150-FPPCamera.posy);
+            GL11.glVertex3d(-149+FPPCamera.posz,-150-FPPCamera.posx, 150-FPPCamera.posy);
 
             GL11.glTexCoord2f(0.25f, 2f/3f);
-            GL11.glVertex3f(-149+FPPCamera.posz,-150-FPPCamera.posx, 150-FPPCamera.posy);
+            GL11.glVertex3d(-149+FPPCamera.posz,-150-FPPCamera.posx, 150-FPPCamera.posy);
             GL11.glTexCoord2f(0.25f, 1f/3f);
-            GL11.glVertex3f(-149+FPPCamera.posz,-150-FPPCamera.posx, -150-FPPCamera.posy);
+            GL11.glVertex3d(-149+FPPCamera.posz,-150-FPPCamera.posx, -150-FPPCamera.posy);
             GL11.glTexCoord2f(0, 1f/3f);
-            GL11.glVertex3f(-149+FPPCamera.posz,150-FPPCamera.posx, -150-FPPCamera.posy);
+            GL11.glVertex3d(-149+FPPCamera.posz,150-FPPCamera.posx, -150-FPPCamera.posy);
 
             //right
             GL11.glTexCoord2f(0.75f, 1f/3f);
-            GL11.glVertex3f(149+FPPCamera.posz,150-FPPCamera.posx, -150-FPPCamera.posy);
+            GL11.glVertex3d(149+FPPCamera.posz,150-FPPCamera.posx, -150-FPPCamera.posy);
             GL11.glTexCoord2f(0.75f, 2f/3f);
-            GL11.glVertex3f(149+FPPCamera.posz,150-FPPCamera.posx, 150-FPPCamera.posy);
+            GL11.glVertex3d(149+FPPCamera.posz,150-FPPCamera.posx, 150-FPPCamera.posy);
             GL11.glTexCoord2f(0.5f, 2f/3f);
-            GL11.glVertex3f(149+FPPCamera.posz,-150-FPPCamera.posx, 150-FPPCamera.posy);
+            GL11.glVertex3d(149+FPPCamera.posz,-150-FPPCamera.posx, 150-FPPCamera.posy);
 
             GL11.glTexCoord2f(0.5f, 2f/3f);
-            GL11.glVertex3f(149+FPPCamera.posz,-150-FPPCamera.posx, 150-FPPCamera.posy);
+            GL11.glVertex3d(149+FPPCamera.posz,-150-FPPCamera.posx, 150-FPPCamera.posy);
             GL11.glTexCoord2f(0.5f, 1f/3f);
-            GL11.glVertex3f(149+FPPCamera.posz,-150-FPPCamera.posx, -150-FPPCamera.posy);
+            GL11.glVertex3d(149+FPPCamera.posz,-150-FPPCamera.posx, -150-FPPCamera.posy);
             GL11.glTexCoord2f(0.75f, 1f/3f);
-            GL11.glVertex3f(149+FPPCamera.posz,150-FPPCamera.posx, -150-FPPCamera.posy);
+            GL11.glVertex3d(149+FPPCamera.posz,150-FPPCamera.posx, -150-FPPCamera.posy);
         GL11.glEnd();
     }
     //</editor-fold>

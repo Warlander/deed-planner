@@ -9,6 +9,8 @@ import org.lwjgl.util.glu.GLU;
 
 public class FPPCamera {
     
+    public static boolean fixedHeight = false;
+    
     private int pastMousex;
     private int pastMousey;
     
@@ -18,9 +20,9 @@ public class FPPCamera {
     public static float shiftMod = 5;
     public static float controlMod = 0.2f;
     
-    public static float posx=0;
-    public static float posy=2;
-    public static float posz=0;
+    public static double posx=0;
+    public static double posy=2;
+    public static double posz=0;
     
     private float dirx=1;
     private float diry=0;
@@ -28,6 +30,8 @@ public class FPPCamera {
     
     private float anglex=(float)Math.PI/2;
     private float angley=0;
+    
+    private double stickedHeight = 2;
     
     public void setSpeed(float speed, float rotation) {
         fraction=speed;
@@ -43,8 +47,11 @@ public class FPPCamera {
             fraction*=controlMod;
         }
         
-        int currX = (int)(posx/4);
-        int currZ = (int)(posz/4);
+        double xDivine = posx/4d;
+        double zDivine = posz/4d;
+        
+        int currX = (int)xDivine;
+        int currZ = (int)zDivine;
         Camera.visibleDownX = currX-40;
         Camera.visibleUpX = currX+40;
         Camera.visibleDownY = currZ-40;
@@ -89,24 +96,106 @@ public class FPPCamera {
         else if (mouse.released.left) {
             mouse.setMouseGrabbed(false);
         }
-        if (keyboard.hold[Keyboard.KEY_D]) {
-            posx += (float)(Math.cos(angley+Math.PI/2))*fraction;
-            posz += (float)(Math.sin(angley+Math.PI/2))*fraction;
+        
+        if (!fixedHeight) {
+            if (keyboard.hold[Keyboard.KEY_D]) {
+                posx += (float)(Math.cos(angley+Math.PI/2))*fraction;
+                posz += (float)(Math.sin(angley+Math.PI/2))*fraction;
+            }
+            if (keyboard.hold[Keyboard.KEY_A]) {
+
+                posx += (float)(Math.cos(angley-Math.PI/2))*fraction;
+                posz += (float)(Math.sin(angley-Math.PI/2))*fraction;
+            }
+            if (keyboard.hold[Keyboard.KEY_W]) {
+                posx += dirx * fraction;
+                posz += dirz * fraction;
+                posy += diry * fraction;
+            }
+            if (keyboard.hold[Keyboard.KEY_S]) {
+                posx -= dirx * fraction;
+                posz -= dirz * fraction;
+                posy -= diry * fraction;
+            }
+
+            if (keyboard.hold[Keyboard.KEY_R]) {
+                posy += fraction;
+            }
+            else if (keyboard.hold[Keyboard.KEY_F]) {
+                posy -= fraction;
+            }
         }
-        if (keyboard.hold[Keyboard.KEY_A]) {
+        
+        if (fixedHeight) {
+            if (keyboard.hold[Keyboard.KEY_D]) {
+                posx += (float)(Math.cos(angley+Math.PI/2))*fraction;
+                posz += (float)(Math.sin(angley+Math.PI/2))*fraction;
+            }
+            if (keyboard.hold[Keyboard.KEY_A]) {
+                posx += (float)(Math.cos(angley-Math.PI/2))*fraction;
+                posz += (float)(Math.sin(angley-Math.PI/2))*fraction;
+            }
+            if (keyboard.hold[Keyboard.KEY_W]) {
+                posx += (float)(Math.cos(angley))*fraction;
+                posz += (float)(Math.sin(angley))*fraction;
+            }
+            if (keyboard.hold[Keyboard.KEY_S]) {
+                posx -= (float)(Math.cos(angley))*fraction;
+                posz -= (float)(Math.sin(angley))*fraction;
+            }
             
-            posx += (float)(Math.cos(angley-Math.PI/2))*fraction;
-            posz += (float)(Math.sin(angley-Math.PI/2))*fraction;
-        }
-        if (keyboard.hold[Keyboard.KEY_W]) {
-            posx += dirx * fraction;
-            posz += dirz * fraction;
-            posy += diry * fraction;
-        }
-        if (keyboard.hold[Keyboard.KEY_S]) {
-            posx -= dirx * fraction;
-            posz -= dirz * fraction;
-            posy -= diry * fraction;
+            if (keyboard.hold[Keyboard.KEY_LSHIFT]) {
+                if (mouse.scrollUp) {
+                    stickedHeight+=3;
+                }
+                else if (mouse.scrollDown && stickedHeight-3>1) {
+                    stickedHeight-=3;
+                }
+            }
+            else if (keyboard.hold[Keyboard.KEY_LCONTROL]) {
+                if (mouse.scrollUp) {
+                    stickedHeight+=0.3;
+                }
+                else if (mouse.scrollDown && stickedHeight-0.3f>1) {
+                    stickedHeight-=0.3;
+                }
+            }
+            
+            if (posx<=4.1) {
+                posx=4.1;
+            }
+            else if (posx>=Mapper.height*4-4.1) {
+                posx=Mapper.height*4-4.1;
+            }
+            
+            if (posz<=4.1) {
+                posz=4.1;
+            }
+            else if (posz>=Mapper.width*4-4.1) {
+                posz=Mapper.width*4-4.1;
+            }
+            
+            double xRatio = (posx%4d)/4d;
+            double zRatio = (posz%4d)/4d;
+            
+            xDivine = posx/4d;
+            zDivine = posz/4d;
+        
+            currX = (int)xDivine;
+            currZ = (int)zDivine;
+            
+            float v00 = Mapper.heightmap[currZ][currX]/35f*3f;
+            float v10 = Mapper.heightmap[currZ+1][currX]/35f*3f;
+            float v01 = Mapper.heightmap[currZ][currX+1]/35f*3f;
+            float v11 = Mapper.heightmap[currZ+1][currX+1]/35f*3f;
+            
+            double intX0 = v00*(1d-zRatio)+v10*zRatio;
+            double intX1 = v01*(1d-zRatio)+v11*zRatio;
+            double intY = intX0*(1d-xRatio)+intX1*xRatio;
+            
+            double height=intY;
+            height+=stickedHeight;
+            posy = height;
         }
     }
     
@@ -119,7 +208,7 @@ public class FPPCamera {
         GLU.gluPerspective(70, width/height, 0.1f, 260.0f);
         GL11.glMatrixMode(GL11.GL_MODELVIEW);
         GL11.glLoadIdentity();
-        GLU.gluLookAt(posx, posy, posz, posx+dirx, posy+diry, posz+dirz, 0, 1, 0);
+        GLU.gluLookAt((float)posx, (float)posy, (float)posz, (float)posx+dirx, (float)posy+diry, (float)posz+dirz, 0, 1, 0);
     }
     
     public static void reset() {
