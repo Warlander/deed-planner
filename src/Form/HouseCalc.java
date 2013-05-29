@@ -48,7 +48,7 @@ public class HouseCalc extends javax.swing.JFrame {
     public static double g=1;
     public static double b=1;
     
-    private final boolean release = true;
+    private final boolean release = false;
     private final boolean debug = false;
     private int version;
     private String visualVersion;
