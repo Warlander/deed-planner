@@ -78,20 +78,6 @@ public class GLInit {
         GL11.glLoadIdentity();
     }
     
-    private static IntBuffer arrayToBuffer(int[] arr) {
-        IntBuffer buff = BufferUtils.createIntBuffer(arr.length);
-        buff.put(arr);
-        buff.rewind();
-        return buff;
-    }
-    
-    private static FloatBuffer arrayToBuffer(float[] arr) {
-        FloatBuffer buff = BufferUtils.createFloatBuffer(arr.length);
-        buff.put(arr);
-        buff.rewind();
-        return buff;
-    }
-    
     public static void refit() {
         GL11.glViewport(0, 0, HouseCalc.programFrame.getWidth(), HouseCalc.programFrame.getHeight());
         GL11.glMatrixMode(GL11.GL_PROJECTION);

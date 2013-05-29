@@ -45,7 +45,7 @@ public class TextureLoader {
 
         GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 1);
 
-        GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGB, dec.getWidth(), dec.getHeight(), 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buf);
+        GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, dec.getWidth(), dec.getHeight(), 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buf);
         if (modern) {
             if (Properties.getProperty("useMipmaps")!=null) {
                 if ((boolean)Properties.getProperty("useMipmaps")) {

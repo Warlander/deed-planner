@@ -20,6 +20,7 @@ public class StatusBar extends javax.swing.JPanel {
         writName.setVisible(false);
         objectName.setVisible(false);
         elevationShow.setVisible(false);
+        helpLabel.setText("");
     }
     
     public void setGround(Ground ground) {
@@ -128,6 +129,7 @@ public class StatusBar extends javax.swing.JPanel {
         writName = new javax.swing.JLabel();
         objectName = new javax.swing.JLabel();
         elevationShow = new javax.swing.JLabel();
+        helpLabel = new javax.swing.JLabel();
 
         setBorder(javax.swing.BorderFactory.createMatteBorder(2, 0, 0, 0, new java.awt.Color(0, 0, 0)));
         setMaximumSize(new java.awt.Dimension(32767, 38));
@@ -169,10 +171,16 @@ public class StatusBar extends javax.swing.JPanel {
         elevationShow.setText("X 1000");
         add(elevationShow);
         elevationShow.setBounds(561, 2, 110, 15);
+
+        helpLabel.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        helpLabel.setText("Help label");
+        add(helpLabel);
+        helpLabel.setBounds(561, 23, 120, 15);
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel elevationShow;
     public static javax.swing.JLabel errorLabel;
+    public javax.swing.JLabel helpLabel;
     private javax.swing.JLabel objectName;
     public static Form.TipLabel tipLabel1;
     private javax.swing.JLabel writName;

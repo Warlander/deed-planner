@@ -8,6 +8,7 @@ import Lib.Graphics.GLInit;
 import Lib.Graphics.Ground;
 import Lib.Object.Data;
 import Lib.Object.DataLoader;
+import Lib.Object.Label;
 import Lib.Object.Rotation;
 import Lib.Object.Structure;
 import Lib.Object.Type;
@@ -64,6 +65,7 @@ public class Mapper {
     public static float diffElevation = 0;
     public static Data[][][] tiles=new Data[25][25][15];
     public static Structure[][][] objects = new Structure[100][100][15];
+    public static Label[][] labels = new Label[25][25];
     public static Data[][][] bordersx=new Data[25][25][15];
     public static Data[][][] bordersy=new Data[25][25][15];
     
@@ -248,17 +250,28 @@ public class Mapper {
                                 bordersx[i][i2][i3].render(-i, i2, i3, Rotation.horizontal);
                             }
                         }
-                        for (int i4=0; i4<4; i4++) {
-                            for (int i5=0; i5<4; i5++) {
-                                if (i*4+i4>=0 && i*4+i4<width*4 && i2*4+i5>=0 && i2*4+i5<height*4 && objects[i*4+i4][i2*4+i5][i3]!=null) {
-                                    objects[i*4+i4][i2*4+i5][i3].render(-(i*4+i4), i2*4+i5, i3);
-                                }
-                            }
-                        }
                     }
                 }
             }
         GL11.glPopMatrix();
+        
+        for (int i=Camera.visibleDownY; i<Camera.visibleUpY; i++) {
+            for (int i2=Camera.visibleDownX; i2<Camera.visibleUpX; i2++) {
+                if (i>=0 && i<width && i2>=0 && i2<height && labels[i][i2]!=null) {
+                    labels[i][i2].render(i, i2);
+                }
+                for (int i3=0; i3<15; i3++) {
+                    for (int i4=0; i4<4; i4++) {
+                        for (int i5=0; i5<4; i5++) {
+                            if (i*4+i4>=0 && i*4+i4<width*4 && i2*4+i5>=0 && i2*4+i5<height*4 && objects[i*4+i4][i2*4+i5][i3]!=null) {
+                                objects[i*4+i4][i2*4+i5][i3].render(i*4+i4, i2*4+i5, i3);
+                            }
+                        }
+                    }                    
+                }
+            }
+        }
+        
         if (keyboard.pressed[Keyboard.KEY_F11]) {
             Screenshot.takeScreenshot();
         }

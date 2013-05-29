@@ -98,6 +98,11 @@ public class HeightUpdater {
                                 smoothHeight(point);
                             }
                             break;
+                        case "Level area":
+                            if ((mouse.pressed.left ^ mouse.pressed.right) && points.length==1) {
+                                levelArea(mouse, point);
+                            }
+                            break;
                     }
                 }
             }
@@ -277,6 +282,34 @@ public class HeightUpdater {
                     }
                 }
             }
+            p2=null;
+        }
+    }
+    
+    private void levelArea(MouseInput mouse, Point p1) {
+        if (p2==null) {
+            p2 = p1;
+        }
+        else {
+            int minX = Math.min(p1.getX(), p2.getX());
+            int maxX = Math.max(p1.getX(), p2.getX());
+            int minY = Math.min(p1.getY(), p2.getY());
+            int maxY = Math.max(p1.getY(), p2.getY());
+            
+            int set;
+            if (mouse.pressed.left) {
+                set = HouseCalc.elevationSetLeft;
+            }
+            else {
+                set = HouseCalc.elevationSetRight;
+            }
+            
+            for (int i=minX; i<=maxX; i++) {
+                for (int i2=minY; i2<=maxY; i2++) {
+                    Mapper.heightmap[i][i2] = set;
+                }
+            }
+            
             p2=null;
         }
     }

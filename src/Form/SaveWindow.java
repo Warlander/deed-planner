@@ -3,6 +3,7 @@ package Form;
 import Lib.Files.FileManager;
 import Lib.Graphics.Ground;
 import Lib.Object.Writ;
+import Mapper.Data.D;
 import Mapper.Mapper;
 import java.awt.Desktop;
 import java.awt.Toolkit;
@@ -27,6 +28,7 @@ import javax.swing.filechooser.FileFilter;
 
 public class SaveWindow extends javax.swing.JFrame {
 
+    private final String endl = System.getProperty("line.separator");
     private final String slash = System.getProperty("file.separator");
     private static String previousDir;
     
@@ -54,19 +56,30 @@ public class SaveWindow extends javax.swing.JFrame {
     
     private void saveMaker() {
         StringBuilder maps = new StringBuilder();
-        maps.append("0.9|");
-        maps.append(Mapper.width).append(",").append(Mapper.height).append(",");
+        maps.append("1.0|").append(endl);
+        maps.append(Mapper.width).append(" ").append(Mapper.height).append(endl);
         
         for (int x=0; x<=Mapper.width; x++) {
             for (int y=0; y<=Mapper.height; y++) {
-                maps.append((int)Mapper.heightmap[x][y]).append(",");
+                if (Mapper.heightmap[x][y]!=0f) {
+                    saveHeight(maps, x, y);
+                }
             }
         }
         
         for (int x=0; x<Mapper.width; x++) {
             for (int y=0; y<Mapper.height; y++) {
-                maps.append(Mapper.ground[x][y].shortName).append(",");
-                maps.append(Mapper.caveGround[x][y].shortName).append(",");
+                if (!Mapper.ground[x][y].shortName.equals(D.grounds.get(0).shortName)) {
+                    saveGround(maps, x, y);
+                }
+            }
+        }
+        
+        for (int x=0; x<Mapper.width; x++) {
+            for (int y=0; y<Mapper.height; y++) {
+                if (!Mapper.caveGround[x][y].shortName.equals(D.caveGrounds.get(0).shortName)) {
+                    saveCave(maps, x, y);
+                }
             }
         }
         
@@ -74,12 +87,8 @@ public class SaveWindow extends javax.swing.JFrame {
             for (int x=0; x<Mapper.width*4; x++) {
                 for (int y=0; y<Mapper.height*4; y++) {
                     if (Mapper.objects[x][y][z]!=null) {
-                        maps.append(Mapper.objects[x][y][z].shortName).append(";").append(Mapper.objects[x][y][z].rPaint).append(";").append(Mapper.objects[x][y][z].gPaint).append(";").append(Mapper.objects[x][y][z].bPaint);
+                        saveObject(maps, x, y, z);
                     }
-                    else {
-                        maps.append("0");
-                    }
-                    maps.append(",");
                 }
             }
         }
@@ -88,51 +97,111 @@ public class SaveWindow extends javax.swing.JFrame {
             for (int x=0; x<Mapper.width; x++) {
                 for (int y=0; y<Mapper.height; y++) {
                     if (Mapper.tiles[x][y][z]!=null) {
-                        maps.append(Mapper.tiles[x][y][z].shortName);
+                        saveTile(maps, x, y, z);
                     }
-                    else {
-                        maps.append("0");
-                    }
-                    maps.append(",");
-                    if (Mapper.bordersx[x][y][z]!=null) {
-                        maps.append(Mapper.bordersx[x][y][z].shortName).append(";").append(Mapper.bordersx[x][y][z].rPaint).append(";").append(Mapper.bordersx[x][y][z].gPaint).append(";").append(Mapper.bordersx[x][y][z].bPaint);
-                    }
-                    else {
-                        maps.append("0");
-                    }
-                    maps.append(",");
-                    if (Mapper.bordersy[x][y][z]!=null) {
-                        maps.append(Mapper.bordersy[x][y][z].shortName).append(";").append(Mapper.bordersy[x][y][z].rPaint).append(";").append(Mapper.bordersy[x][y][z].gPaint).append(";").append(Mapper.bordersy[x][y][z].bPaint);
-                    }
-                    else {
-                        maps.append("0");
-                    }
-                    maps.append(",");
                 }
             }
         }
         
-        maps.append(Mapper.updater.writUpdater.model.size()).append(",");
+        for (int z=0; z<15; z++) {
+            for (int x=0; x<Mapper.width; x++) {
+                for (int y=0; y<Mapper.height; y++) {
+                    if (Mapper.bordersx[x][y][z]!=null) {
+                        saveBorderX(maps, x, y, z);
+                    }
+                }
+            }
+        }
+        
+        for (int z=0; z<15; z++) {
+            for (int x=0; x<Mapper.width; x++) {
+                for (int y=0; y<Mapper.height; y++) {
+                    if (Mapper.bordersy[x][y][z]!=null) {
+                        saveBorderY(maps, x, y, z);
+                    }
+                }
+            }
+        }
+        
+        for (int x=0; x<Mapper.width; x++) {
+            for (int y=0; y<Mapper.height; y++) {
+                if (Mapper.labels[x][y]!=null) {
+                    saveLabel(maps, x, y);
+                }
+            }
+        }
+        
         if (!Mapper.updater.writUpdater.model.isEmpty()) {
             for (int i=0; i<Mapper.updater.writUpdater.model.size(); i++) {
                 Writ w = (Writ)Mapper.updater.writUpdater.model.get(i);
-                maps.append(w.name).append(";");
-                for (int i2=0; i2<w.tiles.size(); i2++) {
-                    Ground g = w.tiles.get(i2);
-                    maps.append(g.x).append(".").append(g.y);
-                    maps.append(";");
-                }
-                maps.append("end;");
+                saveWrit(maps, w);
             }
         }
         save = maps.toString();
     }
-
+    
+    private void saveHeight(StringBuilder builder, int x, int y) {
+        builder.append("H ").append(x).append(" ").append(y).append(" ").append((int)Mapper.heightmap[x][y]).append(endl);
+    }
+    
+    private void saveGround(StringBuilder builder, int x, int y) {
+        builder.append("G ").append(x).append(" ").append(y).append(" ").append(Mapper.ground[x][y].shortName).append(endl);
+    }
+    
+    private void saveCave(StringBuilder builder, int x, int y) {
+        builder.append("C ").append(x).append(" ").append(y).append(" ").append(Mapper.caveGround[x][y].shortName).append(endl);
+    }
+    
     /**
-     * This method is called from within the constructor to initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is always
-     * regenerated by the Form Editor.
+     * 1. Type
+     * 2. x coord
+     * 3. y coord
+     * 4. z coord
+     * 5. Shortname
+     * 6. Red
+     * 7. Green
+     * 8. Blue
+     * 9. Rotation
      */
+    private void saveObject(StringBuilder builder, int x, int y, int z) {
+        builder.append("O ").append(x).append(" ").append(y).append(" ").append(z).append(" ").append(Mapper.objects[x][y][z].shortName).append(" ").append(Mapper.objects[x][y][z].rPaint).append(" ").append(Mapper.objects[x][y][z].gPaint).append(" ").append(Mapper.objects[x][y][z].bPaint).append(" ").append(Mapper.objects[x][y][z].rotation).append(endl);
+    }
+    
+    private void saveTile(StringBuilder builder, int x, int y, int z) {
+        builder.append("T ").append(x).append(" ").append(y).append(" ").append(z).append(" ").append(Mapper.tiles[x][y][z].shortName).append(endl);
+    }
+    
+    private void saveBorderX(StringBuilder builder, int x, int y, int z) {
+        builder.append("BX ").append(x).append(" ").append(y).append(" ").append(z).append(" ").append(Mapper.bordersx[x][y][z].shortName).append(" ").append(Mapper.bordersx[x][y][z].rPaint).append(" ").append(Mapper.bordersx[x][y][z].gPaint).append(" ").append(Mapper.bordersx[x][y][z].bPaint).append(endl);
+    }
+    
+    private void saveBorderY(StringBuilder builder, int x, int y, int z) {
+        builder.append("BY ").append(x).append(" ").append(y).append(" ").append(z).append(" ").append(Mapper.bordersy[x][y][z].shortName).append(" ").append(Mapper.bordersy[x][y][z].rPaint).append(" ").append(Mapper.bordersy[x][y][z].gPaint).append(" ").append(Mapper.bordersy[x][y][z].bPaint).append(endl);
+    }
+    
+    /**
+     * 1. Type
+     * 2. x coord
+     * 3. y coord
+     * 4. Text
+     * 5. Font
+     * 6. Size
+     * 7. Red
+     * 8. Green
+     * 9. Blue
+     * 10. Alpha
+     */
+    private void saveLabel(StringBuilder builder, int x, int y) {
+        builder.append("L ").append(x).append(" ").append(y).append(" ").append(Mapper.labels[x][y].text.replace(" ", "_").replace("\n", "\\n")).append(" ").append(Mapper.labels[x][y].font.getName().replace(" ", "_")).append(" ").append(Mapper.labels[x][y].font.getSize()).append(" ").append(Mapper.labels[x][y].color.getRed()).append(" ").append(Mapper.labels[x][y].color.getGreen()).append(" ").append(Mapper.labels[x][y].color.getBlue()).append(" ").append(Mapper.labels[x][y].color.getAlpha()).append(endl);
+    }
+    
+    private void saveWrit(StringBuilder builder, Writ writ) {
+        builder.append("W ").append(writ.name.replace(" ", "_")).append(" ").append(writ.tiles.size());
+        for (Ground g : writ.tiles) {
+            builder.append(" ").append(g.x).append(" ").append(g.y);
+        }
+    }
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -148,9 +217,11 @@ public class SaveWindow extends javax.swing.JFrame {
         jTextField1 = new javax.swing.JTextField();
         jButton5 = new javax.swing.JButton();
         jButton6 = new javax.swing.JButton();
+        pasteExpiration = new javax.swing.JComboBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Save map");
+        setMinimumSize(new java.awt.Dimension(500, 400));
 
         jButton1.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jButton1.setText("Save to file");
@@ -215,6 +286,10 @@ public class SaveWindow extends javax.swing.JFrame {
             }
         });
 
+        pasteExpiration.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        pasteExpiration.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "10 minutes", "1 hour", "1 day", "1 week", "2 weeks", "1 month", "Never delete" }));
+        pasteExpiration.setSelectedIndex(5);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -222,21 +297,24 @@ public class SaveWindow extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jButton1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jButton3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jScrollPane1)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton4)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton5)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton6)
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                            .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(jButton4)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(jButton5)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(jButton6))
+                        .addGroup(layout.createSequentialGroup()
+                            .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, 324, Short.MAX_VALUE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(pasteExpiration, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -249,7 +327,9 @@ public class SaveWindow extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton2)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton2)
+                    .addComponent(pasteExpiration, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -267,13 +347,34 @@ public class SaveWindow extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-
         try {
             String data;
             data = URLEncoder.encode("api_dev_key", "UTF-8") + "=" + URLEncoder.encode("24844c99ae9971a2da79a2f7d0da7642", "UTF-8");
             data += "&" + URLEncoder.encode("api_paste_code", "UTF-8") + "=" + URLEncoder.encode(save, "UTF-8");
             data += "&" + URLEncoder.encode("api_option", "UTF-8") + "=" + URLEncoder.encode("paste", "UTF-8");
-            data += "&" + URLEncoder.encode("api_paste_expire_date", "UTF-8") + "=" + URLEncoder.encode("1M", "UTF-8");
+            switch ((String)pasteExpiration.getModel().getSelectedItem()) {
+                case "10 minutes":
+                    data += "&" + URLEncoder.encode("api_paste_expire_date", "UTF-8") + "=" + URLEncoder.encode("10M", "UTF-8");
+                    break;
+                case "1 hour":
+                    data += "&" + URLEncoder.encode("api_paste_expire_date", "UTF-8") + "=" + URLEncoder.encode("1H", "UTF-8");
+                    break;
+                case "1 day":
+                    data += "&" + URLEncoder.encode("api_paste_expire_date", "UTF-8") + "=" + URLEncoder.encode("1D", "UTF-8");
+                    break;
+                case "1 week":
+                    data += "&" + URLEncoder.encode("api_paste_expire_date", "UTF-8") + "=" + URLEncoder.encode("1W", "UTF-8");
+                    break;
+                case "2 weeks":
+                    data += "&" + URLEncoder.encode("api_paste_expire_date", "UTF-8") + "=" + URLEncoder.encode("2W", "UTF-8");
+                    break;
+                case "1 month":
+                    data += "&" + URLEncoder.encode("api_paste_expire_date", "UTF-8") + "=" + URLEncoder.encode("1M", "UTF-8");
+                    break;
+                case "Never delete":
+                    data += "&" + URLEncoder.encode("api_paste_expire_date", "UTF-8") + "=" + URLEncoder.encode("N", "UTF-8");
+                    break;
+            }
             URL url = new URL("http://pastebin.com/api/api_post.php");
             URLConnection conn = url.openConnection();
             conn.setDoOutput(true);
@@ -296,7 +397,6 @@ public class SaveWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-
         JFileChooser fc = new JFileChooser();
         FileFilter filter = new ExtensionFileFilter(".MAP file", new String[] { "MAP" });
         fc.setFileFilter(filter);
@@ -355,7 +455,6 @@ public class SaveWindow extends javax.swing.JFrame {
 
     private class ExtensionFileFilter extends FileFilter {
         String description;
-
         String extensions[];
 
         public ExtensionFileFilter(String description, String extension) {
@@ -439,5 +538,6 @@ public class SaveWindow extends javax.swing.JFrame {
     private javax.swing.JList jList1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextField jTextField1;
+    private javax.swing.JComboBox pasteExpiration;
     // End of variables declaration//GEN-END:variables
 }

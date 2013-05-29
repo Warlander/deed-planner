@@ -3,6 +3,7 @@ package Form;
 import Lib.Files.FileManager;
 import Lib.Graphics.Ground;
 import Lib.Object.Data;
+import Lib.Object.Label;
 import Lib.Object.Structure;
 import Lib.Object.Writ;
 import Mapper.Data.D;
@@ -18,14 +19,18 @@ import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 import Mapper.Mapper;
 import Mapper.UpCamera;
+import java.awt.Font;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.FileReader;
 import java.io.InputStreamReader;
+import java.util.Scanner;
 import javax.swing.DefaultListModel;
+import org.lwjgl.util.Color;
 
 public class LoadWindow extends javax.swing.JFrame {
 
+    private final String endl = System.getProperty("line.separator");
     private static String ver=null;
     
     DefaultListModel list;
@@ -53,6 +58,13 @@ public class LoadWindow extends javax.swing.JFrame {
         ver = version;
         HouseCalc.reset();
         switch(version) {
+            case "1.0":
+                try {
+                    load1_0(load);
+                } catch (IOException ex) {
+                    Logger.getLogger(LoadWindow.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                break;
             case "0.9":
                 load0_9(load);
                 break;
@@ -74,6 +86,182 @@ public class LoadWindow extends javax.swing.JFrame {
         }
         UpCamera.reset();
         FPPCamera.reset();
+    }
+    
+    private static void load1_0(String load) throws IOException {
+        Mapper.updater.writUpdater.model.clear();
+        
+        InputStream is = new ByteArrayInputStream(load.getBytes());
+	BufferedReader br = new BufferedReader(new InputStreamReader(is));
+        Scanner scan;
+        
+        br.readLine();
+        String line = br.readLine();
+        scan = new Scanner(line);
+        int width = scan.nextInt();
+        int height = scan.nextInt();
+        
+        float[][] heightmap = new float[width+1][height+1];
+        Ground[][] ground = new Ground[width][height];
+        Ground[][] caveGround = new Ground[width][height];
+        Label[][] labels = new Label[width][height];
+        Structure[][][] objects = new Structure[width*4][height*4][15];
+        Data[][][] tiles = new Data[width][height][15];
+        Data[][][] bordersx = new Data[width][height][15];
+        Data[][][] bordersy = new Data[width][height][15];
+        
+        for (int i=0; i<width; i++) {
+            for (int i2=0; i2<height; i2++) {
+                ground[i][i2] = D.grounds.get(0).copy(i, i2);
+                caveGround[i][i2] = D.caveGrounds.get(0).copy(i, i2);
+            }
+        }
+        
+        while ((line=br.readLine())!=null) {
+            scan = new Scanner(line);
+            
+            switch (scan.next()) {
+                case "H":
+                    readHeight(scan, heightmap);
+                    break;
+                case "G":
+                    readGround(scan, ground);
+                    break;
+                case "C":
+                    readCave(scan, caveGround);
+                    break;
+                case "O":
+                    readObject(scan, objects);
+                    break;
+                case "T":
+                    readTile(scan, tiles);
+                    break;
+                case "BX":
+                    readBorder(scan, bordersx);
+                    break;
+                case "BY":
+                    readBorder(scan, bordersy);
+                    break;
+                case "L":
+                    readLabel(scan, labels);
+                    break;
+                case "W":
+                    readWrit(scan, ground, Mapper.updater.writUpdater.model);
+                    break;
+            }
+        }
+        
+        Mapper.width = width;
+        Mapper.height = height;
+        Mapper.heightmap = heightmap;
+        Mapper.updater.heightUpdater.checkElevations();
+        Mapper.ground = ground;
+        Mapper.labels = labels;
+        Mapper.caveGround = caveGround;
+        Mapper.tiles = tiles;
+        Mapper.updater.roofUpdater.roofsRefit();
+        Mapper.objects = objects;
+        Mapper.bordersx = bordersx;
+        Mapper.bordersy = bordersy;
+        
+        int cap = Mapper.updater.writUpdater.model.getSize()+1;
+        HouseCalc.jTextField1.setText("Writ "+cap);
+    }
+    
+    public static void readHeight(Scanner source, float[][] out) {
+        int x = source.nextInt();
+        int y = source.nextInt();
+        int val = source.nextInt();
+        
+        out[x][y] = val;
+    }
+    
+    public static void readGround(Scanner source, Ground[][] out) {
+        int x = source.nextInt();
+        int y = source.nextInt();
+        String shortName = source.next();
+        
+        out[x][y] = getGround(shortName, x, y);
+    }
+    
+    public static void readCave(Scanner source, Ground[][] out) {
+        int x = source.nextInt();
+        int y = source.nextInt();
+        String shortName = source.next();
+        
+        out[x][y] = getCaveGround(shortName, x, y);
+    }
+    
+    public static void readObject(Scanner source, Structure[][][] out) {
+        int x = source.nextInt();
+        int y = source.nextInt();
+        int z = source.nextInt();
+        String shortName = source.next();
+        double rPaint = Double.parseDouble(source.next());
+        double gPaint = Double.parseDouble(source.next());
+        double bPaint = Double.parseDouble(source.next());
+        
+        Structure object = getStructure(shortName);
+        object.rPaint = rPaint;
+        object.gPaint = gPaint;
+        object.bPaint = bPaint;
+        out[x][y][z] = object;
+    }
+    
+    public static void readTile(Scanner source, Data[][][] out) {
+        int x = source.nextInt();
+        int y = source.nextInt();
+        int z = source.nextInt();
+        String shortName = source.next();
+        
+        out[x][y][z] = getData(shortName);
+    }
+    
+    public static void readBorder(Scanner source, Data[][][] out) {
+        int x = source.nextInt();
+        int y = source.nextInt();
+        int z = source.nextInt();
+        String shortName = source.next();
+        double rPaint = Double.parseDouble(source.next());
+        double gPaint = Double.parseDouble(source.next());
+        double bPaint = Double.parseDouble(source.next());
+        
+        Data object = getData(shortName);
+        object.rPaint = rPaint;
+        object.gPaint = gPaint;
+        object.bPaint = bPaint;
+        out[x][y][z] = object;
+    }
+    
+    public static void readLabel(Scanner source, Label[][] out) {
+        int x = source.nextInt();
+        int y = source.nextInt();
+        String text = source.next().replace("_", " ").replace("\\n", "\n");
+        String font = source.next().replace("_", " ");
+        int size = Integer.parseInt(source.next());
+        int rPaint = Integer.parseInt(source.next());
+        int gPaint = Integer.parseInt(source.next());
+        int bPaint = Integer.parseInt(source.next());
+        int aPaint = Integer.parseInt(source.next());
+        
+        Font f = new Font(font, Font.PLAIN, size);
+        Color c = new Color(rPaint, gPaint, bPaint, aPaint);
+        Label object = new Label(f, c, text);
+        out[x][y] = object;
+    }
+    
+    public static void readWrit(Scanner source, Ground[][] in, DefaultListModel out) {
+        String shortName = source.next().replace("_", " ");
+        int tiles = source.nextInt();
+        
+        Writ w = new Writ(shortName);
+        
+        for (int i=0; i<tiles; i++) {
+            int x = source.nextInt();
+            int y = source.nextInt();
+            w.tiles.add(in[x][y]);
+        }
+        out.addElement(w);
     }
     
     private static void load0_9(String load) {
@@ -104,7 +292,7 @@ public class LoadWindow extends javax.swing.JFrame {
                 String name = readToChar(br, ',');
                 ground[x][y] = getGround(name, x, y);
                 name = readToChar(br, ',');
-                caveGround[x][y] = getGround(name, x, y);
+                caveGround[x][y] = getCaveGround(name, x, y);
             }
         }
         
@@ -144,14 +332,16 @@ public class LoadWindow extends javax.swing.JFrame {
             Mapper.updater.writUpdater.model.addElement(w);
         }
         
-        Mapper.heightmap = heightmap;
-        Mapper.ground = ground;
-        Mapper.caveGround = caveGround;
-        Mapper.tiles = tiles;
-        Mapper.bordersx = bordersx;
-        Mapper.bordersy = bordersy;
         Mapper.width = width;
         Mapper.height = height;
+        Mapper.heightmap = heightmap;
+        Mapper.ground = ground;
+        Mapper.labels = new Label[width][height];
+        Mapper.caveGround = caveGround;
+        Mapper.tiles = tiles;
+        Mapper.objects = objects;
+        Mapper.bordersx = bordersx;
+        Mapper.bordersy = bordersy;
         
         int cap = Mapper.updater.writUpdater.model.getSize()+1;
         HouseCalc.jTextField1.setText("Writ "+cap);
@@ -217,14 +407,16 @@ public class LoadWindow extends javax.swing.JFrame {
             Mapper.updater.writUpdater.model.addElement(w);
         }
         
+        Mapper.width = width;
+        Mapper.height = height;
         Mapper.heightmap = heightmap;
         Mapper.ground = ground;
+        Mapper.labels = new Label[width][height];
         Mapper.caveGround = caveGround;
+        Mapper.objects = new Structure[width*4][height*4][15];
         Mapper.tiles = tiles;
         Mapper.bordersx = bordersx;
         Mapper.bordersy = bordersy;
-        Mapper.width = width;
-        Mapper.height = height;
         
         int cap = Mapper.updater.writUpdater.model.getSize()+1;
         HouseCalc.jTextField1.setText("Writ "+cap);
@@ -283,14 +475,16 @@ public class LoadWindow extends javax.swing.JFrame {
             Mapper.updater.writUpdater.model.addElement(w);
         }
         
+        Mapper.width = width;
+        Mapper.height = height;
         Mapper.heightmap = new float[width+1][height+1];
+        Mapper.labels = new Label[width][height];
         Mapper.ground = ground;
         Mapper.caveGround = caveGround;
         Mapper.tiles = tiles;
+        Mapper.objects = new Structure[width*4][height*4][15];
         Mapper.bordersx = bordersx;
         Mapper.bordersy = bordersy;
-        Mapper.width = width;
-        Mapper.height = height;
         
         int cap = Mapper.updater.writUpdater.model.getSize()+1;
         HouseCalc.jTextField1.setText("Writ "+cap);
@@ -332,14 +526,16 @@ public class LoadWindow extends javax.swing.JFrame {
             }
         }
         
+        Mapper.width = width;
+        Mapper.height = height;
         Mapper.heightmap = new float[width+1][height+1];
+        Mapper.labels = new Label[width][height];
         Mapper.ground = ground;
         Mapper.caveGround = caveGround;
         Mapper.tiles = tiles;
+        Mapper.objects = new Structure[width*4][height*4][15];
         Mapper.bordersx = bordersx;
         Mapper.bordersy = bordersy;
-        Mapper.width = width;
-        Mapper.height = height;
         Mapper.wData=null;
         
         Mapper.updater.roofUpdater.roofsRefit();
@@ -381,8 +577,10 @@ public class LoadWindow extends javax.swing.JFrame {
         }
         
         Mapper.heightmap = new float[width+1][height+1];
+        Mapper.labels = new Label[width][height];
         Mapper.ground = ground;
         Mapper.tiles = tiles;
+        Mapper.objects = new Structure[width*4][height*4][15];
         Mapper.bordersx = bordersx;
         Mapper.bordersy = bordersy;
         Mapper.width = width;
@@ -483,6 +681,15 @@ public class LoadWindow extends javax.swing.JFrame {
     
     private static Ground getGround(String shortName, int x, int y) {
         for (Ground g : D.grounds) {
+            if (g.shortName.equals(shortName)) {
+                return g.copy(x, y);
+            }
+        }
+        return null;
+    }
+    
+    private static Ground getCaveGround(String shortName, int x, int y) {
+        for (Ground g : D.caveGrounds) {
             if (g.shortName.equals(shortName)) {
                 return g.copy(x, y);
             }
@@ -629,12 +836,14 @@ public class LoadWindow extends javax.swing.JFrame {
             URL uri = new URL(url);
             URLConnection conn = uri.openConnection();
             InputStream in = conn.getInputStream();
-            String output="";
-            while (in.available()>0) {
-                output = output.concat(String.valueOf((char)in.read()));
+            BufferedReader read = new BufferedReader(new InputStreamReader(in));
+            StringBuilder output=new StringBuilder();
+            String line;
+            while ((line=read.readLine())!=null) {
+                output.append(line).append(endl);
             }
             in.close();
-            loadManager(output);
+            loadManager(output.toString());
         } catch (IOException ex) {
             Logger.getLogger(LoadWindow.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -652,9 +861,13 @@ public class LoadWindow extends javax.swing.JFrame {
             File file = fc.getSelectedFile();
             try {
                 BufferedReader read = new BufferedReader(new FileReader(file));
-                String out = read.readLine();
+                StringBuilder output = new StringBuilder();
+                String line;
+                while ((line=read.readLine())!=null) {
+                    output.append(line).append(endl);
+                }
                 read.close();
-                loadManager(out);
+                loadManager(output.toString());
             } catch (IOException ex) {
                 Logger.getLogger(SaveWindow.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -668,9 +881,13 @@ public class LoadWindow extends javax.swing.JFrame {
            File file = ((FileWrapper)jList1.getSelectedValue()).file;
             try {
                 BufferedReader read = new BufferedReader(new FileReader(file));
-                String out = read.readLine();
+                StringBuilder output = new StringBuilder();
+                String line;
+                while ((line=read.readLine())!=null) {
+                    output.append(line).append(endl);
+                }
                 read.close();
-                loadManager(out);
+                loadManager(output.toString());
                 setVisible(false);
                 dispose();
             } catch (IOException ex) {

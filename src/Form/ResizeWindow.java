@@ -2,6 +2,7 @@ package Form;
 
 import Lib.Graphics.Ground;
 import Lib.Object.Data;
+import Lib.Object.Label;
 import Lib.Object.Structure;
 import Mapper.Data.D;
 import Mapper.Mapper;
@@ -169,6 +170,7 @@ public class ResizeWindow extends javax.swing.JFrame {
         Data[][][] bordersy = new Data[Mapper.width+right+left][Mapper.height+up+down][15];
         Ground[][] ground = new Ground[Mapper.width+right+left][Mapper.height+up+down];
         Ground[][] caveGround = new Ground[Mapper.width+right+left][Mapper.height+up+down];
+        Label[][] labels = new Label[Mapper.width+right+left][Mapper.height+up+down];
         float[][] heightmap = new float[Mapper.width+right+left+1][Mapper.height+up+down+1];
         
         int xReg = 0;
@@ -187,6 +189,7 @@ public class ResizeWindow extends javax.swing.JFrame {
                         bordersx[xReg][yReg][i3] = Mapper.bordersx[i][i2][i3];
                         bordersy[xReg][yReg][i3] = Mapper.bordersy[i][i2][i3];
                     }
+                    labels[xReg][yReg] = Mapper.labels[i][i2];
                     ground[xReg][yReg] = Mapper.ground[i][i2];
                     caveGround[xReg][yReg] = Mapper.caveGround[i][i2];
                 }
@@ -223,12 +226,20 @@ public class ResizeWindow extends javax.swing.JFrame {
             }
         }
         
+        if (Mapper.width>width) {
+            Mapper.width = width;
+        }
+        if (Mapper.height>height) {
+            Mapper.height = height;
+        }
         Mapper.heightmap = heightmap;
+        Mapper.labels = labels;
         Mapper.objects = objects;
         Mapper.tiles = tiles;
         Mapper.bordersx = bordersx;
         Mapper.bordersy = bordersy;
         Mapper.ground = ground;
+        Mapper.caveGround = caveGround;
         Mapper.width = width;
         Mapper.height = height;
         close();
