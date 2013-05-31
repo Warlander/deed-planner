@@ -171,6 +171,7 @@ public class ResizeWindow extends javax.swing.JFrame {
         Ground[][] ground = new Ground[Mapper.width+right+left][Mapper.height+up+down];
         Ground[][] caveGround = new Ground[Mapper.width+right+left][Mapper.height+up+down];
         Label[][] labels = new Label[Mapper.width+right+left][Mapper.height+up+down];
+        Label[][] caveLabels = new Label[Mapper.width+right+left][Mapper.height+up+down];
         float[][] heightmap = new float[Mapper.width+right+left+1][Mapper.height+up+down+1];
         
         int xReg = 0;
@@ -190,6 +191,7 @@ public class ResizeWindow extends javax.swing.JFrame {
                         bordersy[xReg][yReg][i3] = Mapper.bordersy[i][i2][i3];
                     }
                     labels[xReg][yReg] = Mapper.labels[i][i2];
+                    caveLabels[xReg][yReg] = Mapper.caveLabels[i][i2];
                     ground[xReg][yReg] = Mapper.ground[i][i2];
                     caveGround[xReg][yReg] = Mapper.caveGround[i][i2];
                 }
@@ -234,6 +236,7 @@ public class ResizeWindow extends javax.swing.JFrame {
         }
         Mapper.heightmap = heightmap;
         Mapper.labels = labels;
+        Mapper.caveLabels = caveLabels;
         Mapper.objects = objects;
         Mapper.tiles = tiles;
         Mapper.bordersx = bordersx;

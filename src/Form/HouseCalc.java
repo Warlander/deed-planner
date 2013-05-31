@@ -55,6 +55,7 @@ public class HouseCalc extends javax.swing.JFrame {
     private boolean checkVersion = true;
     
     public HouseCalc() {
+        
         System.setProperty("Dsun.java2d.opengl", "true");
         getProperties();
         BufferedReader reader=null;
@@ -237,6 +238,7 @@ public class HouseCalc extends javax.swing.JFrame {
         writMoveDown = new javax.swing.JLabel();
         jSpinner2 = new javax.swing.JSpinner();
         jButton10 = new javax.swing.JButton();
+        jButton11 = new javax.swing.JButton();
         elevationCreatorPane = new javax.swing.JPanel();
         jLabel6 = new javax.swing.JLabel();
         addSpinner = new javax.swing.JSpinner();
@@ -329,7 +331,7 @@ public class HouseCalc extends javax.swing.JFrame {
 
             elevationList.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
             elevationList.setModel(new javax.swing.AbstractListModel() {
-                String[] strings = { "Increase height", "Decrease height", "Set height", "Select height", "Reset height", "Smooth height", "Level area" };
+                String[] strings = { "Increase/decrease height", "Increase/decrease area height", "Set height", "Select height", "Reset height", "Smooth height", "Level area" };
                 public int getSize() { return strings.length; }
                 public Object getElementAt(int i) { return strings[i]; }
             });
@@ -593,7 +595,7 @@ public class HouseCalc extends javax.swing.JFrame {
                 }
             });
             writCreatorPane.add(jButton7);
-            jButton7.setBounds(10, 10, 71, 21);
+            jButton7.setBounds(10, 10, 75, 21);
 
             jToggleButton1.setFont(new java.awt.Font("Arial", 0, 10)); // NOI18N
             jToggleButton1.setSelected(true);
@@ -616,15 +618,16 @@ public class HouseCalc extends javax.swing.JFrame {
             writCreatorPane.add(jToggleButton2);
             jToggleButton2.setBounds(105, 95, 95, 21);
 
-            jButton8.setFont(new java.awt.Font("Arial", 0, 10)); // NOI18N
-            jButton8.setText("Delete selected writ and whole building");
+            jButton8.setFont(new java.awt.Font("Arial", 1, 10)); // NOI18N
+            jButton8.setForeground(new java.awt.Color(255, 0, 0));
+            jButton8.setText("Delete building");
             jButton8.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
                     jButton8ActionPerformed(evt);
                 }
             });
             writCreatorPane.add(jButton8);
-            jButton8.setBounds(10, 35, 230, 20);
+            jButton8.setBounds(95, 35, 150, 20);
 
             jTextField1.setFont(new java.awt.Font("Arial", 0, 10)); // NOI18N
             jTextField1.setText("Writ 1");
@@ -634,7 +637,7 @@ public class HouseCalc extends javax.swing.JFrame {
                 }
             });
             writCreatorPane.add(jTextField1);
-            jTextField1.setBounds(90, 10, 153, 20);
+            jTextField1.setBounds(93, 10, 150, 20);
 
             writMoveUp.setFont(new java.awt.Font("Arial", 0, 10)); // NOI18N
             writMoveUp.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -695,6 +698,16 @@ public class HouseCalc extends javax.swing.JFrame {
             });
             writCreatorPane.add(jButton10);
             jButton10.setBounds(90, 65, 110, 20);
+
+            jButton11.setFont(new java.awt.Font("Arial", 0, 10)); // NOI18N
+            jButton11.setText("Rename");
+            jButton11.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    jButton11ActionPerformed(evt);
+                }
+            });
+            writCreatorPane.add(jButton11);
+            jButton11.setBounds(10, 35, 75, 20);
 
             writCreatorPane.setBounds(0, 0, 250, 120);
             toolkitPane.add(writCreatorPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
@@ -844,7 +857,7 @@ public class HouseCalc extends javax.swing.JFrame {
                         .addComponent(floorDown, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(floorLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGap(140, 140, 140)
-                    .addComponent(contextPane)
+                    .addComponent(contextPane, javax.swing.GroupLayout.DEFAULT_SIZE, 339, Short.MAX_VALUE)
                     .addGap(0, 0, 0))
                 .addGroup(interfacePaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(interfacePaneLayout.createSequentialGroup()
@@ -1281,6 +1294,7 @@ public class HouseCalc extends javax.swing.JFrame {
         for (int i=0; i<Mapper.width; i++) {
             for (int i2=0; i2<Mapper.height; i2++) {
                 Mapper.labels[i][i2] = null;
+                Mapper.caveLabels[i][i2] = null;
                 Mapper.ground[i][i2] = D.grounds.get(0).copy(i, i2);
                 Mapper.caveGround[i][i2] = D.caveGrounds.get(0).copy(i, i2);
                 for (int i3=0; i3<15; i3++) {
@@ -1295,6 +1309,7 @@ public class HouseCalc extends javax.swing.JFrame {
                 }
             }
         }
+        Mapper.heightmap = new float[Mapper.width][Mapper.height];
         Mapper.updater.writUpdater.model.clear();
         Mapper.wData=null;
         HouseCalc.jTextField1.setText("Writ 1");
@@ -1349,6 +1364,8 @@ public class HouseCalc extends javax.swing.JFrame {
         wallsList.setEnabled(!jToggleButton5.isSelected());
         roofsList.setEnabled(!jToggleButton5.isSelected());
         wallsButton.setEnabled(!jToggleButton5.isSelected());
+        jButton9.setEnabled(!jToggleButton5.isSelected());
+        labelToggle.setEnabled(!jToggleButton5.isSelected());
         containerLoop(toolkitPane);
         programFrame.requestFocus();
     }//GEN-LAST:event_jToggleButton5ActionPerformed
@@ -1608,6 +1625,14 @@ public class HouseCalc extends javax.swing.JFrame {
         Mapper.updater.labelMode = labelToggle.isSelected();
     }//GEN-LAST:event_labelToggleActionPerformed
 
+    private void jButton11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton11ActionPerformed
+        if (!writsList.isSelectionEmpty()) {
+            Writ w = (Writ) writsList.getSelectedValue();
+            w.name = jTextField1.getText();
+            writsList.repaint();
+        }
+    }//GEN-LAST:event_jButton11ActionPerformed
+
     public static void error() {
         if (!error) {
             error=true;
@@ -1671,6 +1696,7 @@ public class HouseCalc extends javax.swing.JFrame {
     private javax.swing.JPanel interfacePane;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton10;
+    private javax.swing.JButton jButton11;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;

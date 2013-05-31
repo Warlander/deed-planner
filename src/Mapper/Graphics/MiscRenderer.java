@@ -9,7 +9,10 @@ import Mapper.Data.D;
 import Mapper.FPPCamera;
 import static Mapper.Mapper.fpsView;
 import Mapper.UpCamera;
+import java.nio.FloatBuffer;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.util.vector.Vector3f;
 
 public class MiscRenderer {
     
@@ -17,8 +20,8 @@ public class MiscRenderer {
         GL11.glPushMatrix();
             GL11.glRotatef(90, 1, 0, 0);
             GL11.glRotatef(90, 0, 0, 1);
-            
             renderGround();
+            GL11.glColor3f(1, 1, 1);
             if (!fpsView && UpCamera.showGrid) {
                 if (Mapper.z>=0) {
                     renderGrid();
@@ -64,27 +67,121 @@ public class MiscRenderer {
         }
     }
     
+    public FloatBuffer floatBuffer(float a, float b, float c, float d) {
+      float[] data = new float[]{a,b,c,d};
+      FloatBuffer fb = BufferUtils.createFloatBuffer(data.length);
+      fb.put(data);
+      fb.flip();
+      return fb;
+    }
+    
+    public Vector3f SurfaceNormal(Vector3f c1, Vector3f c2, Vector3f c3) {
+        Vector3f edge1 = new Vector3f(c2.x - c1.x, c2.y - c1.y, c2.z - c1.z);
+        Vector3f edge2 = new Vector3f(c3.x - c1.x, c3.y - c1.y, c3.z - c1.z);
+        
+        Vector3f normal = Vector3f.cross(edge1, edge2, null);
+        normal.normalise();
+ 
+        return normal;
+    }
+    
+    private float MapperAvgHeigh(float[] array) {
+        return (array[0] + array[1] + array[2] + array[3]) / 4f;
+    }
+    
     private void renderGroundTile(Ground[][] source, int x, int y) {
         if (y>=Mapper.height || y<0 || x>=Mapper.width || x<0) {
             return;
         }
         
+        if (!fpsView && Mapper.z<3) {
+            switch (Mapper.z) {
+                case 0: 
+                    GL11.glColor4f(1, 1, 1, 1);
+                    break;
+                case 1:
+                    GL11.glColor4f(1-0.4f, 1-0.4f, 1-0.4f, 1);
+                    break;
+                case 2:
+                    GL11.glColor4f(1-0.75f, 1-0.75f, 1-0.75f, 1);
+                    break;
+            }
+        }
+        else if (fpsView) {
+            GL11.glColor4f(1, 1, 1, 1);
+        }
+        else {
+            return;
+        }
+        
+        // setup light
+        GL11.glEnable(GL11.GL_LIGHTING);
+        GL11.glEnable(GL11.GL_LIGHT0);  
+        GL11.glLightModeli(GL11.GL_LIGHT_MODEL_LOCAL_VIEWER, GL11.GL_TRUE);
+        GL11.glEnable(GL11.GL_COLOR_MATERIAL);
+        GL11.glColorMaterial(GL11.GL_FRONT_AND_BACK, GL11.GL_AMBIENT_AND_DIFFUSE);
+        // distant point light with static attenuation, at the position of background "sun"
+        // GL11.glLight(GL11.GL_LIGHT0,GL11.GL_POSITION, floatBuffer(0,25000000,50000000,1));
+        // distant point light with static attenuation, at position directly above
+        GL11.glLight(GL11.GL_LIGHT0,GL11.GL_POSITION, floatBuffer(0,0,50000000,1));
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, source[x][y].tex.ID);
-        GL11.glBegin(GL11.GL_TRIANGLES);  
+        
+        // create tile corner vertices
+        Vector3f TL = new Vector3f( (float)(x*4), (float)(-y*4-4), -Mapper.heightmap[x][y+1]/(35f/3f) );
+        Vector3f TR = new Vector3f( (float)(x*4+4), (float)(-y*4-4), -Mapper.heightmap[x+1][y+1]/(35f/3f) );
+        Vector3f BR = new Vector3f( (float)(x*4+4), (float)(-y*4), -Mapper.heightmap[x+1][y]/(35f/3f) );
+        Vector3f BL = new Vector3f( (float)(x*4), (float)(-y*4), -Mapper.heightmap[x][y]/(35f/3f) );
+        // create center vertice
+        float[] heighVals = {
+            -Mapper.heightmap[x][y+1]/(35f/3f),
+            -Mapper.heightmap[x+1][y+1]/(35f/3f),
+            -Mapper.heightmap[x+1][y]/(35f/3f),
+            -Mapper.heightmap[x][y]/(35f/3f)
+        };
+        Vector3f C = new Vector3f( (float)(x*4+2), (float)-y*4-2, MapperAvgHeigh(heighVals));
+        // create normals
+        Vector3f nT = SurfaceNormal(TL, TR, C);
+        Vector3f nR = SurfaceNormal(TR, BR, C);
+        Vector3f nL = SurfaceNormal(TL,C, BL);
+        Vector3f nB = SurfaceNormal(C, BR, BL);
+        
+        GL11.glBegin(GL11.GL_TRIANGLES);
+            // render top triangle
+            GL11.glNormal3f(nT.x, nT.y, nT.z);
             GL11.glTexCoord2f(0, 0);
-            GL11.glVertex3f(x*4,-y*4-4, -Mapper.heightmap[x][y+1]/(35f/3f));
+            GL11.glVertex3f(TL.x, TL.y, TL.z);
             GL11.glTexCoord2f(1, 0);
-            GL11.glVertex3f(x*4+4,-y*4-4, -Mapper.heightmap[x+1][y+1]/(35f/3f));
+            GL11.glVertex3f(TR.x, TR.y, TR.z);
+            GL11.glTexCoord2f(0.5f, 0.5f);
+            GL11.glVertex3f(C.x, C.y, C.z);
+            // render right triangle
+            GL11.glNormal3f(nR.x, nR.y, nR.z);
+            GL11.glTexCoord2f(1, 0);
+            GL11.glVertex3f(TR.x, TR.y, TR.z);
             GL11.glTexCoord2f(1, 1);
-            GL11.glVertex3f(x*4+4,-y*4, -Mapper.heightmap[x+1][y]/(35f/3f));
-
+            GL11.glVertex3f(BR.x, BR.y, BR.z);
+            GL11.glTexCoord2f(0.5f, 0.5f);
+            GL11.glVertex3f(C.x, C.y, C.z);
+            // render left triangle
+            GL11.glNormal3f(nL.x, nL.y, nL.z);
             GL11.glTexCoord2f(0, 0);
-            GL11.glVertex3f(x*4,-y*4-4, -Mapper.heightmap[x][y+1]/(35f/3f));
+            GL11.glVertex3f(TL.x, TL.y, TL.z);
+            GL11.glTexCoord2f(0.5f, 0.5f);
+            GL11.glVertex3f(C.x, C.y, C.z);
             GL11.glTexCoord2f(0, 1);
-            GL11.glVertex3f(x*4,-y*4, -Mapper.heightmap[x][y]/(35f/3f));
+            GL11.glVertex3f(BL.x, BL.y, BL.z);
+            // render bottom triangle
+            GL11.glNormal3f(nB.x, nB.y, nB.z);
+            GL11.glTexCoord2f(0.5f, 0.5f);
+            GL11.glVertex3f(C.x, C.y, C.z);
             GL11.glTexCoord2f(1, 1);
-            GL11.glVertex3f(x*4+4,-y*4, -Mapper.heightmap[x+1][y]/(35f/3f));
+            GL11.glVertex3f(BR.x, BR.y, BR.z);
+            GL11.glTexCoord2f(0, 1);
+            GL11.glVertex3f(BL.x, BL.y, BL.z);
         GL11.glEnd();
+        GL11.glDisable(GL11.GL_COLOR_MATERIAL);
+        GL11.glDisable(GL11.GL_LIGHT0);
+        GL11.glDisable(GL11.GL_LIGHTING);
     }
     
     private void renderGrid() {
@@ -317,12 +414,12 @@ public class MiscRenderer {
         }
         
         GL11.glBegin(GL11.GL_TRIANGLES);
-            GL11.glTexCoord2f(0, 0);
-            GL11.glVertex3f(x*4,-y*4-4, 0.05f);
-            GL11.glTexCoord2f(1, 0);
-            GL11.glVertex3f(x*4+4,-y*4-4, 0.05f);
             GL11.glTexCoord2f(1, 1);
             GL11.glVertex3f(x*4+4,-y*4, 0.05f);
+            GL11.glTexCoord2f(1, 0);
+            GL11.glVertex3f(x*4+4,-y*4-4, 0.05f);
+            GL11.glTexCoord2f(0, 0);
+            GL11.glVertex3f(x*4,-y*4-4, 0.05f);
 
             GL11.glTexCoord2f(0, 0);
             GL11.glVertex3f(x*4,-y*4-4, 0.05f);

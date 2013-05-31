@@ -1,6 +1,5 @@
 package Lib.Graphics;
 
-import Lib.Object.Data;
 import Lib.Object.Writ;
 
 public class Ground {

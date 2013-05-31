@@ -66,6 +66,7 @@ public class Mapper {
     public static Data[][][] tiles=new Data[25][25][15];
     public static Structure[][][] objects = new Structure[100][100][15];
     public static Label[][] labels = new Label[25][25];
+    public static Label[][] caveLabels = new Label[25][25];
     public static Data[][][] bordersx=new Data[25][25][15];
     public static Data[][][] bordersy=new Data[25][25][15];
     
@@ -218,7 +219,9 @@ public class Mapper {
             upcamera.set();
         }
         
+        GL11.glDisable(GL11.GL_CULL_FACE);
         miscRenderer.update();
+        GL11.glEnable(GL11.GL_CULL_FACE);
         
         GL11.glPushMatrix();
             GL11.glRotatef(90, 1, 0, 0);
@@ -257,8 +260,17 @@ public class Mapper {
         
         for (int i=Camera.visibleDownY; i<Camera.visibleUpY; i++) {
             for (int i2=Camera.visibleDownX; i2<Camera.visibleUpX; i2++) {
-                if (i>=0 && i<width && i2>=0 && i2<height && labels[i][i2]!=null) {
-                    labels[i][i2].render(i, i2);
+                if (i>=0 && i<width && i2>=0 && i2<height) {
+                    if (z>=0) {
+                        if (labels[i][i2]!=null) {
+                            labels[i][i2].render(i, i2);
+                        }
+                    }
+                    else {
+                        if (caveLabels[i][i2]!=null) {
+                            caveLabels[i][i2].render(i, i2);
+                        }
+                    }
                 }
                 for (int i3=0; i3<15; i3++) {
                     for (int i4=0; i4<4; i4++) {

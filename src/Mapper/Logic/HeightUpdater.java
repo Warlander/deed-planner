@@ -72,14 +72,14 @@ public class HeightUpdater {
             for (Point point : points) {
                 if (!containsWrit(point)) {
                     switch ((String)HouseCalc.elevationList.getSelectedValue()) {
-                        case "Increase height":
+                        case "Increase/decrease height":
                             if (mouse.pressed.left ^ mouse.pressed.right) {
                                 increaseHeight(mouse, point);
                             }
                             break;
-                        case "Decrease height":
+                        case "Increase/decrease area height":
                             if (mouse.pressed.left ^ mouse.pressed.right) {
-                                decreaseHeight(mouse, point);
+                                liftArea(mouse, point);
                             }
                             break;
                         case "Set height":
@@ -202,15 +202,6 @@ public class HeightUpdater {
         }
     }
     
-    private void decreaseHeight(MouseInput mouse, Point point) {
-        if (mouse.pressed.left) {
-            Mapper.heightmap[point.getX()][point.getY()]-=HouseCalc.elevationAdd;
-        }
-        else {
-            Mapper.heightmap[point.getX()][point.getY()]+=HouseCalc.elevationAdd;
-        }
-    }
-    
     private void setHeight(MouseInput mouse, Point point) {
         if (mouse.hold.left) {
             Mapper.heightmap[point.getX()][point.getY()]=HouseCalc.elevationSetLeft;
@@ -307,6 +298,34 @@ public class HeightUpdater {
             for (int i=minX; i<=maxX; i++) {
                 for (int i2=minY; i2<=maxY; i2++) {
                     Mapper.heightmap[i][i2] = set;
+                }
+            }
+            
+            p2=null;
+        }
+    }
+    
+    private void liftArea(MouseInput mouse, Point p1) {
+        if (p2==null) {
+            p2 = p1;
+        }
+        else {
+            int minX = Math.min(p1.getX(), p2.getX());
+            int maxX = Math.max(p1.getX(), p2.getX());
+            int minY = Math.min(p1.getY(), p2.getY());
+            int maxY = Math.max(p1.getY(), p2.getY());
+            
+            int add;
+            if (mouse.pressed.left) {
+                add = HouseCalc.elevationAdd;
+            }
+            else {
+                add = -HouseCalc.elevationAdd;
+            }
+            
+            for (int i=minX; i<=maxX; i++) {
+                for (int i2=minY; i2<=maxY; i2++) {
+                    Mapper.heightmap[i][i2]+=add;
                 }
             }
             

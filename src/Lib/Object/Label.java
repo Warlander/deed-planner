@@ -13,10 +13,13 @@ public class Label {
     public Color color;
     public String text;
     
-    public Label(Font font, Color color, String text) {
+    public boolean cave;
+    
+    public Label(Font font, Color color, String text, boolean cave) {
         this.font = font;
         this.color = color;
         this.text = text;
+        this.cave = cave;
     }
     
     public void render(int sx, int sy) {

@@ -128,6 +128,9 @@ public class SaveWindow extends javax.swing.JFrame {
                 if (Mapper.labels[x][y]!=null) {
                     saveLabel(maps, x, y);
                 }
+                if (Mapper.caveLabels[x][y]!=null) {
+                    saveCaveLabel(maps, x, y);
+                }
             }
         }
         
@@ -190,9 +193,14 @@ public class SaveWindow extends javax.swing.JFrame {
      * 8. Green
      * 9. Blue
      * 10. Alpha
+     * 11. Cave
      */
     private void saveLabel(StringBuilder builder, int x, int y) {
-        builder.append("L ").append(x).append(" ").append(y).append(" ").append(Mapper.labels[x][y].text.replace(" ", "_").replace("\n", "\\n")).append(" ").append(Mapper.labels[x][y].font.getName().replace(" ", "_")).append(" ").append(Mapper.labels[x][y].font.getSize()).append(" ").append(Mapper.labels[x][y].color.getRed()).append(" ").append(Mapper.labels[x][y].color.getGreen()).append(" ").append(Mapper.labels[x][y].color.getBlue()).append(" ").append(Mapper.labels[x][y].color.getAlpha()).append(endl);
+        builder.append("L ").append(x).append(" ").append(y).append(" ").append(Mapper.labels[x][y].text.replace(" ", "_").replace("\n", "\\n")).append(" ").append(Mapper.labels[x][y].font.getName().replace(" ", "_")).append(" ").append(Mapper.labels[x][y].font.getSize()).append(" ").append(Mapper.labels[x][y].color.getRed()).append(" ").append(Mapper.labels[x][y].color.getGreen()).append(" ").append(Mapper.labels[x][y].color.getBlue()).append(" ").append(Mapper.labels[x][y].color.getAlpha()).append(" ").append(false).append(endl);
+    }
+    
+    private void saveCaveLabel(StringBuilder builder, int x, int y) {
+        builder.append("L ").append(x).append(" ").append(y).append(" ").append(Mapper.caveLabels[x][y].text.replace(" ", "_").replace("\n", "\\n")).append(" ").append(Mapper.caveLabels[x][y].font.getName().replace(" ", "_")).append(" ").append(Mapper.caveLabels[x][y].font.getSize()).append(" ").append(Mapper.caveLabels[x][y].color.getRed()).append(" ").append(Mapper.caveLabels[x][y].color.getGreen()).append(" ").append(Mapper.caveLabels[x][y].color.getBlue()).append(" ").append(Mapper.caveLabels[x][y].color.getAlpha()).append(" ").append(true).append(endl);
     }
     
     private void saveWrit(StringBuilder builder, Writ writ) {
@@ -200,6 +208,7 @@ public class SaveWindow extends javax.swing.JFrame {
         for (Ground g : writ.tiles) {
             builder.append(" ").append(g.x).append(" ").append(g.y);
         }
+        builder.append(endl);
     }
 
     @SuppressWarnings("unchecked")

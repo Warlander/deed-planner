@@ -13,7 +13,7 @@ public class LabelWindow extends javax.swing.JFrame {
     public static int y;
     public static int size = 20;
     public static java.awt.Font font = new java.awt.Font("Arial", java.awt.Font.PLAIN, 10);
-    public static java.awt.Color color = java.awt.Color.black;
+    public static java.awt.Color color = java.awt.Color.white;
     
     public LabelWindow() {
         initComponents();
@@ -29,6 +29,9 @@ public class LabelWindow extends javax.swing.JFrame {
         fontsBox.setSelectedIndex(selectedFont);
         colorPreview.setBackground(color);
         sizeSpinner.getModel().setValue(size);
+        labelText.setSelectionStart(0);
+        labelText.setSelectionEnd(labelText.getText().length());
+        labelText.requestFocus();
     }
 
     @SuppressWarnings("unchecked")
@@ -159,14 +162,33 @@ public class LabelWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_sizeSpinnerStateChanged
 
     private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
+        String text = labelText.getText().replace("\\n", "\n");
+        if (text.equals("")) {
+            Mapper.Mapper.labels[x][y] = null;
+            close();
+            return;
+        }
+        
+        boolean cave = false;
+        if (Mapper.Mapper.z==-1) {
+            cave = true;
+        }
         Color c = new Color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
         Font fnt = new Font(font.getName(), Font.PLAIN, size);
-        String text = labelText.getText().replace("\\n", "\n");
-        Mapper.Mapper.labels[x][y] = new Label(fnt, c, text);
-        setVisible(false);
-        dispose();
+        if (!cave) {
+            Mapper.Mapper.labels[x][y] = new Label(fnt, c, text, cave);
+        }
+        else {
+            Mapper.Mapper.caveLabels[x][y] = new Label(fnt, c, text, cave);
+        }
+        close();
     }//GEN-LAST:event_saveButtonActionPerformed
 
+    private void close() {
+        setVisible(false);
+        dispose();
+    }
+    
     public static void main(String args[]) {
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.

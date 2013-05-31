@@ -105,6 +105,7 @@ public class LoadWindow extends javax.swing.JFrame {
         Ground[][] ground = new Ground[width][height];
         Ground[][] caveGround = new Ground[width][height];
         Label[][] labels = new Label[width][height];
+        Label[][] caveLabels = new Label[width][height];
         Structure[][][] objects = new Structure[width*4][height*4][15];
         Data[][][] tiles = new Data[width][height][15];
         Data[][][] bordersx = new Data[width][height][15];
@@ -143,7 +144,7 @@ public class LoadWindow extends javax.swing.JFrame {
                     readBorder(scan, bordersy);
                     break;
                 case "L":
-                    readLabel(scan, labels);
+                    readLabel(scan, labels, caveLabels);
                     break;
                 case "W":
                     readWrit(scan, ground, Mapper.updater.writUpdater.model);
@@ -157,6 +158,7 @@ public class LoadWindow extends javax.swing.JFrame {
         Mapper.updater.heightUpdater.checkElevations();
         Mapper.ground = ground;
         Mapper.labels = labels;
+        Mapper.caveLabels = caveLabels;
         Mapper.caveGround = caveGround;
         Mapper.tiles = tiles;
         Mapper.updater.roofUpdater.roofsRefit();
@@ -201,7 +203,7 @@ public class LoadWindow extends javax.swing.JFrame {
         double gPaint = Double.parseDouble(source.next());
         double bPaint = Double.parseDouble(source.next());
         
-        Structure object = getStructure(shortName);
+        Structure object = getLightweightStructure(shortName);
         object.rPaint = rPaint;
         object.gPaint = gPaint;
         object.bPaint = bPaint;
@@ -214,7 +216,7 @@ public class LoadWindow extends javax.swing.JFrame {
         int z = source.nextInt();
         String shortName = source.next();
         
-        out[x][y][z] = getData(shortName);
+        out[x][y][z] = getLightweightData(shortName);
     }
     
     public static void readBorder(Scanner source, Data[][][] out) {
@@ -226,14 +228,14 @@ public class LoadWindow extends javax.swing.JFrame {
         double gPaint = Double.parseDouble(source.next());
         double bPaint = Double.parseDouble(source.next());
         
-        Data object = getData(shortName);
+        Data object = getLightweightData(shortName);
         object.rPaint = rPaint;
         object.gPaint = gPaint;
         object.bPaint = bPaint;
         out[x][y][z] = object;
     }
     
-    public static void readLabel(Scanner source, Label[][] out) {
+    public static void readLabel(Scanner source, Label[][] out, Label[][] outAlt) {
         int x = source.nextInt();
         int y = source.nextInt();
         String text = source.next().replace("_", " ").replace("\\n", "\n");
@@ -243,11 +245,20 @@ public class LoadWindow extends javax.swing.JFrame {
         int gPaint = Integer.parseInt(source.next());
         int bPaint = Integer.parseInt(source.next());
         int aPaint = Integer.parseInt(source.next());
+        boolean cave = false;
+        if (source.hasNextBoolean()) {
+            cave = source.nextBoolean();
+        }
         
         Font f = new Font(font, Font.PLAIN, size);
         Color c = new Color(rPaint, gPaint, bPaint, aPaint);
-        Label object = new Label(f, c, text);
-        out[x][y] = object;
+        Label object = new Label(f, c, text, cave);
+        if (!cave) {
+            out[x][y] = object;
+        }
+        else {
+            outAlt[x][y] = object;
+        }
     }
     
     public static void readWrit(Scanner source, Ground[][] in, DefaultListModel out) {
@@ -260,6 +271,7 @@ public class LoadWindow extends javax.swing.JFrame {
             int x = source.nextInt();
             int y = source.nextInt();
             w.tiles.add(in[x][y]);
+            in[x][y].writ = w;
         }
         out.addElement(w);
     }
@@ -643,6 +655,16 @@ public class LoadWindow extends javax.swing.JFrame {
         return null;
     }
     
+    private static Structure getLightweightStructure(String shortName) {
+        for (Structure s : D.objects) {
+            if (s.shortName.equals(shortName)) {
+                Structure data = s.copy();
+                return data;
+            }
+        }
+        return null;
+    }
+    
     private static Data getData(String shortName) {
         if (shortName.equals("0")) {
             return null;
@@ -674,6 +696,15 @@ public class LoadWindow extends javax.swing.JFrame {
                         return d.copy();
                     }
                 }
+            }
+        }
+        return null;
+    }
+    
+    private static Data getLightweightData(String shortName) {
+        for (Data d : D.models) {
+            if (d.shortName.equals(shortName)) {
+                return d.copy();
             }
         }
         return null;
