@@ -20,6 +20,7 @@ import Mapper.Logic.MapUpdater;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.lwjgl.LWJGLException;
@@ -171,6 +172,12 @@ public class Mapper {
             }
         }
         
+        if (Server.running) {
+            LoadWindow.readFragments(new Scanner(Server.in));
+            updater.roofUpdater.roofsRefit();
+            Server.out.println("1");
+        }
+        
         switch (HouseCalc.paintMode) {
             case type:
                 tick=1;
@@ -207,6 +214,10 @@ public class Mapper {
         else {
             upcamera.update(keyboard, mouse);
             updater.update(keyboard, mouse);
+        }
+        
+        if (Server.running) {
+            Server.out.flush();
         }
     }
     

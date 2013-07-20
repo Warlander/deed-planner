@@ -2,10 +2,12 @@ package Mapper.Logic;
 
 import Form.DrawMode;
 import Form.HouseCalc;
+import Form.SaveWindow;
 import Lib.Object.Data;
 import Lib.Object.Type;
 import Mapper.Mapper;
 import Mapper.MouseInput;
+import Mapper.Server;
 import Mapper.UpCamera;
 import org.lwjgl.opengl.Display;
 
@@ -51,6 +53,10 @@ public class FloorUpdater {
                 else if (Mapper.deleting && mouse.hold.left) Mapper.tiles[tileX][tileY][Mapper.z]=null;
                 else if (mouse.hold.left) Mapper.tiles[realX][realY][Mapper.z]=Mapper.data.copy();
                 else if (mouse.hold.right) Mapper.tiles[realX][realY][Mapper.z]=null;
+                
+                if (Server.running && (mouse.hold.left ^ mouse.hold.right)) {
+                    SaveWindow.saveTile(Server.builder, realX, realY, Mapper.z);
+                }
             }
         }
     }
@@ -84,6 +90,10 @@ public class FloorUpdater {
         }
         else {
             Mapper.tiles[tileX][tileY][Mapper.z] = null;
+        }
+        
+        if (Server.running) {
+            SaveWindow.saveTile(Server.builder, tileX, tileY, Mapper.z);
         }
         fillInfect(mouse, data, tileX-1, tileY);
         fillInfect(mouse, data, tileX+1, tileY);

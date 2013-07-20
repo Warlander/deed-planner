@@ -10,6 +10,7 @@ import Lib.Utils.WebTools;
 import Mapper.Data.D;
 import Mapper.FPPCamera;
 import Mapper.Mapper;
+import Mapper.Server;
 import Mapper.UpCamera;
 import java.awt.Component;
 import java.awt.Container;
@@ -23,6 +24,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import org.lwjgl.util.Point;
@@ -265,6 +267,7 @@ public class HouseCalc extends javax.swing.JFrame {
         jButton9 = new javax.swing.JButton();
         jToggleButton6 = new javax.swing.JToggleButton();
         labelToggle = new javax.swing.JToggleButton();
+        serverToggle = new javax.swing.JToggleButton();
         statusBar = new Form.StatusBar();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
@@ -726,7 +729,7 @@ public class HouseCalc extends javax.swing.JFrame {
             });
 
             setLeftSpinner.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-            setLeftSpinner.setModel(new javax.swing.SpinnerNumberModel(0, -999, 1000, 1));
+            setLeftSpinner.setModel(new javax.swing.SpinnerNumberModel(0, -999, 9999, 1));
             setLeftSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
                 public void stateChanged(javax.swing.event.ChangeEvent evt) {
                     setLeftSpinnerStateChanged(evt);
@@ -740,7 +743,7 @@ public class HouseCalc extends javax.swing.JFrame {
             jLabel8.setText("Set (RMB):");
 
             setRightSpinner.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-            setRightSpinner.setModel(new javax.swing.SpinnerNumberModel(0, -999, 1000, 1));
+            setRightSpinner.setModel(new javax.swing.SpinnerNumberModel(0, -999, 9999, 1));
             setRightSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
                 public void stateChanged(javax.swing.event.ChangeEvent evt) {
                     setRightSpinnerStateChanged(evt);
@@ -1018,6 +1021,20 @@ public class HouseCalc extends javax.swing.JFrame {
                 }
             });
 
+            serverToggle.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+            serverToggle.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Graphics/serverOff.png"))); // NOI18N
+            serverToggle.setFocusable(false);
+            serverToggle.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+                public void mouseMoved(java.awt.event.MouseEvent evt) {
+                    serverToggleMouseMoved(evt);
+                }
+            });
+            serverToggle.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    serverToggleActionPerformed(evt);
+                }
+            });
+
             javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
             jPanel1.setLayout(jPanel1Layout);
             jPanel1Layout.setHorizontalGroup(
@@ -1039,6 +1056,8 @@ public class HouseCalc extends javax.swing.JFrame {
                     .addComponent(jToggleButton6, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGap(2, 2, 2)
                     .addComponent(labelToggle, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGap(2, 2, 2)
+                    .addComponent(serverToggle, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                     .addComponent(wallsButton, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1053,19 +1072,21 @@ public class HouseCalc extends javax.swing.JFrame {
                 jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jPanel1Layout.createSequentialGroup()
                     .addContainerGap()
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addComponent(jButton9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(wallsButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                         .addComponent(labelToggle, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jToggleButton6, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jCheckBox1, javax.swing.GroupLayout.DEFAULT_SIZE, 28, Short.MAX_VALUE)
+                        .addComponent(jCheckBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jButton6, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jToggleButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jButton9, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(wallsButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(serverToggle, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGap(9, 9, 9))
             );
 
@@ -1309,7 +1330,7 @@ public class HouseCalc extends javax.swing.JFrame {
                 }
             }
         }
-        Mapper.heightmap = new float[Mapper.width][Mapper.height];
+        Mapper.heightmap = new float[Mapper.width+1][Mapper.height+1];
         Mapper.updater.writUpdater.model.clear();
         Mapper.wData=null;
         HouseCalc.jTextField1.setText("Writ 1");
@@ -1478,7 +1499,7 @@ public class HouseCalc extends javax.swing.JFrame {
 
     private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
         if (!writsList.isSelectionEmpty()) {
-            Mapper.updater.writUpdater.deleteWrit();
+            Mapper.updater.writUpdater.deleteWrit((Writ)HouseCalc.writsList.getSelectedValue());
             int cap = Mapper.updater.writUpdater.model.getSize()+1;
             jTextField1.setText("Writ "+cap);
         }
@@ -1633,6 +1654,28 @@ public class HouseCalc extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jButton11ActionPerformed
 
+    private void serverToggleMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_serverToggleMouseMoved
+        statusBar.helpLabel.setText("Join/leave server");
+    }//GEN-LAST:event_serverToggleMouseMoved
+
+    private void serverToggleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_serverToggleActionPerformed
+        if (serverToggle.isSelected()) {
+            JDialog dialog = new ServerWindow(this, true);
+            dialog.setVisible(true);
+        }
+        else {
+            if (Server.running) {
+                Server.running = false;
+                try {
+                    Server.socket.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(HouseCalc.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                serverToggle.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Graphics/serverOff.png")));
+            }
+        }
+    }//GEN-LAST:event_serverToggleActionPerformed
+
     public static void error() {
         if (!error) {
             error=true;
@@ -1733,6 +1776,7 @@ public class HouseCalc extends javax.swing.JFrame {
     public static javax.swing.JList roofsList;
     public static javax.swing.JScrollPane roofsPane;
     public static javax.swing.JToggleButton selectToggle;
+    public static javax.swing.JToggleButton serverToggle;
     public static javax.swing.JSpinner setLeftSpinner;
     public static javax.swing.JSpinner setRightSpinner;
     public static Form.StatusBar statusBar;

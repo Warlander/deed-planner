@@ -1,9 +1,11 @@
 package Mapper.Logic;
 
 import Form.HouseCalc;
+import Form.SaveWindow;
 import Mapper.KeyboardInput;
 import Mapper.Mapper;
 import Mapper.MouseInput;
+import Mapper.Server;
 import Mapper.UpCamera;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
@@ -200,6 +202,10 @@ public class HeightUpdater {
         else {
             Mapper.heightmap[point.getX()][point.getY()]-=HouseCalc.elevationAdd;
         }
+        
+        if (Server.running && (mouse.hold.left ^ mouse.hold.right)) {
+            SaveWindow.saveHeight(Server.builder, point.getX(), point.getY());
+        }
     }
     
     private void setHeight(MouseInput mouse, Point point) {
@@ -208,6 +214,10 @@ public class HeightUpdater {
         }
         else {
             Mapper.heightmap[point.getX()][point.getY()]=HouseCalc.elevationSetRight;
+        }
+        
+        if (Server.running && (mouse.hold.left ^ mouse.hold.right)) {
+            SaveWindow.saveHeight(Server.builder, point.getX(), point.getY());
         }
     }
     
@@ -224,6 +234,10 @@ public class HeightUpdater {
     
     private void resetHeight(Point point) {
         Mapper.heightmap[point.getX()][point.getY()]=0;
+        
+        if (Server.running) {
+            SaveWindow.saveHeight(Server.builder, point.getX(), point.getY());
+        }
     }
     
     Point p2=null;
@@ -248,12 +262,18 @@ public class HeightUpdater {
                         for (int i=lower.getY(); i<higher.getY(); i++) {
                             Mapper.heightmap[p1.getX()][i] = min + diff*mult;
                             mult++;
+                            if (Server.running) {
+                                SaveWindow.saveHeight(Server.builder, p1.getX(), i);
+                            }
                         }
                     }
                     else if (lower.getY()>higher.getY()) {
                         for (int i=lower.getY(); i>higher.getY(); i--) {
                             Mapper.heightmap[p1.getX()][i] = min + diff*mult;
                             mult++;
+                            if (Server.running) {
+                                SaveWindow.saveHeight(Server.builder, p1.getX(), i);
+                            }
                         }
                     }
                 }
@@ -263,12 +283,18 @@ public class HeightUpdater {
                         for (int i=lower.getX(); i<higher.getX(); i++) {
                             Mapper.heightmap[i][p1.getY()] = min + diff*mult;
                             mult++;
+                            if (Server.running) {
+                                SaveWindow.saveHeight(Server.builder, i, p1.getY());
+                            }
                         }
                     }
                     else if (lower.getX()>higher.getX()) {
                         for (int i=lower.getX(); i>higher.getX(); i--) {
                             Mapper.heightmap[i][p1.getY()] = min + diff*mult;
                             mult++;
+                            if (Server.running) {
+                                SaveWindow.saveHeight(Server.builder, i, p1.getY());
+                            }
                         }
                     }
                 }
@@ -298,6 +324,9 @@ public class HeightUpdater {
             for (int i=minX; i<=maxX; i++) {
                 for (int i2=minY; i2<=maxY; i2++) {
                     Mapper.heightmap[i][i2] = set;
+                    if (Server.running) {
+                        SaveWindow.saveHeight(Server.builder, i, i2);
+                    }
                 }
             }
             
@@ -326,6 +355,9 @@ public class HeightUpdater {
             for (int i=minX; i<=maxX; i++) {
                 for (int i2=minY; i2<=maxY; i2++) {
                     Mapper.heightmap[i][i2]+=add;
+                    if (Server.running) {
+                        SaveWindow.saveHeight(Server.builder, i, i2);
+                    }
                 }
             }
             

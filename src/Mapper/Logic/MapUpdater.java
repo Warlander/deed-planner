@@ -5,6 +5,7 @@ import Form.LabelWindow;
 import Mapper.KeyboardInput;
 import Mapper.Mapper;
 import Mapper.MouseInput;
+import Mapper.Server;
 import Mapper.UpCamera;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.util.Point;
@@ -92,6 +93,11 @@ public class MapUpdater {
             return;
         }
         HouseCalc.statusBar.setGround(Mapper.ground[tileX-1][tileY]);
+        
+        if (Server.running) {
+            Server.out.println(Server.builder.toString());
+            Server.builder = new StringBuilder();
+        }
     }
     
 }

@@ -1,11 +1,13 @@
 package Mapper.Logic;
 
 import Form.HouseCalc;
+import Form.SaveWindow;
 import Lib.Object.Data;
 import Lib.Object.Type;
 import Mapper.Data.D;
 import Mapper.Mapper;
 import Mapper.MouseInput;
+import Mapper.Server;
 import Mapper.UpCamera;
 import org.lwjgl.opengl.Display;
 
@@ -21,17 +23,6 @@ public class RoofUpdater {
             if (Mapper.z==0) {
                 return;
             }
-            if (mouse.hold.left) {
-                for (int i=0; i<15; i++) {
-                    if (i==Mapper.z) {}
-                    if (tileX<2 || tileY<1 || tileX>Mapper.width-2 || tileY>Mapper.height-1) {}
-                    else if (Mapper.tiles[tileX][tileY][i]!=null && Mapper.tiles[tileX][tileY][i].type==Type.roof) {
-                        if (i!=Mapper.z || Mapper.tiles[tileX][tileY][i].texture==Mapper.data.texture) {
-                            return;
-                        }
-                    }
-                }
-            }
             
             int realX;
             int realY;
@@ -45,6 +36,10 @@ public class RoofUpdater {
                     else if (Mapper.deleting) Mapper.tiles[realX][realY][Mapper.z]=null;
                     else if (mouse.hold.left) Mapper.tiles[realX][realY][Mapper.z]=Mapper.data.copy();
                     else if (mouse.hold.right) Mapper.tiles[realX][realY][Mapper.z]=null;
+                    
+                    if (Server.running) {
+                        SaveWindow.saveTile(Server.builder, realX, realY, Mapper.z);
+                    }
                 }
             }
         }

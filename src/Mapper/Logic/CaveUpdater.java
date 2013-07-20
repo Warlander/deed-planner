@@ -2,11 +2,12 @@ package Mapper.Logic;
 
 import Form.DrawMode;
 import Form.HouseCalc;
+import Form.SaveWindow;
 import Lib.Graphics.Ground;
-import Lib.Object.Writ;
 import Mapper.Data.D;
 import Mapper.Mapper;
 import Mapper.MouseInput;
+import Mapper.Server;
 import Mapper.UpCamera;
 import org.lwjgl.opengl.Display;
 
@@ -40,6 +41,10 @@ public class CaveUpdater {
         else g=D.caveGrounds.get(0).copy(realX, realY);
         
         Mapper.caveGround[realX][realY]=g;
+        
+        if (Server.running && (mouse.hold.left ^ mouse.hold.right)) {
+            SaveWindow.saveCave(Server.builder, realX, realY);
+        }
     }
     
     private void pencil(MouseInput mouse, int tileX, int tileY) {

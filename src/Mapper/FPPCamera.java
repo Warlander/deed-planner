@@ -71,24 +71,6 @@ public class FPPCamera {
             
             anglex += diffy*rotate;
             
-            if (angley>Math.PI*2) {
-                angley-=Math.PI*2;
-            }
-            else if (angley<0) {
-                angley+=Math.PI*2;
-            }
-            
-            if (anglex>Math.PI-0.01f) {
-                anglex=(float)Math.PI-0.01f;
-            }
-            else if (anglex<0.01f) {
-                anglex=0.01f;
-            }
-            
-            dirx = (float)(Math.cos(angley)*Math.sin(anglex));
-            dirz = (float)(Math.sin(angley)*Math.sin(anglex));
-            diry = (float)-Math.cos(anglex);
-            
             Mouse.setCursorPosition(Display.getWidth()/2, Display.getHeight()/2);
             pastMousex = Display.getWidth()/2;
             pastMousey = Display.getHeight()/2;
@@ -116,6 +98,18 @@ public class FPPCamera {
                 posx -= dirx * fraction;
                 posz -= dirz * fraction;
                 posy -= diry * fraction;
+            }
+            if (keyboard.hold[Keyboard.KEY_Q]) {
+                angley -= 5*rotate;
+            }
+            if (keyboard.hold[Keyboard.KEY_E]) {
+                angley += 5*rotate;
+            }
+            if (keyboard.hold[Keyboard.KEY_T]) {
+                anglex += 5*rotate;
+            }
+            if (keyboard.hold[Keyboard.KEY_G]) {
+                anglex -= 5*rotate;
             }
 
             if (keyboard.hold[Keyboard.KEY_R]) {
@@ -197,6 +191,24 @@ public class FPPCamera {
             height+=stickedHeight;
             posy = height;
         }
+        
+        if (angley>Math.PI*2) {
+            angley-=Math.PI*2;
+        }
+        else if (angley<0) {
+            angley+=Math.PI*2;
+        }
+
+        if (anglex>Math.PI-0.01f) {
+            anglex=(float)Math.PI-0.01f;
+        }
+        else if (anglex<0.01f) {
+            anglex=0.01f;
+        }
+        
+        dirx = (float)(Math.cos(angley)*Math.sin(anglex));
+        dirz = (float)(Math.sin(angley)*Math.sin(anglex));
+        diry = (float)-Math.cos(anglex);
     }
     
     public void set() {

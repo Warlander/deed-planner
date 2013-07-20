@@ -140,9 +140,9 @@ public class UpCamera {
     public void set() {
         GL11.glMatrixMode(GL11.GL_PROJECTION);
         GL11.glLoadIdentity();
-        GL11.glOrtho(0, scale*4*Display.getWidth()/Display.getHeight(), 0, scale*4, 0.001f, 200);
+        GL11.glOrtho(0, scale*4*Display.getWidth()/Display.getHeight(), 0, scale*4, 0.001f, 600);
         GL11.glRotatef(120, 1, 1, 1);
-        GL11.glTranslatef(-x, -100, -y);
+        GL11.glTranslatef(-x, -300, -y);
         GL11.glMatrixMode(GL11.GL_MODELVIEW);
         GL11.glLoadIdentity();
     }

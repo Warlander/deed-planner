@@ -18,6 +18,7 @@ import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 import Mapper.Mapper;
+import Mapper.Server;
 import Mapper.UpCamera;
 import java.awt.Font;
 import java.io.BufferedReader;
@@ -170,6 +171,60 @@ public class LoadWindow extends javax.swing.JFrame {
         HouseCalc.jTextField1.setText("Writ "+cap);
     }
     
+    public static void readFragments(Scanner scan) {
+        while (scan.hasNext()) {
+            switch (scan.next()) {
+                case "H":
+                    readHeight(scan, Mapper.heightmap);
+                    break;
+                case "G":
+                    readGround(scan, Mapper.ground);
+                    break;
+                case "C":
+                    readCave(scan, Mapper.caveGround);
+                    break;
+                case "O":
+                    readObject(scan, Mapper.objects);
+                    break;
+                case "T":
+                    readTile(scan, Mapper.tiles);
+                    break;
+                case "BX":
+                    readBorder(scan, Mapper.bordersx);
+                    break;
+                case "BY":
+                    readBorder(scan, Mapper.bordersy);
+                    break;
+                case "L":
+                    readLabel(scan, Mapper.labels, Mapper.caveLabels);
+                    break;
+                case "W":
+                    readWrit(scan, Mapper.ground, Mapper.updater.writUpdater.model);
+                    break;
+                case "DW":
+                    String name = scan.next().replace("_", " ");
+                    for (int i=0; i<HouseCalc.writsList.getModel().getSize(); i++) {
+                        Writ w = (Writ) HouseCalc.writsList.getModel().getElementAt(i);
+                        if (w.name.equals(name)) {
+                            Mapper.updater.writUpdater.deleteWrit(w);
+                            break;
+                        }
+                    }
+                    break;
+                case "-1":
+                    if (Server.running) {
+                        Server.running = false;
+                    try {
+                        Server.socket.close();
+                    } catch (IOException ex) {
+                        Logger.getLogger(LoadWindow.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    return;
+                    }
+            }
+        }
+    }
+    
     public static void readHeight(Scanner source, float[][] out) {
         int x = source.nextInt();
         int y = source.nextInt();
@@ -202,11 +257,13 @@ public class LoadWindow extends javax.swing.JFrame {
         double rPaint = Double.parseDouble(source.next());
         double gPaint = Double.parseDouble(source.next());
         double bPaint = Double.parseDouble(source.next());
+        int rotation = Integer.parseInt(source.next());
         
         Structure object = getLightweightStructure(shortName);
         object.rPaint = rPaint;
         object.gPaint = gPaint;
         object.bPaint = bPaint;
+        object.rotation = rotation;
         out[x][y][z] = object;
     }
     
@@ -349,6 +406,7 @@ public class LoadWindow extends javax.swing.JFrame {
         Mapper.heightmap = heightmap;
         Mapper.ground = ground;
         Mapper.labels = new Label[width][height];
+        Mapper.caveLabels = new Label[width][height];
         Mapper.caveGround = caveGround;
         Mapper.tiles = tiles;
         Mapper.objects = objects;
@@ -424,6 +482,7 @@ public class LoadWindow extends javax.swing.JFrame {
         Mapper.heightmap = heightmap;
         Mapper.ground = ground;
         Mapper.labels = new Label[width][height];
+        Mapper.caveLabels = new Label[width][height];
         Mapper.caveGround = caveGround;
         Mapper.objects = new Structure[width*4][height*4][15];
         Mapper.tiles = tiles;
@@ -491,6 +550,7 @@ public class LoadWindow extends javax.swing.JFrame {
         Mapper.height = height;
         Mapper.heightmap = new float[width+1][height+1];
         Mapper.labels = new Label[width][height];
+        Mapper.caveLabels = new Label[width][height];
         Mapper.ground = ground;
         Mapper.caveGround = caveGround;
         Mapper.tiles = tiles;
@@ -542,6 +602,7 @@ public class LoadWindow extends javax.swing.JFrame {
         Mapper.height = height;
         Mapper.heightmap = new float[width+1][height+1];
         Mapper.labels = new Label[width][height];
+        Mapper.caveLabels = new Label[width][height];
         Mapper.ground = ground;
         Mapper.caveGround = caveGround;
         Mapper.tiles = tiles;
@@ -590,6 +651,7 @@ public class LoadWindow extends javax.swing.JFrame {
         
         Mapper.heightmap = new float[width+1][height+1];
         Mapper.labels = new Label[width][height];
+        Mapper.caveLabels = new Label[width][height];
         Mapper.ground = ground;
         Mapper.tiles = tiles;
         Mapper.objects = new Structure[width*4][height*4][15];

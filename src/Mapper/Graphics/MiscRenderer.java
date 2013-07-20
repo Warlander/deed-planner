@@ -222,18 +222,18 @@ public class MiscRenderer {
             
             if (!HouseCalc.renderHeight && !(Mapper.currType==Type.elevation)) {
                 GL11.glBegin(GL11.GL_LINES);
-                    GL11.glVertex3f(i*4,-i2*4, -99);
-                    GL11.glVertex3f(i*4+4,-i2*4, -99);
+                    GL11.glVertex3f(i*4,-i2*4, -299);
+                    GL11.glVertex3f(i*4+4,-i2*4, -299);
                 GL11.glEnd();
             }
             else {
                 GL11.glBegin(GL11.GL_LINES);
                     float color = (Mapper.heightmap[i][i2]-Mapper.minElevation)/Mapper.diffElevation;
                     GL11.glColor3f(color, 1-color, 0);
-                    GL11.glVertex3f(i*4,-i2*4, -99);
+                    GL11.glVertex3f(i*4,-i2*4, -299);
                     color = (Mapper.heightmap[i+1][i2]-Mapper.minElevation)/Mapper.diffElevation;
                     GL11.glColor3f(color, 1-color, 0);
-                    GL11.glVertex3f(i*4+4,-i2*4, -99);
+                    GL11.glVertex3f(i*4+4,-i2*4, -299);
                 GL11.glEnd();
             }
 
@@ -253,8 +253,8 @@ public class MiscRenderer {
             
             if (!HouseCalc.renderHeight && !(Mapper.currType==Type.elevation)) {
                 GL11.glBegin(GL11.GL_LINES);
-                    GL11.glVertex3f(i*4,-i2*4, -99);
-                    GL11.glVertex3f(i*4,-i2*4-4, -99);
+                    GL11.glVertex3f(i*4,-i2*4, -299);
+                    GL11.glVertex3f(i*4,-i2*4-4, -299);
                 GL11.glEnd();
             }
             else {
@@ -262,10 +262,10 @@ public class MiscRenderer {
                 GL11.glBegin(GL11.GL_LINES);
                     float color = (Mapper.heightmap[i][i2]-Mapper.minElevation)/Mapper.diffElevation;
                     GL11.glColor3f(color, 1-color, 0);
-                    GL11.glVertex3f(i*4,-i2*4, -99);
+                    GL11.glVertex3f(i*4,-i2*4, -299);
                     color = (Mapper.heightmap[i][i2+1]-Mapper.minElevation)/Mapper.diffElevation;
                     GL11.glColor3f(color, 1-color, 0);
-                    GL11.glVertex3f(i*4,-i2*4-4, -99);
+                    GL11.glVertex3f(i*4,-i2*4-4, -299);
                     GL11.glColor3f(1, 1, 1);
                 GL11.glEnd();
             }
@@ -277,7 +277,7 @@ public class MiscRenderer {
         else if (Mapper.currType==Type.elevation) {
             GL11.glColor3f(1, 1, 1);
             GL11.glBegin(GL11.GL_POINTS);
-                GL11.glVertex3f(i*4,-i2*4, -99.5f);
+                GL11.glVertex3f(i*4,-i2*4, -299.5f);
             GL11.glEnd();
         }
     }

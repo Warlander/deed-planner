@@ -28,8 +28,8 @@ import javax.swing.filechooser.FileFilter;
 
 public class SaveWindow extends javax.swing.JFrame {
 
-    private final String endl = System.getProperty("line.separator");
-    private final String slash = System.getProperty("file.separator");
+    private static final String endl = System.getProperty("line.separator");
+    private static final String slash = System.getProperty("file.separator");
     private static String previousDir;
     
     DefaultListModel list;
@@ -143,15 +143,15 @@ public class SaveWindow extends javax.swing.JFrame {
         save = maps.toString();
     }
     
-    private void saveHeight(StringBuilder builder, int x, int y) {
+    public static void saveHeight(StringBuilder builder, int x, int y) {
         builder.append("H ").append(x).append(" ").append(y).append(" ").append((int)Mapper.heightmap[x][y]).append(endl);
     }
     
-    private void saveGround(StringBuilder builder, int x, int y) {
+    public static void saveGround(StringBuilder builder, int x, int y) {
         builder.append("G ").append(x).append(" ").append(y).append(" ").append(Mapper.ground[x][y].shortName).append(endl);
     }
     
-    private void saveCave(StringBuilder builder, int x, int y) {
+    public static void saveCave(StringBuilder builder, int x, int y) {
         builder.append("C ").append(x).append(" ").append(y).append(" ").append(Mapper.caveGround[x][y].shortName).append(endl);
     }
     
@@ -166,20 +166,36 @@ public class SaveWindow extends javax.swing.JFrame {
      * 8. Blue
      * 9. Rotation
      */
-    private void saveObject(StringBuilder builder, int x, int y, int z) {
-        builder.append("O ").append(x).append(" ").append(y).append(" ").append(z).append(" ").append(Mapper.objects[x][y][z].shortName).append(" ").append(Mapper.objects[x][y][z].rPaint).append(" ").append(Mapper.objects[x][y][z].gPaint).append(" ").append(Mapper.objects[x][y][z].bPaint).append(" ").append(Mapper.objects[x][y][z].rotation).append(endl);
+    public static void saveObject(StringBuilder builder, int x, int y, int z) {
+        try {
+            builder.append("O ").append(x).append(" ").append(y).append(" ").append(z).append(" ").append(Mapper.objects[x][y][z].shortName).append(" ").append(Mapper.objects[x][y][z].rPaint).append(" ").append(Mapper.objects[x][y][z].gPaint).append(" ").append(Mapper.objects[x][y][z].bPaint).append(" ").append(Mapper.objects[x][y][z].rotation).append(endl);
+        } catch (NullPointerException ex) {
+            builder.append("DO ").append(x).append(" ").append(y).append(" ").append(z).append(endl);
+        }
     }
     
-    private void saveTile(StringBuilder builder, int x, int y, int z) {
-        builder.append("T ").append(x).append(" ").append(y).append(" ").append(z).append(" ").append(Mapper.tiles[x][y][z].shortName).append(endl);
+    public static void saveTile(StringBuilder builder, int x, int y, int z) {
+        try {
+            builder.append("T ").append(x).append(" ").append(y).append(" ").append(z).append(" ").append(Mapper.tiles[x][y][z].shortName).append(endl);
+        } catch (NullPointerException ex) {
+            builder.append("DT ").append(x).append(" ").append(y).append(" ").append(z).append(endl);
+        }
     }
     
-    private void saveBorderX(StringBuilder builder, int x, int y, int z) {
-        builder.append("BX ").append(x).append(" ").append(y).append(" ").append(z).append(" ").append(Mapper.bordersx[x][y][z].shortName).append(" ").append(Mapper.bordersx[x][y][z].rPaint).append(" ").append(Mapper.bordersx[x][y][z].gPaint).append(" ").append(Mapper.bordersx[x][y][z].bPaint).append(endl);
+    public static void saveBorderX(StringBuilder builder, int x, int y, int z) {
+        try {
+            builder.append("BX ").append(x).append(" ").append(y).append(" ").append(z).append(" ").append(Mapper.bordersx[x][y][z].shortName).append(" ").append(Mapper.bordersx[x][y][z].rPaint).append(" ").append(Mapper.bordersx[x][y][z].gPaint).append(" ").append(Mapper.bordersx[x][y][z].bPaint).append(endl);
+        } catch (NullPointerException ex) {
+            builder.append("DBX ").append(x).append(" ").append(y).append(" ").append(z).append(endl);
+        }
     }
     
-    private void saveBorderY(StringBuilder builder, int x, int y, int z) {
-        builder.append("BY ").append(x).append(" ").append(y).append(" ").append(z).append(" ").append(Mapper.bordersy[x][y][z].shortName).append(" ").append(Mapper.bordersy[x][y][z].rPaint).append(" ").append(Mapper.bordersy[x][y][z].gPaint).append(" ").append(Mapper.bordersy[x][y][z].bPaint).append(endl);
+    public static void saveBorderY(StringBuilder builder, int x, int y, int z) {
+        try {
+            builder.append("BY ").append(x).append(" ").append(y).append(" ").append(z).append(" ").append(Mapper.bordersy[x][y][z].shortName).append(" ").append(Mapper.bordersy[x][y][z].rPaint).append(" ").append(Mapper.bordersy[x][y][z].gPaint).append(" ").append(Mapper.bordersy[x][y][z].bPaint).append(endl);
+        } catch (NullPointerException ex) {
+            builder.append("DBY ").append(x).append(" ").append(y).append(" ").append(z).append(endl);
+        }
     }
     
     /**
@@ -195,20 +211,32 @@ public class SaveWindow extends javax.swing.JFrame {
      * 10. Alpha
      * 11. Cave
      */
-    private void saveLabel(StringBuilder builder, int x, int y) {
-        builder.append("L ").append(x).append(" ").append(y).append(" ").append(Mapper.labels[x][y].text.replace(" ", "_").replace("\n", "\\n")).append(" ").append(Mapper.labels[x][y].font.getName().replace(" ", "_")).append(" ").append(Mapper.labels[x][y].font.getSize()).append(" ").append(Mapper.labels[x][y].color.getRed()).append(" ").append(Mapper.labels[x][y].color.getGreen()).append(" ").append(Mapper.labels[x][y].color.getBlue()).append(" ").append(Mapper.labels[x][y].color.getAlpha()).append(" ").append(false).append(endl);
+    public static void saveLabel(StringBuilder builder, int x, int y) {
+        try {
+            builder.append("L ").append(x).append(" ").append(y).append(" ").append(Mapper.labels[x][y].text.replace(" ", "_").replace("\n", "\\n")).append(" ").append(Mapper.labels[x][y].font.getName().replace(" ", "_")).append(" ").append(Mapper.labels[x][y].font.getSize()).append(" ").append(Mapper.labels[x][y].color.getRed()).append(" ").append(Mapper.labels[x][y].color.getGreen()).append(" ").append(Mapper.labels[x][y].color.getBlue()).append(" ").append(Mapper.labels[x][y].color.getAlpha()).append(" ").append(false).append(endl);
+        } catch (NullPointerException ex) {
+            builder.append("DL ").append(x).append(" ").append(y).append(false).append(endl);
+        }
     }
     
-    private void saveCaveLabel(StringBuilder builder, int x, int y) {
-        builder.append("L ").append(x).append(" ").append(y).append(" ").append(Mapper.caveLabels[x][y].text.replace(" ", "_").replace("\n", "\\n")).append(" ").append(Mapper.caveLabels[x][y].font.getName().replace(" ", "_")).append(" ").append(Mapper.caveLabels[x][y].font.getSize()).append(" ").append(Mapper.caveLabels[x][y].color.getRed()).append(" ").append(Mapper.caveLabels[x][y].color.getGreen()).append(" ").append(Mapper.caveLabels[x][y].color.getBlue()).append(" ").append(Mapper.caveLabels[x][y].color.getAlpha()).append(" ").append(true).append(endl);
+    public static void saveCaveLabel(StringBuilder builder, int x, int y) {
+        try {
+            builder.append("L ").append(x).append(" ").append(y).append(" ").append(Mapper.caveLabels[x][y].text.replace(" ", "_").replace("\n", "\\n")).append(" ").append(Mapper.caveLabels[x][y].font.getName().replace(" ", "_")).append(" ").append(Mapper.caveLabels[x][y].font.getSize()).append(" ").append(Mapper.caveLabels[x][y].color.getRed()).append(" ").append(Mapper.caveLabels[x][y].color.getGreen()).append(" ").append(Mapper.caveLabels[x][y].color.getBlue()).append(" ").append(Mapper.caveLabels[x][y].color.getAlpha()).append(" ").append(true).append(endl);
+        } catch (NullPointerException ex) {
+            builder.append("DL ").append(x).append(" ").append(y).append(true).append(endl);
+        }
     }
     
-    private void saveWrit(StringBuilder builder, Writ writ) {
+    public static void saveWrit(StringBuilder builder, Writ writ) {
         builder.append("W ").append(writ.name.replace(" ", "_")).append(" ").append(writ.tiles.size());
         for (Ground g : writ.tiles) {
             builder.append(" ").append(g.x).append(" ").append(g.y);
         }
         builder.append(endl);
+    }
+    
+    public static void saveWritDeletion(StringBuilder builder, String writ) {
+        builder.append("DW ").append(writ.replace(" ", "_")).append(" ").append(endl);
     }
 
     @SuppressWarnings("unchecked")

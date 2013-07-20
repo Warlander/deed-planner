@@ -1081,7 +1081,7 @@
                           <Font name="Arial" size="12" style="0"/>
                         </Property>
                         <Property name="model" type="javax.swing.SpinnerModel" editor="org.netbeans.modules.form.editors2.SpinnerModelEditor">
-                          <SpinnerModel initial="0" maximum="1000" minimum="-999" numberType="java.lang.Integer" stepSize="1" type="number"/>
+                          <SpinnerModel initial="0" maximum="9999" minimum="-999" numberType="java.lang.Integer" stepSize="1" type="number"/>
                         </Property>
                       </Properties>
                       <Events>
@@ -1113,7 +1113,7 @@
                           <Font name="Arial" size="12" style="0"/>
                         </Property>
                         <Property name="model" type="javax.swing.SpinnerModel" editor="org.netbeans.modules.form.editors2.SpinnerModelEditor">
-                          <SpinnerModel initial="0" maximum="1000" minimum="-999" numberType="java.lang.Integer" stepSize="1" type="number"/>
+                          <SpinnerModel initial="0" maximum="9999" minimum="-999" numberType="java.lang.Integer" stepSize="1" type="number"/>
                         </Property>
                       </Properties>
                       <Events>
@@ -1219,6 +1219,8 @@
                       <Component id="jToggleButton6" min="-2" pref="26" max="-2" attributes="0"/>
                       <EmptySpace min="-2" pref="2" max="-2" attributes="0"/>
                       <Component id="labelToggle" min="-2" pref="26" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="2" max="-2" attributes="0"/>
+                      <Component id="serverToggle" min="-2" pref="26" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="wallsButton" min="-2" pref="90" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
@@ -1235,12 +1237,10 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="1" max="-2" attributes="0">
-                          <Component id="jButton9" alignment="1" max="32767" attributes="0"/>
-                          <Component id="wallsButton" alignment="1" max="32767" attributes="0"/>
+                      <Group type="103" groupAlignment="1" attributes="0">
                           <Component id="labelToggle" min="-2" pref="26" max="-2" attributes="0"/>
                           <Component id="jToggleButton6" min="-2" pref="26" max="-2" attributes="0"/>
-                          <Component id="jCheckBox1" pref="28" max="32767" attributes="0"/>
+                          <Component id="jCheckBox1" min="-2" pref="28" max="-2" attributes="0"/>
                           <Component id="jButton6" min="-2" pref="24" max="-2" attributes="0"/>
                           <Component id="jToggleButton5" min="-2" pref="26" max="-2" attributes="0"/>
                           <Component id="jButton5" min="-2" pref="26" max="-2" attributes="0"/>
@@ -1248,6 +1248,11 @@
                           <Component id="jButton2" min="-2" pref="26" max="-2" attributes="0"/>
                           <Component id="jButton3" min="-2" pref="26" max="-2" attributes="0"/>
                           <Component id="jButton1" alignment="1" min="-2" pref="26" max="-2" attributes="0"/>
+                          <Group type="103" alignment="1" groupAlignment="0" max="-2" attributes="0">
+                              <Component id="jButton9" alignment="1" max="32767" attributes="0"/>
+                              <Component id="wallsButton" alignment="1" max="32767" attributes="0"/>
+                              <Component id="serverToggle" min="-2" pref="26" max="-2" attributes="0"/>
+                          </Group>
                       </Group>
                       <EmptySpace min="-2" pref="9" max="-2" attributes="0"/>
                   </Group>
@@ -1426,6 +1431,24 @@
                 <EventHandler event="mouseMoved" listener="java.awt.event.MouseMotionListener" parameters="java.awt.event.MouseEvent" handler="labelToggleMouseMoved"/>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="labelToggleActionPerformed"/>
               </Events>
+            </Component>
+            <Component class="javax.swing.JToggleButton" name="serverToggle">
+              <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Arial" size="14" style="1"/>
+                </Property>
+                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                  <Image iconType="3" name="/Graphics/serverOff.png"/>
+                </Property>
+                <Property name="focusable" type="boolean" value="false"/>
+              </Properties>
+              <Events>
+                <EventHandler event="mouseMoved" listener="java.awt.event.MouseMotionListener" parameters="java.awt.event.MouseEvent" handler="serverToggleMouseMoved"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="serverToggleActionPerformed"/>
+              </Events>
+              <AuxValues>
+                <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="9"/>
+              </AuxValues>
             </Component>
           </SubComponents>
         </Container>

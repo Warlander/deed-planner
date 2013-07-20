@@ -1,8 +1,10 @@
 package Mapper.Logic;
 
 import Form.HouseCalc;
+import Form.SaveWindow;
 import Mapper.Mapper;
 import Mapper.MouseInput;
+import Mapper.Server;
 import Mapper.UpCamera;
 import org.lwjgl.opengl.Display;
 
@@ -105,6 +107,10 @@ public class WallUpdater {
         else {
             Mapper.bordersy[tileX][tileY][Mapper.z] = null;
         }
+        
+        if (Server.running) {
+            SaveWindow.saveBorderY(Server.builder, tileX, tileY, Mapper.z);
+        }
     }
     
     private void verticalDelete(int tileX, int tileY) {
@@ -112,6 +118,10 @@ public class WallUpdater {
             tileX = lockedVal;
         }
         Mapper.bordersy[tileX][tileY][Mapper.z] = null;
+        
+        if (Server.running) {
+            SaveWindow.saveBorderY(Server.builder, tileX, tileY, Mapper.z);
+        }
     }
     
     private void horizontalSelect(int tileX, int tileY) {
@@ -128,6 +138,10 @@ public class WallUpdater {
         else {
             Mapper.bordersx[tileX][tileY][Mapper.z] = null;
         }
+        
+        if (Server.running) {
+            SaveWindow.saveBorderX(Server.builder, tileX, tileY, Mapper.z);
+        }
     }
     
     private void horizontalDelete(int tileX, int tileY) {
@@ -135,6 +149,10 @@ public class WallUpdater {
             tileY = lockedVal;
         }
         Mapper.bordersx[tileX][tileY][Mapper.z] = null;
+        
+        if (Server.running) {
+            SaveWindow.saveBorderX(Server.builder, tileX, tileY, Mapper.z);
+        }
     }
     
 }

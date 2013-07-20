@@ -2,10 +2,13 @@ package Mapper.Logic;
 
 import Mapper.Mapper;
 import Form.HouseCalc;
+import Form.SaveWindow;
 import Lib.Graphics.Ground;
 import Lib.Object.Data;
+import Lib.Object.Structure;
 import Lib.Object.Writ;
 import Mapper.MouseInput;
+import Mapper.Server;
 import Mapper.UpCamera;
 import java.util.ArrayList;
 import javax.swing.DefaultListModel;
@@ -15,6 +18,7 @@ public class WritUpdater {
     
     public DefaultListModel model;
     private Ground[][] ground;
+    private Structure[][][] objects;
     private Data[][][] tiles;
     private Data[][][] bordersx;
     private Data[][][] bordersy;
@@ -24,9 +28,9 @@ public class WritUpdater {
         HouseCalc.writsList.setModel(model);
     }
     
-    public void deleteWrit() {
-        Writ writ = (Writ)HouseCalc.writsList.getSelectedValue();
+    public void deleteWrit(Writ writ) {
         model.removeElement(writ);
+        String name = writ.name;
         for (Ground g : writ.tiles) {
             g.writ=null;
             for (int z=0; z<15; z++) {
@@ -50,17 +54,27 @@ public class WritUpdater {
                 }
             }
         }
+        
+        if (Server.running) {
+            SaveWindow.saveWritDeletion(Server.builder, name);
+        }
     }
     
     private void copyMapData() {
         ground = new Ground[Mapper.width][Mapper.height];
         tiles = new Data[Mapper.width][Mapper.height][15];
+        objects = new Structure[Mapper.width*4][Mapper.height*4][15];
         bordersx = new Data[Mapper.width][Mapper.height][15];
         bordersy = new Data[Mapper.width][Mapper.height][15];
         for(int i=0; i<Mapper.width; i++) {
             for(int i2=0; i2<Mapper.height; i2++) {
                 ground[i][i2] = Mapper.ground[i][i2];
                 for (int i3 = 0; i3<15; i3++) {
+                    for (int i4=0; i4<4; i4++) {
+                        for (int i5=0; i5<4; i5++) {
+                            objects[i*4+i4][i2*4+i5][i3]=Mapper.objects[i*4+i4][i2*4+i5][i3];
+                        }
+                    }
                     tiles[i][i2][i3] = Mapper.tiles[i][i2][i3];
                     bordersx[i][i2][i3] = Mapper.bordersx[i][i2][i3];
                     bordersy[i][i2][i3] = Mapper.bordersy[i][i2][i3];
@@ -76,28 +90,26 @@ public class WritUpdater {
         Mapper.bordersy = bordersy;
     }
     
-    private void deleteTempWrit() {
+    private void deleteTempWrit(int x, int y) {
         Writ writ = (Writ)HouseCalc.writsList.getSelectedValue();
         for (Ground g : writ.tiles) {
             for (int z=0; z<15; z++) {
                 tiles[g.x+1][g.y][z] = null;
+                tiles[g.x+1+x][g.y+y][z] = null;
                 for (int i=0; i<4; i++) {
                     for (int i2=0; i2<4; i2++) {
-                        Mapper.objects[(g.x+1)*4+i][g.y*4+i2][z]=null;
+                        objects[(g.x+1)*4+i][g.y*4+i2][z]=null;
+                        objects[(g.x+1+x)*4+i][(g.y+y)*4+i2][z]=null;
                     }
                 }
-                if (ground[g.x][g.y+1].writ==null) {
-                    bordersx[g.x+1][g.y+1][z] = null;
-                }
-                if (ground[g.x][g.y-1].writ==null) {
-                    bordersx[g.x+1][g.y][z] = null;
-                }
-                if (ground[g.x-1][g.y].writ==null) {
-                    bordersy[g.x][g.y][z] = null;
-                }
-                if (ground[g.x+1][g.y].writ==null) {
-                    bordersy[g.x+1][g.y][z] = null;
-                }
+                bordersx[g.x+1][g.y+1][z] = null;
+                bordersx[g.x+1+x][g.y+1+y][z] = null;
+                bordersx[g.x+1][g.y][z] = null;
+                bordersx[g.x+1+x][g.y+y][z] = null;
+                bordersy[g.x][g.y][z] = null;
+                bordersy[g.x+x][g.y+y][z] = null;
+                bordersy[g.x+1][g.y][z] = null;
+                bordersy[g.x+1+x][g.y+y][z] = null;
             }
         }
     }
@@ -180,6 +192,10 @@ public class WritUpdater {
             if (!fillInfect(tiles, Mapper.wData.tiles.get(0)) || tiles.size()!=Mapper.wData.tiles.size()) {
                 delete(x, y);
             }
+            
+            if (Server.running) {
+                SaveWindow.saveWrit(Server.builder, Mapper.wData);
+            }
         }
     }
     
@@ -187,7 +203,7 @@ public class WritUpdater {
         if (movePossible(xAxis, yAxis)) {
             ArrayList<Ground> newGrounds = new ArrayList<>();
             copyMapData();
-            deleteTempWrit();
+            deleteTempWrit(xAxis, yAxis);
             for (Ground g : Mapper.wData.tiles) {
                 g.writ=null;
                 newGrounds.add(ground[g.x+xAxis][g.y+yAxis]);
@@ -220,25 +236,12 @@ public class WritUpdater {
             for (Ground g : newGrounds) {
                 g.writ = Mapper.wData;
             }
-//            for (Ground g : (ArrayList<Ground>)getDiff(newGrounds, Mapper.wData.tiles)) {
-//                for (int z=0; z<15; z++) {
-//                    tiles[g.x+1][g.y][z] = null;
-//                    if (ground[g.x][g.y+1].writ==null) {
-//                        bordersx[g.x+1][g.y+1][z] = null;
-//                    }
-//                    if (ground[g.x][g.y-1].writ==null) {
-//                        bordersx[g.x+1][g.y][z] = null;
-//                    }
-//                    if (ground[g.x-1][g.y].writ==null) {
-//                        bordersy[g.x][g.y][z] = null;
-//                    }
-//                    if (ground[g.x+1][g.y].writ==null) {
-//                        bordersy[g.x+1][g.y][z] = null;
-//                    }
-//                }
-//            }
+            
             Mapper.wData.tiles = newGrounds;
             mergeMapData();
+            if (Server.running) {
+                SaveWindow.saveWrit(Server.builder, Mapper.wData);
+            }
             Mapper.updater.roofUpdater.roofsRefit();
         }
     }
@@ -287,6 +290,10 @@ public class WritUpdater {
         fillInfect(tiles, Mapper.wData.tiles.get(0));
         if (tiles.size()!=Mapper.wData.tiles.size()) {
             add(x, y);
+        }
+        
+        if (Server.running) {
+            SaveWindow.saveWrit(Server.builder, Mapper.wData);
         }
     }
     

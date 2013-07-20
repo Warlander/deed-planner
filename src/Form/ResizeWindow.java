@@ -224,6 +224,8 @@ public class ResizeWindow extends javax.swing.JFrame {
                 else {
                     ground[i][i2].x = i;
                     ground[i][i2].y = i2;
+                    caveGround[i][i2].x = i;
+                    caveGround[i][i2].y = i2;
                 }
             }
         }

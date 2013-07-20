@@ -1,8 +1,10 @@
 package Mapper.Logic;
 
+import Form.SaveWindow;
 import Lib.Object.Structure;
 import Mapper.Mapper;
 import Mapper.MouseInput;
+import Mapper.Server;
 import Mapper.UpCamera;
 import org.lwjgl.opengl.Display;
 
@@ -39,6 +41,10 @@ public class StructureUpdater {
                 float deltaX = mouse.x - xPos;
                 currStruct.rotation = -(int)((Math.atan2(deltaY, deltaX)+Math.PI/2)*180/Math.PI);
             }
+        }
+        
+        if (Server.running && (mouse.hold.left ^ mouse.hold.right)) {
+            SaveWindow.saveObject(Server.builder, tileX, tileY, Mapper.z);
         }
     }
                 

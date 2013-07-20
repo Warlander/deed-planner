@@ -2,11 +2,13 @@ package Mapper.Logic;
 
 import Form.DrawMode;
 import Form.HouseCalc;
+import Form.SaveWindow;
 import Lib.Graphics.Ground;
 import Lib.Object.Writ;
 import Mapper.Data.D;
 import Mapper.Mapper;
 import Mapper.MouseInput;
+import Mapper.Server;
 import Mapper.UpCamera;
 import org.lwjgl.opengl.Display;
 
@@ -48,6 +50,10 @@ public class GroundUpdater {
             g.writ = w;
             w.tiles.add(g);
             Mapper.ground[realX][realY] = g;
+        }
+        
+        if (Server.running && (mouse.hold.left ^ mouse.hold.right)) {
+            SaveWindow.saveGround(Server.builder, realX, realY);
         }
     }
     

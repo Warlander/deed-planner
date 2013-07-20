@@ -5,8 +5,6 @@ import Lib.Object.Data;
 import Lib.Object.Writ;
 import java.util.ArrayList;
 import Mapper.Mapper;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class WritComponents {
     
