@@ -3,11 +3,31 @@ package Lib.Object;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import org.lwjgl.opengl.GL11;
 
 public class ReadObject {
     
-    public static ObjectData read(BufferedReader source) throws IOException {
-        ObjectData data = new ObjectData();
+    private ReadObject() {}
+    
+    /**
+     * Use this method ONLY for hardcoded models!
+     * 
+     * @param source BufferedReader from which you want to read data
+     * @return ObjectData with loadID = 0
+     * @throws IOException when directory cannot be found
+     */
+    static ObjectData read(BufferedReader source) throws IOException {
+        return read(source, 0);
+    }
+    
+    /**
+     * Method to load external models.
+     * 
+     * @param source BufferedReader from which you want to read data
+     * @return ObjectData
+     * @throws IOException when directory cannot be found
+     */
+    static ObjectData read(BufferedReader source, int loadID) throws IOException {
         String line;
         ArrayList<Float> x = new ArrayList();
         ArrayList<Float> y = new ArrayList();
@@ -47,31 +67,20 @@ public class ReadObject {
             }
         }
         
-        data.x = copyFloatList(x);
-        data.y = copyFloatList(y);
-        data.z = copyFloatList(z);
-        data.texU = copyFloatList(u);
-        data.texV = copyFloatList(v);
-        data.vert = copyIntList(vert);
-        data.coord = copyIntList(coord);
-        data.size = vert.size();
+        int listID = GL11.glGenLists(1);
+        
+        GL11.glNewList(listID, GL11.GL_COMPILE);
+            GL11.glBegin(GL11.GL_TRIANGLES);
+                for (int i=0; i<vert.size(); i++) {
+                    GL11.glTexCoord2f(u.get(coord.get(i)), 1-v.get(coord.get(i)));
+                    GL11.glVertex3f(x.get(vert.get(i)), y.get(vert.get(i)), z.get(vert.get(i)));
+                }
+            GL11.glEnd();
+        GL11.glEndList();
+        
+        ObjectData data = new ObjectData(loadID, listID);
+        
         return data;
-    }
-    
-    private static float[] copyFloatList(ArrayList<Float> list) {
-        float[] array = new float[list.size()];
-        for (int i=0; i<list.size(); i++) {
-            array[i] = list.get(i);
-        }
-        return array;
-    }
-    
-    private static int[] copyIntList(ArrayList<Integer> list) {
-        int[] array = new int[list.size()];
-        for (int i=0; i<list.size(); i++) {
-            array[i] = list.get(i);
-        }
-        return array;
     }
     
 }

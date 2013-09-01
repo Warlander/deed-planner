@@ -7,25 +7,24 @@ import Lib.Graphics.Ground;
 import Mapper.Data.D;
 import Mapper.Mapper;
 import Mapper.MouseInput;
-import Mapper.Server;
 import Mapper.UpCamera;
 import org.lwjgl.opengl.Display;
 
 public class CaveUpdater {
     
-    protected void update(MouseInput mouse) {
-        if (mouse.hold.left ^ mouse.hold.right) {
+    static void update() {
+        if (MouseInput.hold.left ^ MouseInput.hold.right) {
             float tileScaler = (float)Display.getWidth()/(float)Display.getHeight();
             float tileSize = (float)Display.getHeight()/UpCamera.scale/4;
-            int tileX = (int) ((mouse.x+UpCamera.y*tileSize)/((float)Display.getWidth()/UpCamera.scale/tileScaler));
-            int tileY = (int) ((mouse.y+UpCamera.x*tileSize)/((float)Display.getHeight()/UpCamera.scale));
+            int tileX = (int) ((MouseInput.x+UpCamera.y*tileSize)/((float)Display.getWidth()/UpCamera.scale/tileScaler));
+            int tileY = (int) ((MouseInput.y+UpCamera.x*tileSize)/((float)Display.getHeight()/UpCamera.scale));
             
             switch (HouseCalc.drawMode) {
                 case pencil:
-                    pencil(mouse, tileX, tileY);
+                    pencil(tileX, tileY);
                     break;
                 case fill:
-                    fill(mouse, tileX, tileY);
+                    fill(tileX, tileY);
                     break;
                 case select:
                     select(tileX, tileY);
@@ -34,20 +33,16 @@ public class CaveUpdater {
         }
     }
     
-    private void groundChange(MouseInput mouse, int realX, int realY) {
+    private static void groundChange(int realX, int realY) {
         Ground g;
         
-        if (mouse.hold.left) g=Mapper.cData.copy(realX, realY);
+        if (MouseInput.hold.left) g=Mapper.cData.copy(realX, realY);
         else g=D.caveGrounds.get(0).copy(realX, realY);
         
         Mapper.caveGround[realX][realY]=g;
-        
-        if (Server.running && (mouse.hold.left ^ mouse.hold.right)) {
-            SaveWindow.saveCave(Server.builder, realX, realY);
-        }
     }
     
-    private void pencil(MouseInput mouse, int tileX, int tileY) {
+    private static void pencil(int tileX, int tileY) {
         int realX;
         int realY;
         
@@ -56,34 +51,34 @@ public class CaveUpdater {
                 realX = tileX+i;
                 realY = tileY+i2;
                 if (realX<0 || realY<0 || realX>Mapper.width-1 || realY>Mapper.height-1) {}
-                else groundChange(mouse, realX, realY);
+                else groundChange(realX, realY);
             }
         }
     }
     
-    private void fill(MouseInput mouse, int tileX, int tileY) {
+    private static void fill(int tileX, int tileY) {
         if (tileX<0 || tileY<0 || tileX>Mapper.width-1 || tileY>Mapper.height-1) {
             return;
         }
-        fillInfect(mouse, Mapper.caveGround[tileX][tileY], tileX, tileY);
+        fillInfect(Mapper.caveGround[tileX][tileY], tileX, tileY);
     }
     
-    private void fillInfect(MouseInput mouse, Ground ground, int tileX, int tileY) {
+    private static void fillInfect(Ground ground, int tileX, int tileY) {
         if (tileX<0 || tileY<0 || tileX>Mapper.width-1 || tileY>Mapper.height-1) {
             return;
         }
         if (!Mapper.caveGround[tileX][tileY].shortName.equals(ground.shortName)) return;
-        if (mouse.hold.left && Mapper.caveGround[tileX][tileY].shortName.equals(Mapper.cData.shortName)) return;
-        if (mouse.hold.right && Mapper.caveGround[tileX][tileY].shortName.equals(D.caveGrounds.get(0).shortName)) return;
+        if (MouseInput.hold.left && Mapper.caveGround[tileX][tileY].shortName.equals(Mapper.cData.shortName)) return;
+        if (MouseInput.hold.right && Mapper.caveGround[tileX][tileY].shortName.equals(D.caveGrounds.get(0).shortName)) return;
         
-        groundChange(mouse, tileX, tileY);
-        fillInfect(mouse, ground, tileX-1, tileY);
-        fillInfect(mouse, ground, tileX+1, tileY);
-        fillInfect(mouse, ground, tileX, tileY-1);
-        fillInfect(mouse, ground, tileX, tileY+1);
+        groundChange(tileX, tileY);
+        fillInfect(ground, tileX-1, tileY);
+        fillInfect(ground, tileX+1, tileY);
+        fillInfect(ground, tileX, tileY-1);
+        fillInfect(ground, tileX, tileY+1);
     }
     
-    private void select(int tileX, int tileY) {
+    private static void select(int tileX, int tileY) {
         Ground ground = Mapper.caveGround[tileX][tileY];
         for (int i=0; i<HouseCalc.groundsList.getModel().getSize(); i++) {
             if (((Ground)HouseCalc.groundsList.getModel().getElementAt(i)).name.equals(ground.name)) {

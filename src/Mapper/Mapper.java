@@ -20,7 +20,6 @@ import Mapper.Logic.MapUpdater;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.lwjgl.LWJGLException;
@@ -48,13 +47,6 @@ public class Mapper {
     private boolean resizeRequested = false;
     public static boolean fpsView = false;
     
-    private MouseInput mouse;
-    private KeyboardInput keyboard;
-    private FPPCamera fpscamera;
-    private UpCamera upcamera;
-    public static MapUpdater updater;
-    private MiscRenderer miscRenderer;
-    
     public static int width = 25;
     public static int height = 25;
     
@@ -64,14 +56,14 @@ public class Mapper {
     public static float minElevation = 0;
     public static float maxElevation = 0;
     public static float diffElevation = 0;
-    public static Data[][][] tiles=new Data[25][25][15];
-    public static Structure[][][] objects = new Structure[100][100][15];
+    public static Data[][][] tiles=new Data[25][15][25];
+    public static Structure[][][] objects = new Structure[100][15][100];
     public static Label[][] labels = new Label[25][25];
     public static Label[][] caveLabels = new Label[25][25];
-    public static Data[][][] bordersx=new Data[25][25][15];
-    public static Data[][][] bordersy=new Data[25][25][15];
+    public static Data[][][] bordersx=new Data[25][15][25];
+    public static Data[][][] bordersy=new Data[25][15][25];
     
-    public static int z = 0;
+    public static int y = 0;
     
     public Mapper() {}
     
@@ -82,24 +74,10 @@ public class Mapper {
                     GLInit.initDisplay((int)((float)Properties.getProperty("antialiasing")));
                 }
                 else {
-                    GLInit.initDisplay(16);
+                    GLInit.initDisplay(8);
                 }
                 GLInit.initOpenGL();
-                System.out.println("Initializing mouse input");
-                mouse = new MouseInput();
-                System.out.println("Done!");
-                System.out.println("Initializing keyboard input");
-                keyboard = new KeyboardInput();
-                System.out.println("Done!");
-                System.out.println("Initializing 3d and 2d view camera");
-                fpscamera = new FPPCamera();
-                upcamera = new UpCamera();
-                System.out.println("Done!");
-                System.out.println("Initializing program logic engine");
-                updater = new MapUpdater();
-                System.out.println("Done!");
                 System.out.println("Initializing program rendering engine");
-                miscRenderer = new MiscRenderer();
                 System.out.println("Done!");
                 try {
                     System.out.println("Loading data from \"Objects.txt\"");
@@ -132,11 +110,10 @@ public class Mapper {
         while (true) {
             GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
             resize();
-            mouse.update();
-            keyboard.update();
+            MouseInput.update();
+            KeyboardInput.update();
             logic();
             draw();
-            keyboard.reset();
             Display.update();
             HouseCalc.statusBar.display();
             Display.sync(30);
@@ -172,12 +149,6 @@ public class Mapper {
             }
         }
         
-        if (Server.running) {
-            LoadWindow.readFragments(new Scanner(Server.in));
-            updater.roofUpdater.roofsRefit();
-            Server.out.println("1");
-        }
-        
         switch (HouseCalc.paintMode) {
             case type:
                 tick=1;
@@ -209,70 +180,55 @@ public class Mapper {
         }
         
         if (fpsView) {
-            fpscamera.update(keyboard, mouse);
+            FPPCamera.update();
         }
         else {
-            upcamera.update(keyboard, mouse);
-            updater.update(keyboard, mouse);
-        }
-        
-        if (Server.running) {
-            Server.out.flush();
+            UpCamera.update();
+            MapUpdater.update();
         }
     }
     
     private void draw() {
-        GL11.glLoadIdentity();
         if (fpsView) {
-            fpscamera.set();
+            FPPCamera.set();
         }
         else {
-            upcamera.set();
+            UpCamera.set();
         }
         
-        GL11.glDisable(GL11.GL_CULL_FACE);
-        miscRenderer.update();
-        GL11.glEnable(GL11.GL_CULL_FACE);
+        MiscRenderer.update();
         
-        GL11.glPushMatrix();
-            GL11.glRotatef(90, 1, 0, 0);
-            GL11.glRotatef(180, 0, 0, 1);
-            for (int i=Camera.visibleDownY; i<Camera.visibleUpY; i++) {
-                for (int i2=Camera.visibleDownX; i2<Camera.visibleUpX; i2++) {
-                    for (int i3=0; i3<15; i3++) {
-                        if (i>=0 && i<width && i2>=0 && i2<height) {
-                            if (bordersy[i][i2][i3]!=null) {
-                                bordersy[i][i2][i3].render(i2, i, i3, Rotation.vertical);
-                            }
+        for (int i=Camera.visibleDownX; i<Camera.visibleUpX; i++) {
+            for (int i2=Camera.visibleDownY; i2<Camera.visibleUpY; i2++) {
+                for (int i3=0; i3<15; i3++) {
+                    if (i>=0 && i<width && i2>=0 && i2<height) {
+                        if (bordersy[i][i3][i2]!=null) {
+                            bordersy[i][i3][i2].render(i, i3, i2, Rotation.vertical);
                         }
                     }
                 }
             }
-        GL11.glPopMatrix();
+        }
         
-        GL11.glPushMatrix();
-            GL11.glRotatef(90, 1, 0, 0);
-            GL11.glRotatef(90, 0, 0, 1);
-            for (int i=Camera.visibleDownY; i<Camera.visibleUpY; i++) {
-                for (int i2=Camera.visibleDownX; i2<Camera.visibleUpX; i2++) {
-                    for (int i3=0; i3<15; i3++) {
-                        if (i>=0 && i<width && i2>=0 && i2<height) {
-                            if (tiles[i][i2][i3]!=null && tiles[i][i2][i3].object!=null) {
-                                tiles[i][i2][i3].render(-i, i2, i3, null);
-                            }
-                            if (bordersx[i][i2][i3]!=null) {
-                                bordersx[i][i2][i3].render(-i, i2, i3, Rotation.horizontal);
-                            }
+        for (int i=Camera.visibleDownX; i<Camera.visibleUpX; i++) {
+            for (int i2=Camera.visibleDownY; i2<Camera.visibleUpY; i2++) {
+                for (int i3=0; i3<15; i3++) {
+                    if (i>=0 && i<width && i2>=0 && i2<height) {
+                        if (tiles[i][i3][i2]!=null && tiles[i][i3][i2].object!=null) {
+                            tiles[i][i3][i2].render(i, i3, i2, null);
+                        }
+                        if (bordersx[i][i3][i2]!=null) {
+                            bordersx[i][i3][i2].render(i, i3, i2, Rotation.horizontal);
                         }
                     }
                 }
             }
-        GL11.glPopMatrix();
+        }
         
-        for (int i=Camera.visibleDownY; i<Camera.visibleUpY; i++) {
-            for (int i2=Camera.visibleDownX; i2<Camera.visibleUpX; i2++) {
+        for (int i=Camera.visibleDownX; i<Camera.visibleUpX; i++) {
+            for (int i2=Camera.visibleDownY; i2<Camera.visibleUpY; i2++) {
                 if (i>=0 && i<width && i2>=0 && i2<height) {
-                    if (z>=0) {
+                    if (y>=0) {
                         if (labels[i][i2]!=null) {
                             labels[i][i2].render(i, i2);
                         }
@@ -286,16 +242,16 @@ public class Mapper {
                 for (int i3=0; i3<15; i3++) {
                     for (int i4=0; i4<4; i4++) {
                         for (int i5=0; i5<4; i5++) {
-                            if (i*4+i4>=0 && i*4+i4<width*4 && i2*4+i5>=0 && i2*4+i5<height*4 && objects[i*4+i4][i2*4+i5][i3]!=null) {
-                                objects[i*4+i4][i2*4+i5][i3].render(i*4+i4, i2*4+i5, i3);
+                            if (i*4+i4>=0 && i*4+i4<width*4 && i2*4+i5>=0 && i2*4+i5<height*4 && objects[i*4+i4][i3][i2*4+i5]!=null) {
+                                objects[i*4+i4][i3][i2*4+i5].render(i*4+i4, i3, i2*4+i5);
                             }
                         }
-                    }                    
+                    }
                 }
             }
         }
         
-        if (keyboard.pressed[Keyboard.KEY_F11]) {
+        if (KeyboardInput.pressed[Keyboard.KEY_F11]) {
             Screenshot.takeScreenshot();
         }
     }

@@ -2,89 +2,69 @@ package Mapper.Logic;
 
 import Form.HouseCalc;
 import Form.LabelWindow;
-import Mapper.KeyboardInput;
 import Mapper.Mapper;
 import Mapper.MouseInput;
-import Mapper.Server;
 import Mapper.UpCamera;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.util.Point;
 
 public class MapUpdater {
     
-    public boolean labelMode = false;
+    public static boolean labelMode = false;
     
-    private GroundUpdater groundUpdater;
-    private CaveUpdater caveUpdater;
-    public HeightUpdater heightUpdater;
-    public WritUpdater writUpdater;
-    private FloorUpdater floorUpdater;
-    private WallUpdater wallUpdater;
-    public RoofUpdater roofUpdater;
-    private StructureUpdater structureUpdater;
+    private MapUpdater() {}
     
-    public MapUpdater() {
-        groundUpdater = new GroundUpdater();
-        caveUpdater = new CaveUpdater();
-        heightUpdater = new HeightUpdater();
-        writUpdater = new WritUpdater();
-        floorUpdater = new FloorUpdater();
-        wallUpdater = new WallUpdater();
-        roofUpdater = new RoofUpdater();
-        structureUpdater = new StructureUpdater();
-    }
-    
-    public void update(KeyboardInput keyboard, MouseInput mouse) {
+    public static void update() {
         if (!labelMode) {
             switch (Mapper.currType) {
                 case ground:
-                    if (Mapper.z>=0) groundUpdater.update(mouse);
-                    else caveUpdater.update(mouse);
+                    if (Mapper.y>=0) GroundUpdater.update();
+                    else CaveUpdater.update();
                     break;
                 case elevation:
-                    if (Mapper.z>=0) heightUpdater.update(keyboard, mouse);
+                    if (Mapper.y>=0) HeightUpdater.update();
                     break;
                 case writ:
-                    if (Mapper.z>=0) writUpdater.update(mouse);
+                    if (Mapper.y>=0) WritUpdater.update();
                     break;
                 case floor:
-                    if (Mapper.z>=0) floorUpdater.update(mouse);
+                    if (Mapper.y>=0) FloorUpdater.update();
                     break;
                 case wall:
-                    if (Mapper.z>=0) wallUpdater.update(mouse);
+                    if (Mapper.y>=0) WallUpdater.update();
                     break;
                 case roof:
-                    if (Mapper.z>=0) roofUpdater.update(mouse);
+                    if (Mapper.y>=0) RoofUpdater.update();
                     break;
                 case structure:
-                    if (Mapper.z>=0) structureUpdater.update(mouse);
+                    if (Mapper.y>=0) StructureUpdater.update();
             }
         }
         
-        double tileScaler = (double)Display.getWidth()/(double)Display.getHeight();
-        double realSize = (double)Display.getHeight()/(double)UpCamera.scale/4d;
-        double tileSize = ((double)Display.getHeight()/(double)UpCamera.scale);
+        final double tileScaler = (double)Display.getWidth()/(double)Display.getHeight();
+        final double realSize = (double)Display.getHeight()/(double)UpCamera.scale/4d;
+        final double tileSize = ((double)Display.getHeight()/(double)UpCamera.scale);
 
-        int tileX = (int) (((double)mouse.x+(double)UpCamera.y*realSize)/((double)Display.getWidth()/(double)UpCamera.scale/tileScaler))+1;
-        int tileY = (int) (((double)mouse.y+(double)UpCamera.x*realSize)/((double)Display.getHeight()/(double)UpCamera.scale));
+        final int tileX = (int) (((double)MouseInput.x+(double)UpCamera.x*realSize)/((double)Display.getWidth()/(double)UpCamera.scale/tileScaler))+1;
+        final int tileY = (int) (((double)MouseInput.y+(double)UpCamera.y*realSize)/((double)Display.getHeight()/(double)UpCamera.scale));
         
         if (tileX<0 || tileY<0 || tileX>Mapper.width || tileY>Mapper.height) {
             return;
         }
         
-        if (labelMode && mouse.pressed.left) {
+        if (labelMode && MouseInput.pressed.left) {
             LabelWindow.x = tileX;
             LabelWindow.y = tileY;
             LabelWindow.main(null);
         }
 
-        double x = mouse.x+UpCamera.y*realSize;
-        double y = mouse.y+UpCamera.x*realSize;
+        final double x = MouseInput.x+UpCamera.x*realSize;
+        final double y = MouseInput.y+UpCamera.y*realSize;
 
-        double xClip = x%tileSize;
-        double yClip = y%tileSize;
+        final double xClip = x%tileSize;
+        final double yClip = y%tileSize;
         
-        Point[] points = heightUpdater.selectedPoint(tileX, tileY, xClip, yClip, tileSize);
+        Point[] points = HeightUpdater.selectedPoint(tileX, tileY, xClip, yClip, tileSize);
         
         if (points!=null) {
             HouseCalc.statusBar.setPoint(points[0]);
@@ -93,11 +73,6 @@ public class MapUpdater {
             return;
         }
         HouseCalc.statusBar.setGround(Mapper.ground[tileX-1][tileY]);
-        
-        if (Server.running) {
-            Server.out.println(Server.builder.toString());
-            Server.builder = new StringBuilder();
-        }
     }
     
 }

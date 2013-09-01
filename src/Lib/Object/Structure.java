@@ -10,11 +10,11 @@ public class Structure {
     private static final double floor1 = 0.4;
     private static final double floor2 = 0.75;
     
-    public String name;
-    public String shortName;
-    public Tex texture;
-    public ObjectData object;
-    public Materials materials;
+    public final String name;
+    public final String shortName;
+    public final Tex texture;
+    public final ObjectData object;
+    public final Materials materials;
     
     public double rPaint=1;
     public double gPaint=1;
@@ -22,16 +22,16 @@ public class Structure {
     
     public int rotation=0;
     
-    public Structure(String name, String shortName, Tex texture, ObjectData object) {
+    public Structure(String name, String shortName, Tex texture, ObjectData object, Materials materials) {
         this.name = name;
         this.shortName = shortName;
         this.texture = texture;
         this.object = object;
+        this.materials = materials;
     }
     
     public Structure copy() {
-        Structure data = new Structure(name, shortName, texture, object);
-        data.materials=materials;
+        Structure data = new Structure(name, shortName, texture, object, materials);
         data.rPaint = HouseCalc.r;
         data.gPaint = HouseCalc.g;
         data.bPaint = HouseCalc.b;
@@ -39,11 +39,11 @@ public class Structure {
     }
     
     public void render(int sx, int sy, int sz) {
-        if (Mapper.fpsView || ((sz-Mapper.z)<=0 && (sz-Mapper.z)>-3)) {
+        if (Mapper.fpsView || ((sz-Mapper.y)<=0 && (sz-Mapper.y)>-3)) {
             int mapX = (int)(sx/4f);
-            int mapY = (int)(sy/4f);
+            int mapY = (int)(sz/4f);
             float xRatio = (sx%4f)/4f;
-            float zRatio = (sy%4f)/4f;
+            float zRatio = (sz%4f)/4f;
             float v00 = Mapper.heightmap[mapX][mapY]/35f*3f;
             float v10 = Mapper.heightmap[mapX+1][mapY]/35f*3f;
             float v01 = Mapper.heightmap[mapX][mapY+1]/35f*3f;
@@ -54,7 +54,7 @@ public class Structure {
             float height = intX0*(1-zRatio)+intX1*zRatio;
             
             GL11.glPushMatrix();
-                GL11.glTranslatef(sy, sz*3+height, sx);
+                GL11.glTranslatef(sx, sy*3+height, sz);
                 GL11.glRotatef(90, 1, 0, 0);
                 GL11.glRotatef(90, 0, 0, 1);
                 GL11.glRotatef(rotation, 0, 0, 1);
@@ -63,7 +63,7 @@ public class Structure {
                     double showR = 0;
                     double showG = 0;
                     double showB = 0;
-                    switch (sz-Mapper.z) {
+                    switch (sz-Mapper.y) {
                         case 0:
                             showR = rPaint;
                             showG = gPaint;
@@ -86,12 +86,7 @@ public class Structure {
                     GL11.glColor3d(rPaint, gPaint, bPaint);
                 }
 
-                GL11.glBegin(GL11.GL_TRIANGLES);
-                    for (int i=0; i<object.size; i++) {
-                        GL11.glTexCoord2f(object.texU[object.coord[i]], 1-object.texV[object.coord[i]]);
-                        GL11.glVertex3f(object.x[object.vert[i]], object.y[object.vert[i]], object.z[object.vert[i]]);
-                    }
-                GL11.glEnd();
+                object.render();
             GL11.glPopMatrix();
         }
     }

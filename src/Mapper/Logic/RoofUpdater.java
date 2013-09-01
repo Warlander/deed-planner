@@ -1,26 +1,26 @@
 package Mapper.Logic;
 
 import Form.HouseCalc;
-import Form.SaveWindow;
 import Lib.Object.Data;
 import Lib.Object.Type;
 import Mapper.Data.D;
 import Mapper.Mapper;
 import Mapper.MouseInput;
-import Mapper.Server;
 import Mapper.UpCamera;
 import org.lwjgl.opengl.Display;
 
 public class RoofUpdater {
     
-    protected void update(MouseInput mouse) {
+    private RoofUpdater() {}
+    
+    protected static void update() {
         float tileScaler = (float)Display.getWidth()/(float)Display.getHeight();
         float tileSize = (float)Display.getHeight()/UpCamera.scale/4;
-        int tileX = (int) ((mouse.x+UpCamera.y*tileSize)/((float)Display.getWidth()/UpCamera.scale/tileScaler))+1;
-        int tileY = (int) ((mouse.y+UpCamera.x*tileSize)/((float)Display.getHeight()/UpCamera.scale));
+        int tileX = (int) ((MouseInput.x+UpCamera.x*tileSize)/((float)Display.getWidth()/UpCamera.scale/tileScaler))+1;
+        int tileY = (int) ((MouseInput.y+UpCamera.y*tileSize)/((float)Display.getHeight()/UpCamera.scale));
         
-        if (mouse.hold.left ^ mouse.hold.right) {
-            if (Mapper.z==0) {
+        if (MouseInput.hold.left ^ MouseInput.hold.right) {
+            if (Mapper.y==0) {
                 return;
             }
             
@@ -33,13 +33,9 @@ public class RoofUpdater {
                     realY = tileY+i2;
                     if (realX<2 || realY<1 || realX>Mapper.width-2 || tileY>Mapper.height-1) {}
                     else if (Mapper.ground[realX-1][realY].writ==null) {}
-                    else if (Mapper.deleting) Mapper.tiles[realX][realY][Mapper.z]=null;
-                    else if (mouse.hold.left) Mapper.tiles[realX][realY][Mapper.z]=Mapper.data.copy();
-                    else if (mouse.hold.right) Mapper.tiles[realX][realY][Mapper.z]=null;
-                    
-                    if (Server.running) {
-                        SaveWindow.saveTile(Server.builder, realX, realY, Mapper.z);
-                    }
+                    else if (Mapper.deleting) Mapper.tiles[realX][Mapper.y][realY]=null;
+                    else if (MouseInput.hold.left) Mapper.tiles[realX][Mapper.y][realY]=Mapper.data.copy();
+                    else if (MouseInput.hold.right) Mapper.tiles[realX][Mapper.y][realY]=null;
                 }
             }
         }
@@ -47,10 +43,10 @@ public class RoofUpdater {
         roofsRefit();
         
         if (tileX<2 || tileY<1 || tileX>Mapper.width-2 || tileY>Mapper.height-1) {return;}
-        HouseCalc.statusBar.setData(Mapper.tiles[tileX][tileY][Mapper.z]);
+        HouseCalc.statusBar.setData(Mapper.tiles[tileX][Mapper.y][tileY]);
     }
     
-    public void roofsRefit() {
+    public static void roofsRefit() {
         int tVert=0;
         int tHorizon=0;
         int tPos=0;
@@ -59,28 +55,28 @@ public class RoofUpdater {
         for (int i=1; i<Mapper.width-1; i++) {
             for (int i2=1; i2<Mapper.height-1; i2++) {
                 for (int i3=0; i3<15; i3++) {
-                    if (Mapper.tiles[i][i2][i3]!=null) {
-                        if (Mapper.tiles[i][i2][i3].type==Type.roof) {
+                    if (Mapper.tiles[i][i3][i2]!=null) {
+                        if (Mapper.tiles[i][i3][i2].type==Type.roof) {
                             tVert=1;
-                            while ((Mapper.tiles[i][i2+tVert][i3]!=null && Mapper.tiles[i][i2+tVert][i3].type==Type.roof) && (Mapper.tiles[i][i2-tVert][i3]!=null && Mapper.tiles[i][i2-tVert][i3].type==Type.roof)) {
+                            while ((Mapper.tiles[i][i3][i2+tVert]!=null && Mapper.tiles[i][i3][i2+tVert].type==Type.roof) && (Mapper.tiles[i][i3][i2-tVert]!=null && Mapper.tiles[i][i3][i2-tVert].type==Type.roof)) {
                                 tVert++;
                             }
                             tHorizon=1;
-                            while ((Mapper.tiles[i+tHorizon][i2][i3]!=null && Mapper.tiles[i+tHorizon][i2][i3].type==Type.roof) && (Mapper.tiles[i-tHorizon][i2][i3]!=null && Mapper.tiles[i-tHorizon][i2][i3].type==Type.roof)) {
+                            while ((Mapper.tiles[i+tHorizon][i3][i2]!=null && Mapper.tiles[i+tHorizon][i3][i2].type==Type.roof) && (Mapper.tiles[i-tHorizon][i3][i2]!=null && Mapper.tiles[i-tHorizon][i3][i2].type==Type.roof)) {
                                 tHorizon++;
                             }
                             tPos=1;
-                            while ((Mapper.tiles[i+tPos][i2+tPos][i3]!=null && Mapper.tiles[i+tPos][i2+tPos][i3].type==Type.roof) && (Mapper.tiles[i-tPos][i2-tPos][i3]!=null && Mapper.tiles[i-tPos][i2-tPos][i3].type==Type.roof)) {
+                            while ((Mapper.tiles[i+tPos][i3][i2+tPos]!=null && Mapper.tiles[i+tPos][i3][i2+tPos].type==Type.roof) && (Mapper.tiles[i-tPos][i3][i2-tPos]!=null && Mapper.tiles[i-tPos][i3][i2-tPos].type==Type.roof)) {
                                 tPos++;
                             }
                             tNeg=1;
-                            while ((Mapper.tiles[i+tNeg][i2-tNeg][i3]!=null && Mapper.tiles[i+tNeg][i2-tNeg][i3].type==Type.roof) && (Mapper.tiles[i-tNeg][i2+tNeg][i3]!=null && Mapper.tiles[i-tNeg][i2+tNeg][i3].type==Type.roof)) {
+                            while ((Mapper.tiles[i+tNeg][i3][i2-tNeg]!=null && Mapper.tiles[i+tNeg][i3][i2-tNeg].type==Type.roof) && (Mapper.tiles[i-tNeg][i3][i2+tNeg]!=null && Mapper.tiles[i-tNeg][i3][i2+tNeg].type==Type.roof)) {
                                 tNeg++;
                             }
-                            Mapper.tiles[i][i2][i3].roofLevel=Math.min(Math.min(tVert, tHorizon), Math.min(tPos, tNeg));
+                            Mapper.tiles[i][i3][i2].roofLevel=Math.min(Math.min(tVert, tHorizon), Math.min(tPos, tNeg));
                         }
                         else {
-                            Mapper.tiles[i][i2][i3].roofLevel=0;
+                            Mapper.tiles[i][i3][i2].roofLevel=0;
                         }
                     }
                 }
@@ -88,8 +84,8 @@ public class RoofUpdater {
         }
         
         for (int i=0; i<Mapper.width; i++) {
-            for (int i2=0; i2<Mapper.height; i2++) {
-                for (int i3=0; i3<15; i3++) {
+            for (int i2=1; i2<15; i2++) {
+                for (int i3=0; i3<Mapper.height; i3++) {
                     if (Mapper.tiles[i][i2][i3]!=null && Mapper.tiles[i][i2][i3].type==Type.roof) {
                         Mapper.tiles[i][i2][i3].object = D.spineTip;
                         int val=0;
@@ -153,13 +149,13 @@ public class RoofUpdater {
                                     Mapper.tiles[i][i2][i3].modX = -1;
                                     break;
                                 case 1:
-                                    Mapper.tiles[i][i2][i3].modY = -1;
+                                    Mapper.tiles[i][i2][i3].modZ = -1;
                                     break;
                                 case 2:
                                     Mapper.tiles[i][i2][i3].modX = -1;
                                     break;
                                 case 3:
-                                    Mapper.tiles[i][i2][i3].modY = -1;
+                                    Mapper.tiles[i][i2][i3].modZ = -1;
                                     break;
                             }
                             
@@ -171,7 +167,7 @@ public class RoofUpdater {
         
     }
     
-    private int allCheck(int i, int i2, int i3, int[][] check) {
+    private static int allCheck(int i, int i2, int i3, int[][] check) {
         if (checkMatch(i, i2, i3, check)) {
             return Data.right;
         }
@@ -187,17 +183,17 @@ public class RoofUpdater {
         return 4;
     }
     
-    private boolean checkMatch(int i, int i2, int i3, int[][] check) {
+    private static boolean checkMatch(int i, int i2, int i3, int[][] check) {
         int cX=0;
         int cY=0;
         int roof;
         for (int x=i-1; x<=i+1; x++) {
-            for (int y=i2-1; y<=i2+1; y++) {
-                if (Mapper.tiles[x][y][i3]==null) {
+            for (int z=i3-1; z<=i3+1; z++) {
+                if (Mapper.tiles[x][i2][z]==null) {
                     roof=0;
                 }
                 else {
-                    roof = Mapper.tiles[x][y][i3].roofLevel;
+                    roof = Mapper.tiles[x][i2][z].roofLevel;
                 }
                 switch (check[cX][cY]) {
                     case -2:
@@ -234,7 +230,7 @@ public class RoofUpdater {
         return true;
     }
     
-    private int[][] rotate(int[][] in, int r) {
+    private static int[][] rotate(int[][] in, int r) {
         int[][] out = new int[3][3];
         int i=0;
         int i2=0;
@@ -276,7 +272,7 @@ public class RoofUpdater {
         return out;
     }
     
-    private void printArray(int[][] arr) {
+    private static void printArray(int[][] arr) {
         for (int i=0; i<3; i++) {
             for (int i2=0; i2<3; i2++) {
                 if (arr[i][i2]>=0) {
@@ -290,60 +286,60 @@ public class RoofUpdater {
         }
     }
     
-    private final int[][] side = {{ 1, 1, 1},
-                                  { 0, 0, 0},
-                                  {-1,-2,-1}};
-    
-    private final int[][] sideCorner = {{-1,-2,-1},
-                                        {-2, 0, 0},
-                                        {-1, 0, 1}};
-    
-    private final int[][] sideCut = {{ 1, 1, 1},
-                                     { 1, 0, 0},
-                                     { 1, 0,-2}};
-    
-    private final int[][] sideToSpine = {{-2, 0, 1},
-                                         { 0, 0, 1},
-                                         {-2, 0, 1}};
-    
-    private final int[][] spine = {{-1,-2,-1},
-                                   { 0, 0, 0},
-                                   {-1,-2,-1}};
-    
-    private final int[][] spineEnd = {{-1,-2,-1},
-                                      {-2, 0, 0},
-                                      {-1,-2,-1}};
-    
-    private final int[][] spineEndUp = {{-1,-2,-1},
-                                        { 3, 0, 0},
-                                        {-1, 0, 1}};
-    
-    private final int[][] spineEndUp2 = {{-1,-2,-1},
-                                         { 0, 0, 3},
-                                         { 1, 0,-1}};
-    
-    private final int[][] spineCorner = {{-1,-2,-1},
-                                         { 0, 0,-2},
-                                         {-2, 0,-1}};
-    
-    private final int[][] spineCornerUp = {{-2, 0,-2},
-                                           { 0, 0, 0},
-                                           {-2, 0, 1}};
-    
-    private final int[][] spineCross = {{-2, 0,-2},
-                                        { 0, 0, 0},
-                                        {-2, 0,-2}};
-    
-    private final int[][] spineTCross = {{-2, 0,-1},
-                                         { 0, 0,-2},
-                                         {-2, 0,-1}};
-    
-    private final int[][] spineTip = {{-1,-2,-1},
-                                      {-2, 0,-2},
-                                      {-1,-2,-1}};
-    
-    private final int[][] levelsCross = {{ 1, 0,-2},
+    private static final int[][] side = {{ 1, 1, 1},
                                          { 0, 0, 0},
-                                         {-2, 0, 1}};
+                                         {-1,-2,-1}};
+    
+    private static final int[][] sideCorner = {{-1,-2,-1},
+                                               {-2, 0, 0},
+                                               {-1, 0, 1}};
+    
+    private static final int[][] sideCut = {{ 1, 1, 1},
+                                            { 1, 0, 0},
+                                            { 1, 0,-2}};
+    
+    private static final int[][] sideToSpine = {{-2, 0, 1},
+                                                { 0, 0, 1},
+                                                {-2, 0, 1}};
+    
+    private static final int[][] spine = {{-1,-2,-1},
+                                          { 0, 0, 0},
+                                          {-1,-2,-1}};
+    
+    private static final int[][] spineEnd = {{-1,-2,-1},
+                                             {-2, 0, 0},
+                                             {-1,-2,-1}};
+    
+    private static final int[][] spineEndUp = {{-1,-2,-1},
+                                               { 3, 0, 0},
+                                               {-1, 0, 1}};
+    
+    private static final int[][] spineEndUp2 = {{-1,-2,-1},
+                                                { 0, 0, 3},
+                                                { 1, 0,-1}};
+    
+    private static final int[][] spineCorner = {{-1,-2,-1},
+                                                { 0, 0,-2},
+                                                {-2, 0,-1}};
+    
+    private static final int[][] spineCornerUp = {{-2, 0,-2},
+                                                  { 0, 0, 0},
+                                                  {-2, 0, 1}};
+    
+    private static final int[][] spineCross = {{-2, 0,-2},
+                                               { 0, 0, 0},
+                                               {-2, 0,-2}};
+    
+    private static final int[][] spineTCross = {{-2, 0,-1},
+                                                { 0, 0,-2},
+                                                {-2, 0,-1}};
+    
+    private static final int[][] spineTip = {{-1,-2,-1},
+                                            {-2, 0,-2},
+                                            {-1,-2,-1}};
+    
+    private static final int[][] levelsCross = {{ 1, 0,-2},
+                                                { 0, 0, 0},
+                                                {-2, 0, 1}};
     
 }

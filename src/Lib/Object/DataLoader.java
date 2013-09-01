@@ -105,10 +105,10 @@ public class DataLoader {
                         textures.add(tex);
                         break;
                     case "Model":
-                        ObjectData object = ReadObject.read(new BufferedReader(new FileReader("Data"+slash+"Models"+slash+line.substring(line.indexOf("source=\"")+8, line.lastIndexOf("\"")))));
+                        String source = "Data"+slash+"Models"+slash+line.substring(line.indexOf("source=\"")+8, line.lastIndexOf("\""));
                         temp = line.substring(line.indexOf("id=")+3);
                         mid = Integer.parseInt(spaceMax(temp));
-                        object.loadID = mid;
+                        ObjectData object = ReadObject.read(new BufferedReader(new FileReader(source)), mid);
                         models.add(object);
                         break;
                     case "Materials":
@@ -223,8 +223,7 @@ public class DataLoader {
                         name = temp.substring(0, temp.indexOf("\""));
                         temp = line.substring(line.indexOf("shortname=\"")+11);
                         shortName = temp.substring(0, temp.indexOf("\""));
-                        structure = new Structure(name, shortName, getTex(tid), getModel(mid));
-                        structure.materials = getMaterials(matid);
+                        structure = new Structure(name, shortName, getTex(tid), getModel(mid), getMaterials(matid));
                         objects.addElement(structure);
                         D.objects.add(structure);
                         break;

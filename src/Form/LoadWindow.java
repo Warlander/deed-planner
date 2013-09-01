@@ -8,6 +8,9 @@ import Lib.Object.Structure;
 import Lib.Object.Writ;
 import Mapper.Data.D;
 import Mapper.FPPCamera;
+import Mapper.Logic.HeightUpdater;
+import Mapper.Logic.RoofUpdater;
+import Mapper.Logic.WritUpdater;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,7 +21,6 @@ import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 import Mapper.Mapper;
-import Mapper.Server;
 import Mapper.UpCamera;
 import java.awt.Font;
 import java.io.BufferedReader;
@@ -59,6 +61,13 @@ public class LoadWindow extends javax.swing.JFrame {
         ver = version;
         HouseCalc.reset();
         switch(version) {
+            case "1.1" :
+                try {
+                    load1_1(load);
+                } catch (IOException ex) {
+                    Logger.getLogger(LoadWindow.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                break;
             case "1.0":
                 try {
                     load1_0(load);
@@ -89,8 +98,8 @@ public class LoadWindow extends javax.swing.JFrame {
         FPPCamera.reset();
     }
     
-    private static void load1_0(String load) throws IOException {
-        Mapper.updater.writUpdater.model.clear();
+    private static void load1_1(String load) throws IOException {
+        WritUpdater.model.clear();
         
         InputStream is = new ByteArrayInputStream(load.getBytes());
 	BufferedReader br = new BufferedReader(new InputStreamReader(is));
@@ -107,10 +116,10 @@ public class LoadWindow extends javax.swing.JFrame {
         Ground[][] caveGround = new Ground[width][height];
         Label[][] labels = new Label[width][height];
         Label[][] caveLabels = new Label[width][height];
-        Structure[][][] objects = new Structure[width*4][height*4][15];
-        Data[][][] tiles = new Data[width][height][15];
-        Data[][][] bordersx = new Data[width][height][15];
-        Data[][][] bordersy = new Data[width][height][15];
+        Structure[][][] objects = new Structure[width*4][15][height*4];
+        Data[][][] tiles = new Data[width][15][height];
+        Data[][][] bordersx = new Data[width][15][height];
+        Data[][][] bordersy = new Data[width][15][height];
         
         for (int i=0; i<width; i++) {
             for (int i2=0; i2<height; i2++) {
@@ -148,7 +157,7 @@ public class LoadWindow extends javax.swing.JFrame {
                     readLabel(scan, labels, caveLabels);
                     break;
                 case "W":
-                    readWrit(scan, ground, Mapper.updater.writUpdater.model);
+                    readWrit(scan, ground, WritUpdater.model);
                     break;
             }
         }
@@ -156,73 +165,101 @@ public class LoadWindow extends javax.swing.JFrame {
         Mapper.width = width;
         Mapper.height = height;
         Mapper.heightmap = heightmap;
-        Mapper.updater.heightUpdater.checkElevations();
+        HeightUpdater.checkElevations();
         Mapper.ground = ground;
         Mapper.labels = labels;
         Mapper.caveLabels = caveLabels;
         Mapper.caveGround = caveGround;
         Mapper.tiles = tiles;
-        Mapper.updater.roofUpdater.roofsRefit();
+        RoofUpdater.roofsRefit();
         Mapper.objects = objects;
         Mapper.bordersx = bordersx;
         Mapper.bordersy = bordersy;
         
-        int cap = Mapper.updater.writUpdater.model.getSize()+1;
+        int cap = WritUpdater.model.getSize()+1;
         HouseCalc.jTextField1.setText("Writ "+cap);
     }
     
-    public static void readFragments(Scanner scan) {
-        while (scan.hasNext()) {
-            switch (scan.next()) {
-                case "H":
-                    readHeight(scan, Mapper.heightmap);
-                    break;
-                case "G":
-                    readGround(scan, Mapper.ground);
-                    break;
-                case "C":
-                    readCave(scan, Mapper.caveGround);
-                    break;
-                case "O":
-                    readObject(scan, Mapper.objects);
-                    break;
-                case "T":
-                    readTile(scan, Mapper.tiles);
-                    break;
-                case "BX":
-                    readBorder(scan, Mapper.bordersx);
-                    break;
-                case "BY":
-                    readBorder(scan, Mapper.bordersy);
-                    break;
-                case "L":
-                    readLabel(scan, Mapper.labels, Mapper.caveLabels);
-                    break;
-                case "W":
-                    readWrit(scan, Mapper.ground, Mapper.updater.writUpdater.model);
-                    break;
-                case "DW":
-                    String name = scan.next().replace("_", " ");
-                    for (int i=0; i<HouseCalc.writsList.getModel().getSize(); i++) {
-                        Writ w = (Writ) HouseCalc.writsList.getModel().getElementAt(i);
-                        if (w.name.equals(name)) {
-                            Mapper.updater.writUpdater.deleteWrit(w);
-                            break;
-                        }
-                    }
-                    break;
-                case "-1":
-                    if (Server.running) {
-                        Server.running = false;
-                    try {
-                        Server.socket.close();
-                    } catch (IOException ex) {
-                        Logger.getLogger(LoadWindow.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                    return;
-                    }
+    private static void load1_0(String load) throws IOException {
+        WritUpdater.model.clear();
+        
+        InputStream is = new ByteArrayInputStream(load.getBytes());
+	BufferedReader br = new BufferedReader(new InputStreamReader(is));
+        Scanner scan;
+        
+        br.readLine();
+        String line = br.readLine();
+        scan = new Scanner(line);
+        int width = scan.nextInt();
+        int height = scan.nextInt();
+        
+        float[][] heightmap = new float[width+1][height+1];
+        Ground[][] ground = new Ground[width][height];
+        Ground[][] caveGround = new Ground[width][height];
+        Label[][] labels = new Label[width][height];
+        Label[][] caveLabels = new Label[width][height];
+        Structure[][][] objects = new Structure[width*4][15][height*4];
+        Data[][][] tiles = new Data[width][15][height];
+        Data[][][] bordersx = new Data[width][15][height];
+        Data[][][] bordersy = new Data[width][15][height];
+        
+        for (int i=0; i<width; i++) {
+            for (int i2=0; i2<height; i2++) {
+                ground[i][i2] = D.grounds.get(0).copy(i, i2);
+                caveGround[i][i2] = D.caveGrounds.get(0).copy(i, i2);
             }
         }
+        
+        while ((line=br.readLine())!=null) {
+            scan = new Scanner(line);
+            
+            switch (scan.next()) {
+                case "H":
+                    readHeight(scan, heightmap);
+                    break;
+                case "G":
+                    readGround(scan, ground);
+                    break;
+                case "C":
+                    readCave(scan, caveGround);
+                    break;
+                case "O":
+                    readOldObject(scan, objects);
+                    break;
+                case "T":
+                    readOldTile(scan, tiles);
+                    break;
+                case "BX":
+                    readOldBorder(scan, bordersx);
+                    break;
+                case "BY":
+                    readOldBorder(scan, bordersy);
+                    break;
+                case "L":
+                    readLabel(scan, labels, caveLabels);
+                    break;
+                case "W":
+                    readWrit(scan, ground, WritUpdater.model);
+                    break;
+            }
+        }
+        
+        Mapper.width = width;
+        Mapper.height = height;
+        Mapper.heightmap = heightmap;
+        HeightUpdater.checkElevations();
+        Mapper.ground = ground;
+        Mapper.labels = labels;
+        Mapper.caveLabels = caveLabels;
+        Mapper.caveGround = caveGround;
+        Mapper.tiles = tiles;
+        RoofUpdater.roofsRefit();
+        Mapper.objects = objects;
+        Mapper.bordersx = bordersx;
+        Mapper.bordersy = bordersy;
+        
+        int cap = WritUpdater.model.getSize()+1;
+        HouseCalc.jTextField1.setText("Writ "+cap);
     }
     
     public static void readHeight(Scanner source, float[][] out) {
@@ -267,6 +304,24 @@ public class LoadWindow extends javax.swing.JFrame {
         out[x][y][z] = object;
     }
     
+    public static void readOldObject(Scanner source, Structure[][][] out) {
+        int x = source.nextInt();
+        int z = source.nextInt();
+        int y = source.nextInt();
+        String shortName = source.next();
+        double rPaint = Double.parseDouble(source.next());
+        double gPaint = Double.parseDouble(source.next());
+        double bPaint = Double.parseDouble(source.next());
+        int rotation = Integer.parseInt(source.next());
+        
+        Structure object = getLightweightStructure(shortName);
+        object.rPaint = rPaint;
+        object.gPaint = gPaint;
+        object.bPaint = bPaint;
+        object.rotation = rotation;
+        out[x][y][z] = object;
+    }
+    
     public static void readTile(Scanner source, Data[][][] out) {
         int x = source.nextInt();
         int y = source.nextInt();
@@ -276,10 +331,35 @@ public class LoadWindow extends javax.swing.JFrame {
         out[x][y][z] = getLightweightData(shortName);
     }
     
+    public static void readOldTile(Scanner source, Data[][][] out) {
+        int x = source.nextInt();
+        int z = source.nextInt();
+        int y = source.nextInt();
+        String shortName = source.next();
+        
+        out[x][y][z] = getLightweightData(shortName);
+    }
+    
     public static void readBorder(Scanner source, Data[][][] out) {
         int x = source.nextInt();
         int y = source.nextInt();
         int z = source.nextInt();
+        String shortName = source.next();
+        double rPaint = Double.parseDouble(source.next());
+        double gPaint = Double.parseDouble(source.next());
+        double bPaint = Double.parseDouble(source.next());
+        
+        Data object = getLightweightData(shortName);
+        object.rPaint = rPaint;
+        object.gPaint = gPaint;
+        object.bPaint = bPaint;
+        out[x][y][z] = object;
+    }
+    
+    public static void readOldBorder(Scanner source, Data[][][] out) {
+        int x = source.nextInt();
+        int z = source.nextInt();
+        int y = source.nextInt();
         String shortName = source.next();
         double rPaint = Double.parseDouble(source.next());
         double gPaint = Double.parseDouble(source.next());
@@ -337,7 +417,7 @@ public class LoadWindow extends javax.swing.JFrame {
         InputStream is = new ByteArrayInputStream(load.getBytes());
 	BufferedReader br = new BufferedReader(new InputStreamReader(is));
         
-        Mapper.updater.writUpdater.model.clear();
+        WritUpdater.model.clear();
         
         int width = Integer.parseInt(readToChar(br, ','));
         int height = Integer.parseInt(readToChar(br, ','));
@@ -345,10 +425,10 @@ public class LoadWindow extends javax.swing.JFrame {
         float[][] heightmap = new float[width+1][height+1];
         Ground[][] ground = new Ground[width][height];
         Ground[][] caveGround = new Ground[width][height];
-        Structure[][][] objects = new Structure[width*4][height*4][15];
-        Data[][][] tiles = new Data[width][height][15];
-        Data[][][] bordersx = new Data[width][height][15];
-        Data[][][] bordersy = new Data[width][height][15];
+        Structure[][][] objects = new Structure[width*4][15][height*4];
+        Data[][][] tiles = new Data[width][15][height];
+        Data[][][] bordersx = new Data[width][15][height];
+        Data[][][] bordersy = new Data[width][15][height];
         
         for (int x=0; x<=width; x++) {
             for (int y=0; y<=height; y++) {
@@ -398,7 +478,7 @@ public class LoadWindow extends javax.swing.JFrame {
                 w.tiles.add(ground[gx][gy]);
                 ground[gx][gy].writ = w;
             }
-            Mapper.updater.writUpdater.model.addElement(w);
+            WritUpdater.model.addElement(w);
         }
         
         Mapper.width = width;
@@ -413,18 +493,18 @@ public class LoadWindow extends javax.swing.JFrame {
         Mapper.bordersx = bordersx;
         Mapper.bordersy = bordersy;
         
-        int cap = Mapper.updater.writUpdater.model.getSize()+1;
+        int cap = WritUpdater.model.getSize()+1;
         HouseCalc.jTextField1.setText("Writ "+cap);
         
-        Mapper.updater.roofUpdater.roofsRefit();
-        Mapper.updater.heightUpdater.checkElevations();
+        RoofUpdater.roofsRefit();
+        HeightUpdater.checkElevations();
     }
     
     private static void load0_6(String load) {
         InputStream is = new ByteArrayInputStream(load.getBytes());
 	BufferedReader br = new BufferedReader(new InputStreamReader(is));
         
-        Mapper.updater.writUpdater.model.clear();
+        WritUpdater.model.clear();
         
         int width = Integer.parseInt(readToChar(br, ','));
         int height = Integer.parseInt(readToChar(br, ','));
@@ -432,9 +512,9 @@ public class LoadWindow extends javax.swing.JFrame {
         float[][] heightmap = new float[width+1][height+1];
         Ground[][] ground = new Ground[width][height];
         Ground[][] caveGround = new Ground[width][height];
-        Data[][][] tiles = new Data[width][height][15];
-        Data[][][] bordersx = new Data[width][height][15];
-        Data[][][] bordersy = new Data[width][height][15];
+        Data[][][] tiles = new Data[width][15][height];
+        Data[][][] bordersx = new Data[width][15][height];
+        Data[][][] bordersy = new Data[width][15][height];
         
         for (int x=0; x<=width; x++) {
             for (int y=0; y<=height; y++) {
@@ -474,7 +554,7 @@ public class LoadWindow extends javax.swing.JFrame {
                 w.tiles.add(ground[gx][gy]);
                 ground[gx][gy].writ = w;
             }
-            Mapper.updater.writUpdater.model.addElement(w);
+            WritUpdater.model.addElement(w);
         }
         
         Mapper.width = width;
@@ -489,18 +569,18 @@ public class LoadWindow extends javax.swing.JFrame {
         Mapper.bordersx = bordersx;
         Mapper.bordersy = bordersy;
         
-        int cap = Mapper.updater.writUpdater.model.getSize()+1;
+        int cap = WritUpdater.model.getSize()+1;
         HouseCalc.jTextField1.setText("Writ "+cap);
         
-        Mapper.updater.roofUpdater.roofsRefit();
-        Mapper.updater.heightUpdater.checkElevations();
+        RoofUpdater.roofsRefit();
+        HeightUpdater.checkElevations();
     }
     
     private static void load0_5(String load) {
         InputStream is = new ByteArrayInputStream(load.getBytes());
 	BufferedReader br = new BufferedReader(new InputStreamReader(is));
         
-        Mapper.updater.writUpdater.model.clear();
+        WritUpdater.model.clear();
         
         int width = Integer.parseInt(readToChar(br, ','));
         int height = Integer.parseInt(readToChar(br, ','));
@@ -543,7 +623,7 @@ public class LoadWindow extends javax.swing.JFrame {
                 w.tiles.add(ground[gx][gy]);
                 ground[gx][gy].writ = w;
             }
-            Mapper.updater.writUpdater.model.addElement(w);
+            WritUpdater.model.addElement(w);
         }
         
         Mapper.width = width;
@@ -558,10 +638,10 @@ public class LoadWindow extends javax.swing.JFrame {
         Mapper.bordersx = bordersx;
         Mapper.bordersy = bordersy;
         
-        int cap = Mapper.updater.writUpdater.model.getSize()+1;
+        int cap = WritUpdater.model.getSize()+1;
         HouseCalc.jTextField1.setText("Writ "+cap);
         
-        Mapper.updater.roofUpdater.roofsRefit();
+        RoofUpdater.roofsRefit();
     }
     
     private static void load0_4(String load) {
@@ -611,7 +691,7 @@ public class LoadWindow extends javax.swing.JFrame {
         Mapper.bordersy = bordersy;
         Mapper.wData=null;
         
-        Mapper.updater.roofUpdater.roofsRefit();
+        RoofUpdater.roofsRefit();
     }
     
     private static void load0_3(String load) {
@@ -660,7 +740,7 @@ public class LoadWindow extends javax.swing.JFrame {
         Mapper.width = width;
         Mapper.height = height;
         
-        Mapper.updater.roofUpdater.roofsRefit();
+        RoofUpdater.roofsRefit();
     }
     
     private static void load0_2(String load) {
@@ -679,7 +759,7 @@ public class LoadWindow extends javax.swing.JFrame {
                 }
             }
         }
-        Mapper.updater.roofUpdater.roofsRefit();
+        RoofUpdater.roofsRefit();
     }
     
     private static String readToChar(BufferedReader read, char toChar) {

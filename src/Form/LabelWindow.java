@@ -170,7 +170,7 @@ public class LabelWindow extends javax.swing.JFrame {
         }
         
         boolean cave = false;
-        if (Mapper.Mapper.z==-1) {
+        if (Mapper.Mapper.y==-1) {
             cave = true;
         }
         Color c = new Color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());

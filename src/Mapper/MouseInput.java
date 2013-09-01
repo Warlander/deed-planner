@@ -7,35 +7,35 @@ import org.lwjgl.input.Mouse;
 
 public class MouseInput {
     
-    public pressed pressed = new pressed();
-    public hold hold = new hold();
-    public released released = new released();
+    public static pressed pressed = new pressed();
+    public static hold hold = new hold();
+    public static released released = new released();
     
-    public boolean scrollUp=false;
-    public boolean scrollDown=false;
+    public static boolean scrollUp=false;
+    public static boolean scrollDown=false;
     
-    public float x = 0;
-    public float y = 0;
+    public static float x = 0;
+    public static float y = 0;
     
-    public class pressed {
+    public static class pressed {
         public boolean left=false;
         public boolean middle=false;
         public boolean right=false;
     }
     
-    public class hold {
+    public static class hold {
         public boolean left=false;
         public boolean middle=false;
         public boolean right=false;
     }
     
-    public class released {
+    public static class released {
         public boolean left=false;
         public boolean middle=false;
         public boolean right=false;
     }
     
-    protected MouseInput() {
+    static {
         try {
             Mouse.create();
         } catch (LWJGLException ex) {
@@ -43,7 +43,9 @@ public class MouseInput {
         }
     }
     
-    protected void update() {
+    private MouseInput() {}
+    
+    static void update() {
         x = Mouse.getX();
         y = Mouse.getY();
         left();
@@ -52,15 +54,15 @@ public class MouseInput {
         wheel();
     }
     
-    public void setMouseGrabbed(boolean set) {
+    public static void setMouseGrabbed(boolean set) {
         Mouse.setGrabbed(set);
     }
     
-    public boolean isMouseGrabbed() {
+    public static boolean isMouseGrabbed() {
         return Mouse.isGrabbed();
     }
     
-    private void left() {
+    private static void left() {
         if (Mouse.isButtonDown(0)) {
             if (!pressed.left && !hold.left) {
                 pressed.left = true;
@@ -87,7 +89,7 @@ public class MouseInput {
         }
     }
     
-    private void right() {
+    private static void right() {
         if (Mouse.isButtonDown(1)) {
             if (!pressed.right && !hold.right) {
                 pressed.right = true;
@@ -114,7 +116,7 @@ public class MouseInput {
         }
     }
     
-    private void middle() {
+    private static void middle() {
         if (Mouse.isButtonDown(2)) {
             if (!pressed.middle && !hold.middle) {
                 pressed.middle = true;
@@ -141,7 +143,7 @@ public class MouseInput {
         }
     }
     
-    private void wheel() {
+    private static void wheel() {
         int mouse = Mouse.getDWheel();
         if (mouse>0) {
             scrollUp=true;

@@ -136,7 +136,7 @@ public class SettingsWindow extends javax.swing.JFrame {
         jLabel5.setText("Camera sensitivity in FPP view");
 
         scaleUpSelect.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        scaleUpSelect.setModel(new javax.swing.SpinnerNumberModel(10, 5, 25, 1));
+        scaleUpSelect.setModel(new javax.swing.SpinnerNumberModel(10, 5, 40, 1));
 
         jLabel6.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel6.setText("Top view scale (visible vertical tiles)");
@@ -166,6 +166,7 @@ public class SettingsWindow extends javax.swing.JFrame {
 
         antialiasingCombo.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         antialiasingCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "16", "8", "4", "2", "0" }));
+        antialiasingCombo.setSelectedIndex(2);
 
         jLabel9.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel9.setText("Antialiasing");

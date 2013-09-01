@@ -4,43 +4,42 @@ import Form.HouseCalc;
 import Form.SaveWindow;
 import Mapper.Mapper;
 import Mapper.MouseInput;
-import Mapper.Server;
 import Mapper.UpCamera;
 import org.lwjgl.opengl.Display;
 
 public class WallUpdater {
     
-    private int lockedVal = 0;
-    private boolean lockX = false;
-    private boolean lockY = false;
+    private static int lockedVal = 0;
+    private static boolean lockX = false;
+    private static boolean lockY = false;
     
-    protected void update(MouseInput mouse) {
+    static void update() {
         double tileScaler = (double)Display.getWidth()/(double)Display.getHeight();
         double realSize = (double)Display.getHeight()/(double)UpCamera.scale/4d;
         double tileSize = ((double)Display.getHeight()/(double)UpCamera.scale);
 
-        int tileX = (int) (((double)mouse.x+(double)UpCamera.y*realSize)/((double)Display.getWidth()/(double)UpCamera.scale/tileScaler))+1;
-        int tileY = (int) (((double)mouse.y+(double)UpCamera.x*realSize)/((double)Display.getHeight()/(double)UpCamera.scale));
+        int tileX = (int) (((double)MouseInput.x+(double)UpCamera.x*realSize)/((double)Display.getWidth()/(double)UpCamera.scale/tileScaler))+1;
+        int tileY = (int) (((double)MouseInput.y+(double)UpCamera.y*realSize)/((double)Display.getHeight()/(double)UpCamera.scale));
         
         if (tileX<2 || tileY<1 || tileX>=Mapper.width || tileY>=Mapper.height-1) {
             return;
         }
 
-        double x = mouse.x+UpCamera.y*realSize;
-        double y = mouse.y+UpCamera.x*realSize;
+        double x = MouseInput.x+UpCamera.x*realSize;
+        double y = MouseInput.y+UpCamera.y*realSize;
 
         double xClip = x%tileSize;
         double yClip = y%tileSize;
         
-        if (mouse.hold.left ^ mouse.hold.right) {
+        if (MouseInput.hold.left ^ MouseInput.hold.right) {
             if (yClip<(tileSize/6) && xClip>(tileSize/6) && xClip<(tileSize-tileSize/6)) {
                 if (HouseCalc.lockAxis && !lockX && !lockY) {
                     lockX = true;
                     lockedVal = tileY;
                 }
                 if (!lockY) {
-                    if (mouse.hold.left) horizontalBorder(tileX, tileY);
-                    else if (mouse.hold.right) horizontalDelete(tileX, tileY);
+                    if (MouseInput.hold.left) horizontalBorder(tileX, tileY);
+                    else if (MouseInput.hold.right) horizontalDelete(tileX, tileY);
                 }
             }
             else if (yClip>(tileSize-tileSize/6) && xClip>(tileSize/6) && xClip<(tileSize-tileSize/6)) {
@@ -49,8 +48,8 @@ public class WallUpdater {
                     lockedVal = tileY+1;
                 }
                 if (!lockY) {
-                    if (mouse.hold.left) horizontalBorder(tileX, tileY+1);
-                    else if (mouse.hold.right) horizontalDelete(tileX, tileY+1);
+                    if (MouseInput.hold.left) horizontalBorder(tileX, tileY+1);
+                    else if (MouseInput.hold.right) horizontalDelete(tileX, tileY+1);
                 }
             }
             else if (xClip<(tileSize/6) && yClip>(tileSize/6) && yClip<(tileSize-tileSize/6)) {
@@ -59,8 +58,8 @@ public class WallUpdater {
                     lockedVal = tileX-1;
                 }
                 if (!lockX) {
-                    if (mouse.hold.left) verticalBorder(tileX-1, tileY);
-                    else if (mouse.hold.right) verticalDelete(tileX-1, tileY);
+                    if (MouseInput.hold.left) verticalBorder(tileX-1, tileY);
+                    else if (MouseInput.hold.right) verticalDelete(tileX-1, tileY);
                 }
             }
             else if (xClip>(tileSize-tileSize/6) && yClip>(tileSize/6) && yClip<(tileSize-tileSize/6)) {
@@ -69,8 +68,8 @@ public class WallUpdater {
                     lockedVal = tileX;
                 }
                 if (!lockX) {
-                    if (mouse.hold.left) verticalBorder(tileX, tileY);
-                    else if (mouse.hold.right) verticalDelete(tileX, tileY);
+                    if (MouseInput.hold.left) verticalBorder(tileX, tileY);
+                    else if (MouseInput.hold.right) verticalDelete(tileX, tileY);
                 }
             }
         }
@@ -93,66 +92,50 @@ public class WallUpdater {
         }
     }
     
-    private void verticalSelect(int tileX, int tileY) {
-        HouseCalc.statusBar.setData(Mapper.bordersy[tileX][tileY][Mapper.z]);
+    private static void verticalSelect(int tileX, int tileY) {
+        HouseCalc.statusBar.setData(Mapper.bordersy[tileX][Mapper.y][tileY]);
     }
     
-    private void verticalBorder(int tileX, int tileY) {
+    private static void verticalBorder(int tileX, int tileY) {
         if (lockY) {
             tileX = lockedVal;
         }
         if (!Mapper.deleting) {
-            Mapper.bordersy[tileX][tileY][Mapper.z] = Mapper.data.copy();
+            Mapper.bordersy[tileX][Mapper.y][tileY] = Mapper.data.copy();
         }
         else {
-            Mapper.bordersy[tileX][tileY][Mapper.z] = null;
-        }
-        
-        if (Server.running) {
-            SaveWindow.saveBorderY(Server.builder, tileX, tileY, Mapper.z);
+            Mapper.bordersy[tileX][Mapper.y][tileY] = null;
         }
     }
     
-    private void verticalDelete(int tileX, int tileY) {
+    private static void verticalDelete(int tileX, int tileY) {
         if (lockY) {
             tileX = lockedVal;
         }
-        Mapper.bordersy[tileX][tileY][Mapper.z] = null;
-        
-        if (Server.running) {
-            SaveWindow.saveBorderY(Server.builder, tileX, tileY, Mapper.z);
-        }
+        Mapper.bordersy[tileX][Mapper.y][tileY] = null;
     }
     
-    private void horizontalSelect(int tileX, int tileY) {
-        HouseCalc.statusBar.setData(Mapper.bordersx[tileX][tileY][Mapper.z]);
+    private static void horizontalSelect(int tileX, int tileY) {
+        HouseCalc.statusBar.setData(Mapper.bordersx[tileX][Mapper.y][tileY]);
     }
     
-    private void horizontalBorder(int tileX, int tileY) {
+    private static void horizontalBorder(int tileX, int tileY) {
         if (lockX) {
             tileY = lockedVal;
         }
         if (!Mapper.deleting) {
-            Mapper.bordersx[tileX][tileY][Mapper.z] = Mapper.data.copy();
+            Mapper.bordersx[tileX][Mapper.y][tileY] = Mapper.data.copy();
         }
         else {
-            Mapper.bordersx[tileX][tileY][Mapper.z] = null;
-        }
-        
-        if (Server.running) {
-            SaveWindow.saveBorderX(Server.builder, tileX, tileY, Mapper.z);
+            Mapper.bordersx[tileX][Mapper.y][tileY] = null;
         }
     }
     
-    private void horizontalDelete(int tileX, int tileY) {
+    private static void horizontalDelete(int tileX, int tileY) {
         if (lockX) {
             tileY = lockedVal;
         }
-        Mapper.bordersx[tileX][tileY][Mapper.z] = null;
-        
-        if (Server.running) {
-            SaveWindow.saveBorderX(Server.builder, tileX, tileY, Mapper.z);
-        }
+        Mapper.bordersx[tileX][Mapper.y][tileY] = null;
     }
     
 }

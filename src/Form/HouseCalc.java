@@ -9,8 +9,10 @@ import Lib.Object.Writ;
 import Lib.Utils.WebTools;
 import Mapper.Data.D;
 import Mapper.FPPCamera;
+import Mapper.Logic.HeightUpdater;
+import Mapper.Logic.MapUpdater;
+import Mapper.Logic.WritUpdater;
 import Mapper.Mapper;
-import Mapper.Server;
 import Mapper.UpCamera;
 import java.awt.Component;
 import java.awt.Container;
@@ -24,7 +26,6 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import org.lwjgl.util.Point;
@@ -267,7 +268,7 @@ public class HouseCalc extends javax.swing.JFrame {
         jButton9 = new javax.swing.JButton();
         jToggleButton6 = new javax.swing.JToggleButton();
         labelToggle = new javax.swing.JToggleButton();
-        serverToggle = new javax.swing.JToggleButton();
+        helpButton = new javax.swing.JButton();
         statusBar = new Form.StatusBar();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
@@ -860,7 +861,7 @@ public class HouseCalc extends javax.swing.JFrame {
                         .addComponent(floorDown, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(floorLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGap(140, 140, 140)
-                    .addComponent(contextPane, javax.swing.GroupLayout.DEFAULT_SIZE, 339, Short.MAX_VALUE)
+                    .addComponent(contextPane)
                     .addGap(0, 0, 0))
                 .addGroup(interfacePaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(interfacePaneLayout.createSequentialGroup()
@@ -869,6 +870,8 @@ public class HouseCalc extends javax.swing.JFrame {
                         .addContainerGap(372, Short.MAX_VALUE)))
             );
 
+            jPanel1.setMaximumSize(new java.awt.Dimension(32767, 46));
+            jPanel1.setMinimumSize(new java.awt.Dimension(0, 46));
             jPanel1.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
                 public void mouseMoved(java.awt.event.MouseEvent evt) {
                     jPanel1MouseMoved(evt);
@@ -1021,17 +1024,17 @@ public class HouseCalc extends javax.swing.JFrame {
                 }
             });
 
-            serverToggle.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
-            serverToggle.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Graphics/serverOff.png"))); // NOI18N
-            serverToggle.setFocusable(false);
-            serverToggle.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            helpButton.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+            helpButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Graphics/help.png"))); // NOI18N
+            helpButton.setFocusable(false);
+            helpButton.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
                 public void mouseMoved(java.awt.event.MouseEvent evt) {
-                    serverToggleMouseMoved(evt);
+                    helpButtonMouseMoved(evt);
                 }
             });
-            serverToggle.addActionListener(new java.awt.event.ActionListener() {
+            helpButton.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    serverToggleActionPerformed(evt);
+                    helpButtonActionPerformed(evt);
                 }
             });
 
@@ -1057,7 +1060,7 @@ public class HouseCalc extends javax.swing.JFrame {
                     .addGap(2, 2, 2)
                     .addComponent(labelToggle, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGap(2, 2, 2)
-                    .addComponent(serverToggle, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(helpButton, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                     .addComponent(wallsButton, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1071,7 +1074,7 @@ public class HouseCalc extends javax.swing.JFrame {
             jPanel1Layout.setVerticalGroup(
                 jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jPanel1Layout.createSequentialGroup()
-                    .addContainerGap()
+                    .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                         .addComponent(labelToggle, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jToggleButton6, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1086,7 +1089,7 @@ public class HouseCalc extends javax.swing.JFrame {
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(jButton9, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(wallsButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(serverToggle, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(helpButton, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGap(9, 9, 9))
             );
 
@@ -1106,7 +1109,7 @@ public class HouseCalc extends javax.swing.JFrame {
                     .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGap(0, 0, 0)
                     .addComponent(programFrame, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addComponent(interfacePane, javax.swing.GroupLayout.DEFAULT_SIZE, 530, Short.MAX_VALUE)
+                .addComponent(interfacePane, javax.swing.GroupLayout.DEFAULT_SIZE, 572, Short.MAX_VALUE)
             );
 
             javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -1290,7 +1293,7 @@ public class HouseCalc extends javax.swing.JFrame {
         Mapper.currType=Lib.Object.Type.ground;
         if (groundsList.getSelectedValue() instanceof Ground) {
             Mapper.deleting=false;
-            if (Mapper.z>=0) {
+            if (Mapper.y>=0) {
                 Mapper.gData = (Ground)groundsList.getSelectedValue();
             }
             else {
@@ -1319,19 +1322,19 @@ public class HouseCalc extends javax.swing.JFrame {
                 Mapper.ground[i][i2] = D.grounds.get(0).copy(i, i2);
                 Mapper.caveGround[i][i2] = D.caveGrounds.get(0).copy(i, i2);
                 for (int i3=0; i3<15; i3++) {
-                    Mapper.tiles[i][i2][i3]=null;
-                    Mapper.bordersx[i][i2][i3]=null;
-                    Mapper.bordersy[i][i2][i3]=null;
+                    Mapper.tiles[i][i3][i2]=null;
+                    Mapper.bordersx[i][i3][i2]=null;
+                    Mapper.bordersy[i][i3][i2]=null;
                     for (int i4=0; i4<4; i4++) {
                         for (int i5=0; i5<4; i5++) {
-                            Mapper.objects[i*4+i4][i2*4+i5][i3]=null;
+                            Mapper.objects[i*4+i4][i3][i2*4+i5]=null;
                         }
                     }
                 }
             }
         }
         Mapper.heightmap = new float[Mapper.width+1][Mapper.height+1];
-        Mapper.updater.writUpdater.model.clear();
+        WritUpdater.model.clear();
         Mapper.wData=null;
         HouseCalc.jTextField1.setText("Writ 1");
         jCheckBox1.setSelected(false);
@@ -1351,26 +1354,26 @@ public class HouseCalc extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void floorDownActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_floorDownActionPerformed
-        if (Mapper.z>=0) {
-            Mapper.z--;
+        if (Mapper.y>=0) {
+            Mapper.y--;
         }
-        if (Mapper.z==-1) {
+        if (Mapper.y==-1) {
             HouseCalc.groundsList.setModel(DataLoader.caveGrounds);
             HouseCalc.groundsList.setSelectedIndex(0);
         }
-        floorLabel.setText("Floor "+(Mapper.z+1));
+        floorLabel.setText("Floor "+(Mapper.y+1));
         programFrame.requestFocus();
     }//GEN-LAST:event_floorDownActionPerformed
 
     private void floorUpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_floorUpActionPerformed
-        if (Mapper.z<15-1) {
-            Mapper.z++;
+        if (Mapper.y<15-1) {
+            Mapper.y++;
         }
-        if (Mapper.z==0) {
+        if (Mapper.y==0) {
             HouseCalc.groundsList.setModel(DataLoader.grounds);
             HouseCalc.groundsList.setSelectedIndex(0);
         }
-        floorLabel.setText("Floor "+(Mapper.z+1));
+        floorLabel.setText("Floor "+(Mapper.y+1));
         programFrame.requestFocus();
     }//GEN-LAST:event_floorUpActionPerformed
 
@@ -1486,10 +1489,10 @@ public class HouseCalc extends javax.swing.JFrame {
 
     private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
         if (!jTextField1.getText().equals("")) {
-            Mapper.updater.writUpdater.model.addElement(new Writ(jTextField1.getText()));
-            int cap = Mapper.updater.writUpdater.model.getSize()+1;
+            WritUpdater.model.addElement(new Writ(jTextField1.getText()));
+            int cap = WritUpdater.model.getSize()+1;
             jTextField1.setText("Writ "+cap);
-            writsList.setSelectedIndex(Mapper.updater.writUpdater.model.getSize()-1);
+            writsList.setSelectedIndex(WritUpdater.model.getSize()-1);
         }
     }//GEN-LAST:event_jButton7ActionPerformed
 
@@ -1499,8 +1502,8 @@ public class HouseCalc extends javax.swing.JFrame {
 
     private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
         if (!writsList.isSelectionEmpty()) {
-            Mapper.updater.writUpdater.deleteWrit((Writ)HouseCalc.writsList.getSelectedValue());
-            int cap = Mapper.updater.writUpdater.model.getSize()+1;
+            WritUpdater.deleteWrit((Writ)HouseCalc.writsList.getSelectedValue());
+            int cap = WritUpdater.model.getSize()+1;
             jTextField1.setText("Writ "+cap);
         }
     }//GEN-LAST:event_jButton8ActionPerformed
@@ -1568,25 +1571,25 @@ public class HouseCalc extends javax.swing.JFrame {
 
     private void writMoveRightMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_writMoveRightMouseClicked
         if (Mapper.wData!=null) {
-            Mapper.updater.writUpdater.move(1, 0);
+            WritUpdater.move(1, 0);
         }
     }//GEN-LAST:event_writMoveRightMouseClicked
 
     private void writMoveLeftMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_writMoveLeftMouseClicked
         if (Mapper.wData!=null) {
-            Mapper.updater.writUpdater.move(-1, 0);
+            WritUpdater.move(-1, 0);
         }
     }//GEN-LAST:event_writMoveLeftMouseClicked
 
     private void writMoveDownMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_writMoveDownMouseClicked
         if (Mapper.wData!=null) {
-            Mapper.updater.writUpdater.move(0, -1);
+            WritUpdater.move(0, -1);
         }
     }//GEN-LAST:event_writMoveDownMouseClicked
 
     private void writMoveUpMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_writMoveUpMouseClicked
         if (Mapper.wData!=null) {
-            Mapper.updater.writUpdater.move(0, 1);
+            WritUpdater.move(0, 1);
         }
     }//GEN-LAST:event_writMoveUpMouseClicked
 
@@ -1634,7 +1637,7 @@ public class HouseCalc extends javax.swing.JFrame {
             for (Point p : heights) {
                 Mapper.heightmap[p.getX()][p.getY()]+=amount;
             }
-            Mapper.updater.heightUpdater.checkElevations();
+            HeightUpdater.checkElevations();
         }
     }//GEN-LAST:event_jButton10ActionPerformed
 
@@ -1643,7 +1646,7 @@ public class HouseCalc extends javax.swing.JFrame {
     }//GEN-LAST:event_labelToggleMouseMoved
 
     private void labelToggleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_labelToggleActionPerformed
-        Mapper.updater.labelMode = labelToggle.isSelected();
+        MapUpdater.labelMode = labelToggle.isSelected();
     }//GEN-LAST:event_labelToggleActionPerformed
 
     private void jButton11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton11ActionPerformed
@@ -1654,27 +1657,13 @@ public class HouseCalc extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jButton11ActionPerformed
 
-    private void serverToggleMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_serverToggleMouseMoved
-        statusBar.helpLabel.setText("Join/leave server");
-    }//GEN-LAST:event_serverToggleMouseMoved
+    private void helpButtonMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_helpButtonMouseMoved
+        statusBar.helpLabel.setText("Help");
+    }//GEN-LAST:event_helpButtonMouseMoved
 
-    private void serverToggleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_serverToggleActionPerformed
-        if (serverToggle.isSelected()) {
-            JDialog dialog = new ServerWindow(this, true);
-            dialog.setVisible(true);
-        }
-        else {
-            if (Server.running) {
-                Server.running = false;
-                try {
-                    Server.socket.close();
-                } catch (IOException ex) {
-                    Logger.getLogger(HouseCalc.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                serverToggle.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Graphics/serverOff.png")));
-            }
-        }
-    }//GEN-LAST:event_serverToggleActionPerformed
+    private void helpButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_helpButtonActionPerformed
+        HelpWindow.main(null);
+    }//GEN-LAST:event_helpButtonActionPerformed
 
     public static void error() {
         if (!error) {
@@ -1736,6 +1725,7 @@ public class HouseCalc extends javax.swing.JFrame {
     private javax.swing.JSpinner gSpinner;
     public static javax.swing.JList groundsList;
     public static javax.swing.JScrollPane groundsPane;
+    private javax.swing.JButton helpButton;
     private javax.swing.JPanel interfacePane;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton10;
@@ -1776,7 +1766,6 @@ public class HouseCalc extends javax.swing.JFrame {
     public static javax.swing.JList roofsList;
     public static javax.swing.JScrollPane roofsPane;
     public static javax.swing.JToggleButton selectToggle;
-    public static javax.swing.JToggleButton serverToggle;
     public static javax.swing.JSpinner setLeftSpinner;
     public static javax.swing.JSpinner setRightSpinner;
     public static Form.StatusBar statusBar;

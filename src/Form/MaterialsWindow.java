@@ -133,22 +133,22 @@ public class MaterialsWindow extends javax.swing.JFrame {
             floors[i] = new HashMap<>();
         }
         
-        for (int i=0; i<25; i++) {
-            for (int i2=0; i2<25; i2++) {
-                for (int i3=0; i3<15; i3++) {
+        for (int i=0; i<Mapper.width; i++) {
+            for (int i2=0; i2<15; i2++) {
+                for (int i3=0; i3<Mapper.height; i3++) {
                     if (Mapper.tiles[i][i2][i3]!=null) {
                         addToMap(map, Mapper.tiles[i][i2][i3].materials);
-                        addToMap(floors[i3], Mapper.tiles[i][i2][i3].materials);
+                        addToMap(floors[i2], Mapper.tiles[i][i2][i3].materials);
                         addToMap(objects, Mapper.tiles[i][i2][i3]);
                     }
                     if (Mapper.bordersx[i][i2][i3]!=null) {
                         addToMap(map, Mapper.bordersx[i][i2][i3].materials);
-                        addToMap(floors[i3], Mapper.bordersx[i][i2][i3].materials);
+                        addToMap(floors[i2], Mapper.bordersx[i][i2][i3].materials);
                         addToMap(objects, Mapper.bordersx[i][i2][i3]);
                     }
                     if (Mapper.bordersy[i][i2][i3]!=null) {
                         addToMap(map, Mapper.bordersy[i][i2][i3].materials);
-                        addToMap(floors[i3], Mapper.bordersy[i][i2][i3].materials);
+                        addToMap(floors[i2], Mapper.bordersy[i][i2][i3].materials);
                         addToMap(objects, Mapper.bordersy[i][i2][i3]);
                     }
                 }
@@ -157,9 +157,9 @@ public class MaterialsWindow extends javax.swing.JFrame {
     }
     
     private void addToMap(HashMap<String, Integer> map, Materials add) {
-        for (Map.Entry entry : add.entrySet()) {
-            String name = (String)entry.getKey();
-            int amount = (int)entry.getValue();
+        for (Map.Entry<String, Integer> entry : add.entrySet()) {
+            String name = entry.getKey();
+            int amount = entry.getValue();
             
             if (map.containsKey(name)) {
                 map.put(name, map.get(name)+amount);

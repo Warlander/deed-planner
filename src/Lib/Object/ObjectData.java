@@ -1,18 +1,26 @@
 package Lib.Object;
 
+import org.lwjgl.opengl.GL11;
+
 public class ObjectData {
     
-    public int loadID;
-    public int size;
+    public final int loadID;
+    private final int listID;
     
-    public float[] x;
-    public float[] y;
-    public float[] z;
+    ObjectData(int listID) {
+        this(0, listID);
+    }
     
-    public float[] texU;
-    public float[] texV;
+    ObjectData(int loadID, int listID) {
+        this.loadID = loadID;
+        this.listID = listID;
+    }
     
-    public int[] vert;
-    public int[] coord;
+    /**
+     * Renders this model - GL11.glBegin() calls are unnecessary, but proper transformations are.
+     */
+    public void render() {
+        GL11.glCallList(listID);
+    }
     
 }

@@ -5,13 +5,13 @@ import java.util.logging.Logger;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 
-public class KeyboardInput {
+public final class KeyboardInput {
     
-    public boolean[] pressed = new boolean[256];
-    public boolean[] hold = new boolean[256];
-    public boolean[] released = new boolean[256];
+    public static final boolean[] pressed = new boolean[256];
+    public static final boolean[] hold = new boolean[256];
+    public static final boolean[] released = new boolean[256];
     
-    protected KeyboardInput() {
+    static {
         try {
             Keyboard.create();
         } catch (LWJGLException ex) {
@@ -19,23 +19,34 @@ public class KeyboardInput {
         }
     }
     
-    protected void update() {
-        while (Keyboard.next()) {
-            if (Keyboard.getEventKeyState()) {
-                pressed[Keyboard.getEventKey()]=true;
-                hold[Keyboard.getEventKey()]=true;
+    private KeyboardInput() {}
+    
+    static void update() {
+        for (int i=0; i<256; i++) {
+            if (Keyboard.isKeyDown(i)) {
+                if (!pressed[i] && !hold[i]) {
+                    pressed[i] = true;
+                    hold[i] = true;
+                    released[i] = false;
+                }
+                else if (pressed[i] && hold[i]) {
+                    pressed[i] = false;
+                    hold[i] = true;
+                    released[i] = false;
+                }
             }
             else {
-                released[Keyboard.getEventKey()]=true;
-                hold[Keyboard.getEventKey()]=false;
+                if (hold[i]) {
+                    pressed[i] = false;
+                    hold[i] = false;
+                    released[i] = true;
+                }
+                else {
+                    pressed[i] = false;
+                    hold[i] = false;
+                    released[i] = false;
+                }
             }
-        }
-    }
-    
-    protected void reset() {
-        for (int i=0; i<pressed.length; i++) {
-            pressed[i]=false;
-            released[i]=false;
         }
     }
     

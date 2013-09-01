@@ -5,6 +5,7 @@ import Lib.Object.Data;
 import Lib.Object.Label;
 import Lib.Object.Structure;
 import Mapper.Data.D;
+import Mapper.Logic.HeightUpdater;
 import Mapper.Mapper;
 
 public class ResizeWindow extends javax.swing.JFrame {
@@ -164,10 +165,10 @@ public class ResizeWindow extends javax.swing.JFrame {
             return;
         }
         
-        Structure[][][] objects = new Structure[(Mapper.width+right+left)*4][(Mapper.height+up+down)*4][15];
-        Data[][][] tiles = new Data[Mapper.width+right+left][Mapper.height+up+down][15];
-        Data[][][] bordersx = new Data[Mapper.width+right+left][Mapper.height+up+down][15];
-        Data[][][] bordersy = new Data[Mapper.width+right+left][Mapper.height+up+down][15];
+        Structure[][][] objects = new Structure[(Mapper.width+right+left)*4][15][(Mapper.height+up+down)*4];
+        Data[][][] tiles = new Data[Mapper.width+right+left][15][Mapper.height+up+down];
+        Data[][][] bordersx = new Data[Mapper.width+right+left][15][Mapper.height+up+down];
+        Data[][][] bordersy = new Data[Mapper.width+right+left][15][Mapper.height+up+down];
         Ground[][] ground = new Ground[Mapper.width+right+left][Mapper.height+up+down];
         Ground[][] caveGround = new Ground[Mapper.width+right+left][Mapper.height+up+down];
         Label[][] labels = new Label[Mapper.width+right+left][Mapper.height+up+down];
@@ -183,12 +184,12 @@ public class ResizeWindow extends javax.swing.JFrame {
                     for (int i3=0; i3<15; i3++) {
                         for (int i4=0; i4<4; i4++) {
                             for (int i5=0; i5<4; i5++) {
-                                objects[xReg*4+i4][yReg*4+i5][i3] = Mapper.objects[i*4+i4][i2*4+i5][i3];
+                                objects[xReg*4+i4][i3][yReg*4+i5] = Mapper.objects[i*4+i4][i3][i2*4+i5];
                             }
                         }
-                        tiles[xReg][yReg][i3] = Mapper.tiles[i][i2][i3];
-                        bordersx[xReg][yReg][i3] = Mapper.bordersx[i][i2][i3];
-                        bordersy[xReg][yReg][i3] = Mapper.bordersy[i][i2][i3];
+                        tiles[xReg][i3][yReg] = Mapper.tiles[i][i3][i2];
+                        bordersx[xReg][i3][yReg] = Mapper.bordersx[i][i3][i2];
+                        bordersy[xReg][i3][yReg] = Mapper.bordersy[i][i3][i2];
                     }
                     labels[xReg][yReg] = Mapper.labels[i][i2];
                     caveLabels[xReg][yReg] = Mapper.caveLabels[i][i2];
@@ -257,7 +258,7 @@ public class ResizeWindow extends javax.swing.JFrame {
                 Mapper.heightmap[i][i2]+=add;
             }
         }
-        Mapper.updater.heightUpdater.checkElevations();
+        HeightUpdater.checkElevations();
         close();
     }//GEN-LAST:event_jButton2ActionPerformed
 

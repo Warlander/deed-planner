@@ -4,6 +4,7 @@ import Lib.Files.FileManager;
 import Lib.Graphics.Ground;
 import Lib.Object.Writ;
 import Mapper.Data.D;
+import Mapper.Logic.WritUpdater;
 import Mapper.Mapper;
 import java.awt.Desktop;
 import java.awt.Toolkit;
@@ -56,7 +57,7 @@ public class SaveWindow extends javax.swing.JFrame {
     
     private void saveMaker() {
         StringBuilder maps = new StringBuilder();
-        maps.append("1.0|").append(endl);
+        maps.append("1.1|").append(endl);
         maps.append(Mapper.width).append(" ").append(Mapper.height).append(endl);
         
         for (int x=0; x<=Mapper.width; x++) {
@@ -83,9 +84,9 @@ public class SaveWindow extends javax.swing.JFrame {
             }
         }
         
-        for (int z=0; z<15; z++) {
+        for (int y=0; y<15; y++) {
             for (int x=0; x<Mapper.width*4; x++) {
-                for (int y=0; y<Mapper.height*4; y++) {
+                for (int z=0; z<Mapper.height*4; z++) {
                     if (Mapper.objects[x][y][z]!=null) {
                         saveObject(maps, x, y, z);
                     }
@@ -93,9 +94,9 @@ public class SaveWindow extends javax.swing.JFrame {
             }
         }
         
-        for (int z=0; z<15; z++) {
+        for (int y=0; y<15; y++) {
             for (int x=0; x<Mapper.width; x++) {
-                for (int y=0; y<Mapper.height; y++) {
+                for (int z=0; z<Mapper.height; z++) {
                     if (Mapper.tiles[x][y][z]!=null) {
                         saveTile(maps, x, y, z);
                     }
@@ -103,9 +104,9 @@ public class SaveWindow extends javax.swing.JFrame {
             }
         }
         
-        for (int z=0; z<15; z++) {
+        for (int y=0; y<15; y++) {
             for (int x=0; x<Mapper.width; x++) {
-                for (int y=0; y<Mapper.height; y++) {
+                for (int z=0; z<Mapper.height; z++) {
                     if (Mapper.bordersx[x][y][z]!=null) {
                         saveBorderX(maps, x, y, z);
                     }
@@ -113,9 +114,9 @@ public class SaveWindow extends javax.swing.JFrame {
             }
         }
         
-        for (int z=0; z<15; z++) {
+        for (int y=0; y<15; y++) {
             for (int x=0; x<Mapper.width; x++) {
-                for (int y=0; y<Mapper.height; y++) {
+                for (int z=0; z<Mapper.height; z++) {
                     if (Mapper.bordersy[x][y][z]!=null) {
                         saveBorderY(maps, x, y, z);
                     }
@@ -134,9 +135,9 @@ public class SaveWindow extends javax.swing.JFrame {
             }
         }
         
-        if (!Mapper.updater.writUpdater.model.isEmpty()) {
-            for (int i=0; i<Mapper.updater.writUpdater.model.size(); i++) {
-                Writ w = (Writ)Mapper.updater.writUpdater.model.get(i);
+        if (!WritUpdater.model.isEmpty()) {
+            for (int i=0; i<WritUpdater.model.size(); i++) {
+                Writ w = (Writ)WritUpdater.model.get(i);
                 saveWrit(maps, w);
             }
         }
@@ -159,7 +160,7 @@ public class SaveWindow extends javax.swing.JFrame {
      * 1. Type
      * 2. x coord
      * 3. y coord
-     * 4. z coord
+     * 4. y coord
      * 5. Shortname
      * 6. Red
      * 7. Green

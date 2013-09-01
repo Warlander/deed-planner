@@ -1,50 +1,44 @@
 package Mapper.Logic;
 
-import Form.SaveWindow;
 import Lib.Object.Structure;
 import Mapper.Mapper;
 import Mapper.MouseInput;
-import Mapper.Server;
 import Mapper.UpCamera;
 import org.lwjgl.opengl.Display;
 
 public class StructureUpdater {
     
-    private Structure currStruct;
-    private float xPos;
-    private float yPos;
+    private static Structure currStruct;
+    private static float xPos;
+    private static float yPos;
     
-    protected void update(MouseInput mouse) {
+    static void update() {
         int scale = UpCamera.scale*4;
         float tileScaler = (float)Display.getWidth()/(float)Display.getHeight();
         float tileSize = (float)Display.getHeight()/scale;
-        int tileX = (int) ((mouse.x+UpCamera.y*tileSize)/((float)Display.getWidth()/scale/tileScaler))+1;
-        int tileY = (int) ((mouse.y+UpCamera.x*tileSize)/((float)Display.getHeight()/scale));
+        int tileX = (int) ((MouseInput.x+UpCamera.x*tileSize)/((float)Display.getWidth()/scale/tileScaler))+1;
+        int tileY = (int) ((MouseInput.y+UpCamera.y*tileSize)/((float)Display.getHeight()/scale));
         
-        if (mouse.pressed.left ^ mouse.pressed.right) {
+        if (MouseInput.pressed.left ^ MouseInput.pressed.right) {
             if (tileX<2 || tileY<1 || tileX>Mapper.width*4-1 || tileY>Mapper.height*4-1) {}
-            else if (Mapper.deleting && mouse.pressed.left) Mapper.objects[tileX][tileY][Mapper.z]=null;
-            else if (mouse.pressed.left) {
+            else if (Mapper.deleting && MouseInput.pressed.left) Mapper.objects[tileX][Mapper.y][tileY]=null;
+            else if (MouseInput.pressed.left) {
                 currStruct = Mapper.sData.copy();
-                Mapper.objects[tileX][tileY][Mapper.z]=currStruct;
-                xPos = mouse.x;
-                yPos = mouse.y;
+                Mapper.objects[tileX][Mapper.y][tileY]=currStruct;
+                xPos = MouseInput.x;
+                yPos = MouseInput.y;
             }
-            else if (mouse.pressed.right) Mapper.objects[tileX][tileY][Mapper.z]=null;
+            else if (MouseInput.pressed.right) Mapper.objects[tileX][Mapper.y][tileY]=null;
         }
-        else if (mouse.released.left ^ mouse.released.right) {
+        else if (MouseInput.released.left ^ MouseInput.released.right) {
             currStruct = null;
         }
-        else if (mouse.hold.left ^ mouse.hold.right) {
+        else if (MouseInput.hold.left ^ MouseInput.hold.right) {
             if (currStruct!=null) {
-                float deltaY = mouse.y - yPos;
-                float deltaX = mouse.x - xPos;
+                float deltaY = MouseInput.y - yPos;
+                float deltaX = MouseInput.x - xPos;
                 currStruct.rotation = -(int)((Math.atan2(deltaY, deltaX)+Math.PI/2)*180/Math.PI);
             }
-        }
-        
-        if (Server.running && (mouse.hold.left ^ mouse.hold.right)) {
-            SaveWindow.saveObject(Server.builder, tileX, tileY, Mapper.z);
         }
     }
                 

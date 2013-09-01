@@ -5,7 +5,6 @@ import Form.SaveWindow;
 import Mapper.KeyboardInput;
 import Mapper.Mapper;
 import Mapper.MouseInput;
-import Mapper.Server;
 import Mapper.UpCamera;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
@@ -13,9 +12,9 @@ import org.lwjgl.util.Point;
 
 public class HeightUpdater {
     
-    protected void update(KeyboardInput keyboard, MouseInput mouse) {
-        if (keyboard.hold[Keyboard.KEY_LSHIFT] && (mouse.scrollDown ^ mouse.scrollUp)) {
-            if (mouse.scrollDown) {
+    static void update() {
+        if (KeyboardInput.hold[Keyboard.KEY_LSHIFT] && (MouseInput.scrollDown ^ MouseInput.scrollUp)) {
+            if (MouseInput.scrollDown) {
                 if (HouseCalc.elevationAdd>1) {
                     HouseCalc.elevationAdd--;
                 }
@@ -27,8 +26,8 @@ public class HeightUpdater {
             }
             HouseCalc.addSpinner.getModel().setValue(HouseCalc.elevationAdd);
         }
-        if (keyboard.hold[Keyboard.KEY_LCONTROL] && (mouse.scrollDown ^ mouse.scrollUp)) {
-            if (mouse.scrollDown) {
+        if (KeyboardInput.hold[Keyboard.KEY_LCONTROL] && (MouseInput.scrollDown ^ MouseInput.scrollUp)) {
+            if (MouseInput.scrollDown) {
                 HouseCalc.elevationSetLeft--;
             }
             else {
@@ -41,15 +40,15 @@ public class HeightUpdater {
         double realSize = (double)Display.getHeight()/(double)UpCamera.scale/4d;
         double tileSize = ((double)Display.getHeight()/(double)UpCamera.scale);
 
-        int tileX = (int) (((double)mouse.x+(double)UpCamera.y*realSize)/((double)Display.getWidth()/(double)UpCamera.scale/tileScaler))+1;
-        int tileY = (int) (((double)mouse.y+(double)UpCamera.x*realSize)/((double)Display.getHeight()/(double)UpCamera.scale));
+        int tileX = (int) (((double)MouseInput.x+(double)UpCamera.x*realSize)/((double)Display.getWidth()/(double)UpCamera.scale/tileScaler))+1;
+        int tileY = (int) (((double)MouseInput.y+(double)UpCamera.y*realSize)/((double)Display.getHeight()/(double)UpCamera.scale));
 
         if (tileX<0 || tileY<0 || tileX>Mapper.width || tileY>Mapper.height) {
             return;
         }
 
-        double x = mouse.x+UpCamera.y*realSize;
-        double y = mouse.y+UpCamera.x*realSize;
+        double x = MouseInput.x+UpCamera.x*realSize;
+        double y = MouseInput.y+UpCamera.y*realSize;
 
         double xClip = x%tileSize;
         double yClip = y%tileSize;
@@ -60,7 +59,7 @@ public class HeightUpdater {
             HouseCalc.statusBar.setPoint(points[0]);
         }
         
-        if (mouse.hold.left ^ mouse.hold.right) {
+        if (MouseInput.hold.left ^ MouseInput.hold.right) {
             if (points==null) {
                 points = selectedBorder(tileX, tileY, xClip, yClip, tileSize);
             }
@@ -75,34 +74,34 @@ public class HeightUpdater {
                 if (!containsWrit(point)) {
                     switch ((String)HouseCalc.elevationList.getSelectedValue()) {
                         case "Increase/decrease height":
-                            if (mouse.pressed.left ^ mouse.pressed.right) {
-                                increaseHeight(mouse, point);
+                            if (MouseInput.pressed.left ^ MouseInput.pressed.right) {
+                                increaseHeight(point);
                             }
                             break;
                         case "Increase/decrease area height":
-                            if (mouse.pressed.left ^ mouse.pressed.right) {
-                                liftArea(mouse, point);
+                            if (MouseInput.pressed.left ^ MouseInput.pressed.right) {
+                                liftArea(point);
                             }
                             break;
                         case "Set height":
-                            setHeight(mouse, point);
+                            setHeight(point);
                             break;
                         case "Select height":
-                            if (mouse.pressed.left ^ mouse.pressed.right) {
-                                selectHeight(mouse, point);
+                            if (MouseInput.pressed.left ^ MouseInput.pressed.right) {
+                                selectHeight(point);
                             }
                             break;
                         case "Reset height":
                             resetHeight(point);
                             break;
                         case "Smooth height":
-                            if ((mouse.pressed.left ^ mouse.pressed.right) && points.length==1) {
+                            if ((MouseInput.pressed.left ^ MouseInput.pressed.right) && points.length==1) {
                                 smoothHeight(point);
                             }
                             break;
                         case "Level area":
-                            if ((mouse.pressed.left ^ mouse.pressed.right) && points.length==1) {
-                                levelArea(mouse, point);
+                            if ((MouseInput.pressed.left ^ MouseInput.pressed.right) && points.length==1) {
+                                levelArea(point);
                             }
                             break;
                     }
@@ -112,7 +111,7 @@ public class HeightUpdater {
         }
     }
     
-    private boolean containsWrit(Point point) {
+    private static boolean containsWrit(Point point) {
         if (point.getX()<Mapper.width && point.getY()<Mapper.height && Mapper.ground[point.getX()][point.getY()].writ!=null) {return true;}
         else if (point.getX()-1>=0 && point.getY()<Mapper.height && Mapper.ground[point.getX()-1][point.getY()].writ!=null) {return true;}
         else if (point.getX()-1>=0 && point.getY()-1>=0 && Mapper.ground[point.getX()-1][point.getY()-1].writ!=null) {return true;}
@@ -120,7 +119,7 @@ public class HeightUpdater {
         return false;
     }
     
-    protected Point[] selectedPoint(int tileX, int tileY, double xClip, double yClip, double tileSize) {
+    static Point[] selectedPoint(int tileX, int tileY, double xClip, double yClip, double tileSize) {
         Point point = new Point();
         if (xClip<(tileSize/6) && yClip<(tileSize/6)) {
             point.setX(tileX);
@@ -148,7 +147,7 @@ public class HeightUpdater {
         return new Point[]{point};
     }
     
-    private Point[] selectedBorder(int tileX, int tileY, double xClip, double yClip, double tileSize) {
+    private static Point[] selectedBorder(int tileX, int tileY, double xClip, double yClip, double tileSize) {
         Point p1 = new Point();
         Point p2 = new Point();
         if (yClip<(tileSize/6) && xClip>(tileSize/6) && xClip<(tileSize-tileSize/6)) {
@@ -176,7 +175,7 @@ public class HeightUpdater {
         return new Point[]{p1,p2};
     }
     
-    private Point[] selectedTile(int tileX, int tileY) {
+    private static Point[] selectedTile(int tileX, int tileY) {
         Point p1 = new Point();
         Point p2 = new Point();
         Point p3 = new Point();
@@ -195,34 +194,26 @@ public class HeightUpdater {
         return points;
     }
     
-    private void increaseHeight(MouseInput mouse, Point point) {
-        if (mouse.pressed.left) {
+    private static void increaseHeight(Point point) {
+        if (MouseInput.pressed.left) {
             Mapper.heightmap[point.getX()][point.getY()]+=HouseCalc.elevationAdd;
         }
         else {
             Mapper.heightmap[point.getX()][point.getY()]-=HouseCalc.elevationAdd;
         }
-        
-        if (Server.running && (mouse.hold.left ^ mouse.hold.right)) {
-            SaveWindow.saveHeight(Server.builder, point.getX(), point.getY());
-        }
     }
     
-    private void setHeight(MouseInput mouse, Point point) {
-        if (mouse.hold.left) {
+    private static void setHeight(Point point) {
+        if (MouseInput.hold.left) {
             Mapper.heightmap[point.getX()][point.getY()]=HouseCalc.elevationSetLeft;
         }
         else {
             Mapper.heightmap[point.getX()][point.getY()]=HouseCalc.elevationSetRight;
         }
-        
-        if (Server.running && (mouse.hold.left ^ mouse.hold.right)) {
-            SaveWindow.saveHeight(Server.builder, point.getX(), point.getY());
-        }
     }
     
-    private void selectHeight(MouseInput mouse, Point point) {
-        if (mouse.pressed.left) {
+    private static void selectHeight(Point point) {
+        if (MouseInput.pressed.left) {
             HouseCalc.elevationSetLeft = (int)Mapper.heightmap[point.getX()][point.getY()];
             HouseCalc.setLeftSpinner.setValue((int)Mapper.heightmap[point.getX()][point.getY()]);
         }
@@ -232,17 +223,13 @@ public class HeightUpdater {
         }
     }
     
-    private void resetHeight(Point point) {
+    private static void resetHeight(Point point) {
         Mapper.heightmap[point.getX()][point.getY()]=0;
-        
-        if (Server.running) {
-            SaveWindow.saveHeight(Server.builder, point.getX(), point.getY());
-        }
     }
     
-    Point p2=null;
+    private static Point p2=null;
     
-    private void smoothHeight(Point p1) {
+    private static void smoothHeight(Point p1) {
         if (p2==null) {
             p2 = p1;
         }
@@ -262,18 +249,12 @@ public class HeightUpdater {
                         for (int i=lower.getY(); i<higher.getY(); i++) {
                             Mapper.heightmap[p1.getX()][i] = min + diff*mult;
                             mult++;
-                            if (Server.running) {
-                                SaveWindow.saveHeight(Server.builder, p1.getX(), i);
-                            }
                         }
                     }
                     else if (lower.getY()>higher.getY()) {
                         for (int i=lower.getY(); i>higher.getY(); i--) {
                             Mapper.heightmap[p1.getX()][i] = min + diff*mult;
                             mult++;
-                            if (Server.running) {
-                                SaveWindow.saveHeight(Server.builder, p1.getX(), i);
-                            }
                         }
                     }
                 }
@@ -283,18 +264,12 @@ public class HeightUpdater {
                         for (int i=lower.getX(); i<higher.getX(); i++) {
                             Mapper.heightmap[i][p1.getY()] = min + diff*mult;
                             mult++;
-                            if (Server.running) {
-                                SaveWindow.saveHeight(Server.builder, i, p1.getY());
-                            }
                         }
                     }
                     else if (lower.getX()>higher.getX()) {
                         for (int i=lower.getX(); i>higher.getX(); i--) {
                             Mapper.heightmap[i][p1.getY()] = min + diff*mult;
                             mult++;
-                            if (Server.running) {
-                                SaveWindow.saveHeight(Server.builder, i, p1.getY());
-                            }
                         }
                     }
                 }
@@ -303,7 +278,7 @@ public class HeightUpdater {
         }
     }
     
-    private void levelArea(MouseInput mouse, Point p1) {
+    private static void levelArea(Point p1) {
         if (p2==null) {
             p2 = p1;
         }
@@ -314,7 +289,7 @@ public class HeightUpdater {
             int maxY = Math.max(p1.getY(), p2.getY());
             
             int set;
-            if (mouse.pressed.left) {
+            if (MouseInput.pressed.left) {
                 set = HouseCalc.elevationSetLeft;
             }
             else {
@@ -324,9 +299,6 @@ public class HeightUpdater {
             for (int i=minX; i<=maxX; i++) {
                 for (int i2=minY; i2<=maxY; i2++) {
                     Mapper.heightmap[i][i2] = set;
-                    if (Server.running) {
-                        SaveWindow.saveHeight(Server.builder, i, i2);
-                    }
                 }
             }
             
@@ -334,7 +306,7 @@ public class HeightUpdater {
         }
     }
     
-    private void liftArea(MouseInput mouse, Point p1) {
+    private static void liftArea(Point p1) {
         if (p2==null) {
             p2 = p1;
         }
@@ -345,7 +317,7 @@ public class HeightUpdater {
             int maxY = Math.max(p1.getY(), p2.getY());
             
             int add;
-            if (mouse.pressed.left) {
+            if (MouseInput.pressed.left) {
                 add = HouseCalc.elevationAdd;
             }
             else {
@@ -355,9 +327,6 @@ public class HeightUpdater {
             for (int i=minX; i<=maxX; i++) {
                 for (int i2=minY; i2<=maxY; i2++) {
                     Mapper.heightmap[i][i2]+=add;
-                    if (Server.running) {
-                        SaveWindow.saveHeight(Server.builder, i, i2);
-                    }
                 }
             }
             
@@ -365,18 +334,18 @@ public class HeightUpdater {
         }
     }
     
-    private float getHeight(Point p) {
+    private static float getHeight(Point p) {
         return Mapper.heightmap[p.getX()][p.getY()];
     }
     
-    private Point getPoint(float height, Point p1, Point p2) {
+    private static Point getPoint(float height, Point p1, Point p2) {
         if (Mapper.heightmap[p1.getX()][p1.getY()]==height) {
             return p1;
         }
         return p2;
     }
     
-    public void checkElevations() {
+    public static void checkElevations() {
         float elevationMin = Mapper.maxElevation;
         for (int i=0; i<=Mapper.width; i++) {
             for (int i2=0; i2<=Mapper.height; i2++) {

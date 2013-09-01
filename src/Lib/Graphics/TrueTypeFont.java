@@ -61,7 +61,7 @@ public class TrueTypeFont {
 	private int textureHeight = 512;
 
 	/** A reference to Java's AWT Font that we create our font texture from */
-	private Font font;
+	private final Font font;
 
 	/** The font metrics for our Java AWT font */
 	private FontMetrics fontMetrics;
@@ -421,10 +421,9 @@ public class TrueTypeFont {
 		    
 		    int internalFormat = GL11.GL_RGBA8,
 			format = GL11.GL_RGBA;
-			IntBuffer   textureId =  BufferUtils.createIntBuffer(1);;
+			IntBuffer   textureId =  BufferUtils.createIntBuffer(1);
 			GL11.glGenTextures(textureId);
 			GL11.glBindTexture(GL11.GL_TEXTURE_2D, textureId.get(0));
-			
 
 			GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_CLAMP);
 			GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL11.GL_CLAMP);
