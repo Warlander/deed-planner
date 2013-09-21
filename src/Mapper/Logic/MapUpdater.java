@@ -3,12 +3,12 @@ package Mapper.Logic;
 import Form.HouseCalc;
 import Form.LabelWindow;
 import Mapper.Mapper;
-import Mapper.MouseInput;
+import Mapper.Input.MouseInput;
 import Mapper.UpCamera;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.util.Point;
 
-public class MapUpdater {
+public final class MapUpdater {
     
     public static boolean labelMode = false;
     
@@ -18,26 +18,26 @@ public class MapUpdater {
         if (!labelMode) {
             switch (Mapper.currType) {
                 case ground:
-                    if (Mapper.y>=0) GroundUpdater.update();
+                    if (Mapper.getFloor()>=0) GroundUpdater.update();
                     else CaveUpdater.update();
                     break;
                 case elevation:
-                    if (Mapper.y>=0) HeightUpdater.update();
+                    if (Mapper.getFloor()>=0) HeightUpdater.update();
                     break;
                 case writ:
-                    if (Mapper.y>=0) WritUpdater.update();
+                    if (Mapper.getFloor()>=0) WritUpdater.update();
                     break;
                 case floor:
-                    if (Mapper.y>=0) FloorUpdater.update();
+                    if (Mapper.getFloor()>=0) FloorUpdater.update();
                     break;
                 case wall:
-                    if (Mapper.y>=0) WallUpdater.update();
+                    if (Mapper.getFloor()>=0) WallUpdater.update();
                     break;
                 case roof:
-                    if (Mapper.y>=0) RoofUpdater.update();
+                    if (Mapper.getFloor()>=0) RoofUpdater.update();
                     break;
                 case structure:
-                    if (Mapper.y>=0) StructureUpdater.update();
+                    if (Mapper.getFloor()>=0) StructureUpdater.update();
             }
         }
         
@@ -69,7 +69,7 @@ public class MapUpdater {
         if (points!=null) {
             HouseCalc.statusBar.setPoint(points[0]);
         }
-        if (tileX<0 || tileY<0 || tileX>Mapper.width-1 || tileY>Mapper.height-1) {
+        if (tileX<1 || tileY<0 || tileX>Mapper.width-1 || tileY>Mapper.height-1) {
             return;
         }
         HouseCalc.statusBar.setGround(Mapper.ground[tileX-1][tileY]);

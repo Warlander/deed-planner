@@ -1,20 +1,19 @@
 package Mapper;
 
+import Mapper.Input.MouseInput;
 import Form.HouseCalc;
-import static Form.HouseCalc.floorLabel;
-import Lib.Object.DataLoader;
 import Lib.Utils.MatrixTools;
+import Mapper.Input.Keybindings;
 import java.nio.FloatBuffer;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.JViewport;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
-public class UpCamera {
+public final class UpCamera {
     
     public static float x=0;
     public static float y=0;
@@ -41,10 +40,10 @@ public class UpCamera {
     
     static void update() {
         float keyboardFraction = UpCamera.keyboardFraction;
-        if (KeyboardInput.hold[Keyboard.KEY_LSHIFT]) {
+        if (Keybindings.hold(Keybindings.UP_SPEED_MOD1)) {
             keyboardFraction*=FPPCamera.shiftMod;
         }
-        else if (KeyboardInput.hold[Keyboard.KEY_LCONTROL]) {
+        else if (Keybindings.hold(Keybindings.UP_SPEED_MOD2)) {
             keyboardFraction*=FPPCamera.controlMod;
         }
         
@@ -55,15 +54,15 @@ public class UpCamera {
         Camera.visibleDownY = currZ-5;
         Camera.visibleUpY = currZ+scale*2;
         
-        if (KeyboardInput.pressed[Keyboard.KEY_R]) {
+        if (Keybindings.pressed(Keybindings.UP_SCALE_MORE)) {
             if (scale>5) {
                 scale--;
             }
         }
-        else if (KeyboardInput.pressed[Keyboard.KEY_F]) {
+        else if (Keybindings.pressed(Keybindings.UP_SCALE_LESS)) {
             if (scale<40) {
-                    scale++;
-                }
+                scale++;
+            }
         }
         
         if (allowWheel) {
@@ -79,7 +78,7 @@ public class UpCamera {
             }
         }
         else {
-            if ((MouseInput.scrollUp ^ MouseInput.scrollDown) && !(KeyboardInput.hold[Keyboard.KEY_LSHIFT] || KeyboardInput.hold[Keyboard.KEY_LCONTROL])) {
+            if ((MouseInput.scrollUp ^ MouseInput.scrollDown) && !(Keybindings.pressed(Keybindings.UP_SPEED_MOD1) || Keybindings.pressed(Keybindings.UP_SPEED_MOD2))) {
                 JScrollPane pane = (JScrollPane)HouseCalc.contextPane.getSelectedComponent();
                 JList list = (JList)((JViewport)pane.getComponent(0)).getView();
                 if (MouseInput.scrollUp) {
@@ -90,25 +89,11 @@ public class UpCamera {
                 }
             }
         }
-        if (KeyboardInput.pressed[Keyboard.KEY_Q]) {
-            if (Mapper.y>0) {
-                Mapper.y--;
-            }
-            if (Mapper.y==-1) {
-                HouseCalc.groundsList.setModel(DataLoader.caveGrounds);
-                HouseCalc.groundsList.setSelectedIndex(0);
-            }
-            floorLabel.setText("Floor "+(Mapper.y+1));
+        if (Keybindings.pressed(Keybindings.UP_ELEVATION_DOWN)) {
+            Mapper.floorDown();
         }
-        else if (KeyboardInput.pressed[Keyboard.KEY_E]) {
-            if (Mapper.y<15-1) {
-                Mapper.y++;
-            }
-            if (Mapper.y==0) {
-                HouseCalc.groundsList.setModel(DataLoader.grounds);
-                HouseCalc.groundsList.setSelectedIndex(0);
-            }
-            floorLabel.setText("Floor "+(Mapper.y+1));
+        else if (Keybindings.pressed(Keybindings.UP_ELEVATION_UP)) {
+            Mapper.floorUp();
         }
         
         if (MouseInput.pressed.middle) {
@@ -132,17 +117,17 @@ public class UpCamera {
             MouseInput.setMouseGrabbed(false);
         }
         
-        if (KeyboardInput.hold[Keyboard.KEY_W]) {
+        if (Keybindings.hold(Keybindings.UP_MOVE_UP)) {
             y+=keyboardFraction;
         }
-        if (KeyboardInput.hold[Keyboard.KEY_S]) {
+        if (Keybindings.hold(Keybindings.UP_MOVE_DOWN)) {
             y-=keyboardFraction;
         }
         
-        if (KeyboardInput.hold[Keyboard.KEY_D]) {
+        if (Keybindings.hold(Keybindings.UP_MOVE_RIGHT)) {
             x+=keyboardFraction;
         }
-        if (KeyboardInput.hold[Keyboard.KEY_A]) {
+        if (Keybindings.hold(Keybindings.UP_MOVE_LEFT)) {
             x-=keyboardFraction;
         }
         
@@ -153,11 +138,11 @@ public class UpCamera {
             x=0;
         }
         
-        if (y>4*(Mapper.width-scale)) {
-            y=4*(Mapper.width-scale);
+        if (y>4*(Mapper.height-scale)) {
+            y=4*(Mapper.height-scale);
         }
-        if (x>4*(Mapper.height-scale)) {
-            x=4*(Mapper.height-scale);
+        if (x>4*(Mapper.width-scale)) {
+            x=4*(Mapper.width-scale);
         }
     }
     

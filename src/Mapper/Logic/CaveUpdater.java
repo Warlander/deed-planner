@@ -2,22 +2,21 @@ package Mapper.Logic;
 
 import Form.DrawMode;
 import Form.HouseCalc;
-import Form.SaveWindow;
 import Lib.Graphics.Ground;
 import Mapper.Data.D;
 import Mapper.Mapper;
-import Mapper.MouseInput;
+import Mapper.Input.MouseInput;
 import Mapper.UpCamera;
 import org.lwjgl.opengl.Display;
 
-public class CaveUpdater {
+public final class CaveUpdater {
     
     static void update() {
         if (MouseInput.hold.left ^ MouseInput.hold.right) {
             float tileScaler = (float)Display.getWidth()/(float)Display.getHeight();
             float tileSize = (float)Display.getHeight()/UpCamera.scale/4;
-            int tileX = (int) ((MouseInput.x+UpCamera.y*tileSize)/((float)Display.getWidth()/UpCamera.scale/tileScaler));
-            int tileY = (int) ((MouseInput.y+UpCamera.x*tileSize)/((float)Display.getHeight()/UpCamera.scale));
+            int tileX = (int) ((MouseInput.x+UpCamera.x*tileSize)/((float)Display.getWidth()/UpCamera.scale/tileScaler));
+            int tileY = (int) ((MouseInput.y+UpCamera.y*tileSize)/((float)Display.getHeight()/UpCamera.scale));
             
             switch (HouseCalc.drawMode) {
                 case pencil:

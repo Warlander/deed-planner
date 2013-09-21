@@ -2,16 +2,15 @@ package Mapper.Logic;
 
 import Form.DrawMode;
 import Form.HouseCalc;
-import Form.SaveWindow;
 import Lib.Graphics.Ground;
-import Lib.Object.Writ;
+import Lib.Entities.Writ;
 import Mapper.Data.D;
 import Mapper.Mapper;
-import Mapper.MouseInput;
+import Mapper.Input.MouseInput;
 import Mapper.UpCamera;
 import org.lwjgl.opengl.Display;
 
-public class GroundUpdater {
+public final class GroundUpdater {
     
     static void update() {
         if (MouseInput.hold.left ^ MouseInput.hold.right) {

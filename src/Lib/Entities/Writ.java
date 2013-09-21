@@ -1,19 +1,31 @@
-package Form;
+package Lib.Entities;
 
 import Lib.Graphics.Ground;
-import Lib.Object.Data;
-import Lib.Object.Writ;
-import java.util.ArrayList;
 import Mapper.Mapper;
+import java.util.ArrayList;
 
-public class WritComponents {
+public class Writ {
     
-    public ArrayList<Data> data;
+    public ArrayList<Ground> tiles;
+    public String name;
     
-    public WritComponents(Writ writ) {
-        data = new ArrayList<>();
+    public Writ(String name) {
+        this();
+        this.name = name;
+    }
+    
+    public Writ() {
+        tiles = new ArrayList<>();
+    }
+    
+    public String toString() {
+        return name;
+    }
+    
+    public ArrayList<Data> getAllData() {
+        ArrayList<Data> data = new ArrayList<>();
         
-        for (Ground g : writ.tiles) {
+        for (Ground g : tiles) {
             for (int y=0; y<15; y++) {
                 if (Mapper.tiles[g.x+1][y][g.y]!=null) {
                     data.add(Mapper.tiles[g.x+1][y][g.y]);
@@ -32,6 +44,8 @@ public class WritComponents {
                 }
             }
         }
+        
+        return data;
     }
     
 }

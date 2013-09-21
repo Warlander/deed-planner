@@ -1,6 +1,6 @@
 package Form;
 
-import Lib.Object.Label;
+import Lib.Entities.Label;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import javax.swing.DefaultComboBoxModel;
@@ -170,7 +170,7 @@ public class LabelWindow extends javax.swing.JFrame {
         }
         
         boolean cave = false;
-        if (Mapper.Mapper.y==-1) {
+        if (Mapper.Mapper.getFloor()==-1) {
             cave = true;
         }
         Color c = new Color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());

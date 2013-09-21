@@ -1,6 +1,7 @@
 package Lib.Graphics;
 
 import Form.HouseCalc;
+import Lib.Files.Properties;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
@@ -49,8 +50,14 @@ public class GLInit {
             }
             System.out.println("Failed to create display!");
             System.err.println("Failed to create display!");
+            if (anti==0) {
+                System.err.println("DISPLAY CREATION FAILED");
+                System.exit(-1);
+            }
             System.out.println("Another try with lower antialiasing: "+anti+" samples");
             System.err.println("Another try with lower antyaliasing: "+anti+" samples");
+            Properties.setProperty("antialiasing", anti);
+            Properties.saveProperties();
             initDisplay(anti);
         }
     }
@@ -64,6 +71,9 @@ public class GLInit {
         
         GL11.glEnable(GL11.GL_BLEND);
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        
+        GL11.glEnable(GL11.GL_ALPHA_TEST);
+        GL11.glAlphaFunc(GL11.GL_GREATER, 0.1f);
         
         GL11.glViewport(0, 0, HouseCalc.programFrame.getWidth(), HouseCalc.programFrame.getHeight());
         GL11.glMatrixMode(GL11.GL_PROJECTION);

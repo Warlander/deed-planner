@@ -1,12 +1,12 @@
 package Mapper.Logic;
 
-import Lib.Object.Structure;
+import Lib.Entities.Structure;
 import Mapper.Mapper;
-import Mapper.MouseInput;
+import Mapper.Input.MouseInput;
 import Mapper.UpCamera;
 import org.lwjgl.opengl.Display;
 
-public class StructureUpdater {
+public final class StructureUpdater {
     
     private static Structure currStruct;
     private static float xPos;
@@ -21,14 +21,14 @@ public class StructureUpdater {
         
         if (MouseInput.pressed.left ^ MouseInput.pressed.right) {
             if (tileX<2 || tileY<1 || tileX>Mapper.width*4-1 || tileY>Mapper.height*4-1) {}
-            else if (Mapper.deleting && MouseInput.pressed.left) Mapper.objects[tileX][Mapper.y][tileY]=null;
+            else if (Mapper.deleting && MouseInput.pressed.left) Mapper.objects[tileX][Mapper.getFloor()][tileY]=null;
             else if (MouseInput.pressed.left) {
                 currStruct = Mapper.sData.copy();
-                Mapper.objects[tileX][Mapper.y][tileY]=currStruct;
+                Mapper.objects[tileX][Mapper.getFloor()][tileY]=currStruct;
                 xPos = MouseInput.x;
                 yPos = MouseInput.y;
             }
-            else if (MouseInput.pressed.right) Mapper.objects[tileX][Mapper.y][tileY]=null;
+            else if (MouseInput.pressed.right) Mapper.objects[tileX][Mapper.getFloor()][tileY]=null;
         }
         else if (MouseInput.released.left ^ MouseInput.released.right) {
             currStruct = null;
@@ -37,7 +37,7 @@ public class StructureUpdater {
             if (currStruct!=null) {
                 float deltaY = MouseInput.y - yPos;
                 float deltaX = MouseInput.x - xPos;
-                currStruct.rotation = -(int)((Math.atan2(deltaY, deltaX)+Math.PI/2)*180/Math.PI);
+                currStruct.rotation = -(int)((Math.atan2(deltaX, deltaY)+Math.PI/2)*180/Math.PI);
             }
         }
     }

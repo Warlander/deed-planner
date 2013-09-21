@@ -1,7 +1,9 @@
-package Lib.Object;
+package Lib.Entities;
 
 import Form.HouseCalc;
 import Lib.Graphics.Tex;
+import Lib.Object.Materials;
+import Lib.Object.ObjectData;
 import Mapper.Mapper;
 import org.lwjgl.opengl.GL11;
 
@@ -39,7 +41,9 @@ public class Structure {
     }
     
     public void render(int sx, int sy, int sz) {
-        if (Mapper.fpsView || ((sz-Mapper.y)<=0 && (sz-Mapper.y)>-3)) {
+        if (Mapper.fpsView || ((sy-Mapper.getFloor())<=0 && (sy-Mapper.getFloor())>-3)) {
+            texture.use();
+            
             int mapX = (int)(sx/4f);
             int mapY = (int)(sz/4f);
             float xRatio = (sx%4f)/4f;
@@ -58,12 +62,11 @@ public class Structure {
                 GL11.glRotatef(90, 1, 0, 0);
                 GL11.glRotatef(90, 0, 0, 1);
                 GL11.glRotatef(rotation, 0, 0, 1);
-                GL11.glBindTexture(GL11.GL_TEXTURE_2D, texture.ID);
                 if (!Mapper.fpsView) {
                     double showR = 0;
                     double showG = 0;
                     double showB = 0;
-                    switch (sz-Mapper.y) {
+                    switch (sy-Mapper.getFloor()) {
                         case 0:
                             showR = rPaint;
                             showG = gPaint;

@@ -2,10 +2,9 @@ package Form;
 
 import Lib.Files.Properties;
 import Lib.Graphics.Ground;
-import Lib.Object.Data;
-import Lib.Object.DataLoader;
-import Lib.Object.Structure;
-import Lib.Object.Writ;
+import Lib.Entities.Data;
+import Lib.Entities.Structure;
+import Lib.Entities.Writ;
 import Lib.Utils.WebTools;
 import Mapper.Data.D;
 import Mapper.FPPCamera;
@@ -31,7 +30,7 @@ import javax.swing.JScrollPane;
 import org.lwjgl.util.Point;
 
 public class HouseCalc extends javax.swing.JFrame {
-
+    
     public static String mapStr=null;
     
     private static boolean error = false;
@@ -58,8 +57,6 @@ public class HouseCalc extends javax.swing.JFrame {
     private boolean checkVersion = true;
     
     public HouseCalc() {
-        
-        System.setProperty("Dsun.java2d.opengl", "true");
         getProperties();
         BufferedReader reader=null;
         BufferedReader webReader=null;
@@ -130,8 +127,7 @@ public class HouseCalc extends javax.swing.JFrame {
         writCreatorPane.setVisible(false);
         System.out.println("Mapper form initialized");
         System.out.println("Initializing mapper core");
-        mapper = new Mapper();
-        mapper.run();
+        Mapper.run();
         System.out.println("Mapper OpenGL window started");
         try {
             reader.close();
@@ -335,7 +331,7 @@ public class HouseCalc extends javax.swing.JFrame {
 
             elevationList.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
             elevationList.setModel(new javax.swing.AbstractListModel() {
-                String[] strings = { "Increase/decrease height", "Increase/decrease area height", "Set height", "Select height", "Reset height", "Smooth height", "Level area" };
+                String[] strings = { "Increase/decrease height", "Increase/decrease area height", "Set height", "Select height", "Reset height", "Smooth height", "Level area", "Edit slope" };
                 public int getSize() { return strings.length; }
                 public Object getElementAt(int i) { return strings[i]; }
             });
@@ -861,7 +857,7 @@ public class HouseCalc extends javax.swing.JFrame {
                         .addComponent(floorDown, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(floorLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGap(140, 140, 140)
-                    .addComponent(contextPane)
+                    .addComponent(contextPane, javax.swing.GroupLayout.DEFAULT_SIZE, 381, Short.MAX_VALUE)
                     .addGap(0, 0, 0))
                 .addGroup(interfacePaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(interfacePaneLayout.createSequentialGroup()
@@ -1293,7 +1289,7 @@ public class HouseCalc extends javax.swing.JFrame {
         Mapper.currType=Lib.Object.Type.ground;
         if (groundsList.getSelectedValue() instanceof Ground) {
             Mapper.deleting=false;
-            if (Mapper.y>=0) {
+            if (Mapper.getFloor()>=0) {
                 Mapper.gData = (Ground)groundsList.getSelectedValue();
             }
             else {
@@ -1354,26 +1350,12 @@ public class HouseCalc extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void floorDownActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_floorDownActionPerformed
-        if (Mapper.y>=0) {
-            Mapper.y--;
-        }
-        if (Mapper.y==-1) {
-            HouseCalc.groundsList.setModel(DataLoader.caveGrounds);
-            HouseCalc.groundsList.setSelectedIndex(0);
-        }
-        floorLabel.setText("Floor "+(Mapper.y+1));
+        Mapper.floorDown();
         programFrame.requestFocus();
     }//GEN-LAST:event_floorDownActionPerformed
 
     private void floorUpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_floorUpActionPerformed
-        if (Mapper.y<15-1) {
-            Mapper.y++;
-        }
-        if (Mapper.y==0) {
-            HouseCalc.groundsList.setModel(DataLoader.grounds);
-            HouseCalc.groundsList.setSelectedIndex(0);
-        }
-        floorLabel.setText("Floor "+(Mapper.y+1));
+        Mapper.floorUp();
         programFrame.requestFocus();
     }//GEN-LAST:event_floorUpActionPerformed
 

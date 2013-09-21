@@ -1,7 +1,7 @@
 package Form;
 
 import Lib.Graphics.Ground;
-import Lib.Object.Data;
+import Lib.Entities.Data;
 import Mapper.Mapper;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.util.Point;
@@ -62,7 +62,7 @@ public class StatusBar extends javax.swing.JPanel {
             else {
                 objectName.setVisible(false);
             }
-            if (point!=null && !Mapper.fpsView) {
+            if (point!=null && !Mapper.fpsView && point.getX()>0 && point.getX()<Mapper.width  && point.getY()>0 && point.getY()<Mapper.height) {
                 elevationShow.setText("Elevation: "+(int)Mapper.heightmap[point.getX()][point.getY()]);
                 elevationShow.setVisible(true);
                 HouseCalc.centerHeight.setText(Integer.toString((int)Mapper.heightmap[point.getX()][point.getY()]));

@@ -1,21 +1,28 @@
 package Mapper;
 
+import Mapper.Input.MouseInput;
+import Mapper.Input.KeyboardInput;
 import Form.HouseCalc;
+import static Form.HouseCalc.floorLabel;
 import Form.LoadWindow;
+import static Form.SaveWindow.saveToFile;
 import Form.StatusBar;
 import Lib.Files.Properties;
 import Lib.Graphics.GLInit;
 import Lib.Graphics.Ground;
-import Lib.Object.Data;
+import Lib.Entities.Data;
 import Lib.Object.DataLoader;
-import Lib.Object.Label;
+import Lib.Entities.Label;
 import Lib.Object.Rotation;
-import Lib.Object.Structure;
+import Lib.Entities.Structure;
 import Lib.Object.Type;
-import Lib.Object.Writ;
+import Lib.Entities.Writ;
+import Lib.Files.FileManager;
+import Lib.Utils.Repeater;
 import Lib.Utils.Screenshot;
 import Mapper.Data.D;
 import Mapper.Graphics.MiscRenderer;
+import Mapper.Input.Keybindings;
 import Mapper.Logic.MapUpdater;
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -23,17 +30,18 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.lwjgl.LWJGLException;
-import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
-public class Mapper {
+public final class Mapper {
     
-    private int tickDelay=0;
+    private static final String slash = System.getProperty("file.separator");
+    
+    private static int tickDelay=0;
     public static double tick = 0;
-    private boolean tickUp = true;
+    private static boolean tickUp = true;
     
-    private boolean reset=false;
+    private static boolean reset=false;
     
     public static Ground gData=null;
     public static Writ wData=null;
@@ -44,7 +52,7 @@ public class Mapper {
     public static boolean deleting=false;
     public static Type currType=null;
     
-    private boolean resizeRequested = false;
+    private static boolean resizeRequested = false;
     public static boolean fpsView = false;
     
     public static int width = 25;
@@ -63,18 +71,24 @@ public class Mapper {
     public static Data[][][] bordersx=new Data[25][15][25];
     public static Data[][][] bordersy=new Data[25][15][25];
     
-    public static int y = 0;
+    private static Repeater autosave;
     
-    public Mapper() {}
+    private static long previousNano = System.nanoTime();
+    private static int fps = 0;
+    private static long fpsToReset = 1000000000;
     
-    public void run() {
+    private static int y = 0;
+    
+    private Mapper() {}
+    
+    public static void run() {
         Thread engine = new Thread() {
             public void run() {
                 if (Properties.getProperty("antialiasing")!=null) {
                     GLInit.initDisplay((int)((float)Properties.getProperty("antialiasing")));
                 }
                 else {
-                    GLInit.initDisplay(8);
+                    GLInit.initDisplay(4);
                 }
                 GLInit.initOpenGL();
                 System.out.println("Initializing program rendering engine");
@@ -95,6 +109,16 @@ public class Mapper {
                     Logger.getLogger(Mapper.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 System.out.println("Mapper core initialized");
+                
+                autosave = new Repeater(300000) {
+                    
+                    protected void action() {
+                        saveToFile(FileManager.getFile("Saves"+slash+"Autosave"+".MAP"));
+                        System.out.println("Map autosaved!");
+                    }
+                    
+                };
+                
                 System.out.println("Initializing program loop");
                 loop();
             }
@@ -102,11 +126,7 @@ public class Mapper {
         engine.start();
     }
     
-    long previousNano = System.nanoTime();
-    int fps = 0;
-    long fpsToReset = 1000000000;
-    
-    private void loop() {
+    private static void loop() {
         while (true) {
             GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
             resize();
@@ -126,6 +146,7 @@ public class Mapper {
                 fps=0;
             }
             StatusBar.tipLabel1.tick();
+            autosave.update();
             
             if (reset) {
                 try {
@@ -138,7 +159,7 @@ public class Mapper {
         }
     }
     
-    private void logic() {
+    private static void logic() {
         if (HouseCalc.mapStr!=null) {
             try {
                 BufferedReader read = new BufferedReader(new FileReader(HouseCalc.mapStr));
@@ -188,7 +209,7 @@ public class Mapper {
         }
     }
     
-    private void draw() {
+    private static void draw() {
         if (fpsView) {
             FPPCamera.set();
         }
@@ -203,7 +224,12 @@ public class Mapper {
                 for (int i3=0; i3<15; i3++) {
                     if (i>=0 && i<width && i2>=0 && i2<height) {
                         if (bordersy[i][i3][i2]!=null) {
-                            bordersy[i][i3][i2].render(i, i3, i2, Rotation.vertical);
+                            try {
+                                bordersy[i][i3][i2].render(i, i3, i2, Rotation.vertical);
+                            } catch (ArrayIndexOutOfBoundsException ex) {
+                                System.out.println(i+" "+i3+" "+i2);
+                            }
+                            
                         }
                     }
                 }
@@ -251,20 +277,46 @@ public class Mapper {
             }
         }
         
-        if (KeyboardInput.pressed[Keyboard.KEY_F11]) {
+        if (Keybindings.pressed(Keybindings.OTHER_SCREENSHOT)) {
             Screenshot.takeScreenshot();
         }
     }
     
-    public void resizeRequest() {
+    public static void resizeRequest() {
         resizeRequested=true;
     }
     
-    private void resize() {
+    private static void resize() {
         if (resizeRequested) {
             GLInit.refit();
             resizeRequested=false;
         }
+    }
+    
+    public static int getFloor() {
+        return Mapper.y;
+    }
+    
+    public static void floorUp() {
+        if (Mapper.y<15-1) {
+            Mapper.y++;
+        }
+        if (Mapper.y==0) {
+            HouseCalc.groundsList.setModel(DataLoader.grounds);
+            HouseCalc.groundsList.setSelectedIndex(0);
+        }
+        floorLabel.setText("Floor "+(Mapper.y+1));
+    }
+    
+    public static void floorDown() {
+        if (Mapper.y>=0) {
+            Mapper.y--;
+        }
+        if (Mapper.y==-1) {
+            HouseCalc.groundsList.setModel(DataLoader.caveGrounds);
+            HouseCalc.groundsList.setSelectedIndex(0);
+        }
+        floorLabel.setText("Floor "+(Mapper.y+1));
     }
     
 }

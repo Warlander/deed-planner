@@ -1,6 +1,6 @@
 package Lib.Graphics;
 
-import Lib.Object.Writ;
+import Lib.Entities.Writ;
 
 public class Ground {
     

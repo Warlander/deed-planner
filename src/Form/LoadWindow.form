@@ -81,6 +81,9 @@
         </Property>
         <Property name="text" type="java.lang.String" value="Enter code"/>
       </Properties>
+      <Events>
+        <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="codeFieldMouseClicked"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="codeButton">
       <Properties>
@@ -111,6 +114,9 @@
         </Property>
         <Property name="text" type="java.lang.String" value="Enter URL"/>
       </Properties>
+      <Events>
+        <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="urlFieldMouseClicked"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="fileButton">
       <Properties>

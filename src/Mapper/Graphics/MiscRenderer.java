@@ -29,7 +29,7 @@ public class MiscRenderer {
             renderGround();
             GL11.glColor3f(1, 1, 1);
             if (!fpsView && UpCamera.showGrid) {
-                if (Mapper.y>=0) {
+                if (Mapper.getFloor()>=0) {
                     renderGrid();
                 }
             }
@@ -46,8 +46,8 @@ public class MiscRenderer {
     }
     
     private static void renderGround() {
-        if (!fpsView && Mapper.y<3) {
-            switch (Mapper.y) {
+        if (!fpsView && Mapper.getFloor()<3) {
+            switch (Mapper.getFloor()) {
                 case -1: case 0: 
                     GL11.glColor3f(1, 1, 1);
                     break;
@@ -66,9 +66,37 @@ public class MiscRenderer {
             return;
         }
         
+        if (!fpsView && Mapper.getFloor()<3) {
+            switch (Mapper.getFloor()) {
+                case 0: 
+                    GL11.glColor4f(1, 1, 1, 1);
+                    break;
+                case 1:
+                    GL11.glColor4f(1-0.4f, 1-0.4f, 1-0.4f, 1);
+                    break;
+                case 2:
+                    GL11.glColor4f(1-0.75f, 1-0.75f, 1-0.75f, 1);
+                    break;
+            }
+        }
+        else if (fpsView) {
+            GL11.glColor4f(1, 1, 1, 1);
+        }
+
+        // setup light
+        GL11.glEnable(GL11.GL_LIGHTING);
+        GL11.glEnable(GL11.GL_LIGHT0);  
+        GL11.glLightModeli(GL11.GL_LIGHT_MODEL_LOCAL_VIEWER, GL11.GL_TRUE);
+        GL11.glEnable(GL11.GL_COLOR_MATERIAL);
+        GL11.glColorMaterial(GL11.GL_FRONT_AND_BACK, GL11.GL_AMBIENT_AND_DIFFUSE);
+        // distant point light with static attenuation, at the position of background "sun"
+        // GL11.glLight(GL11.GL_LIGHT0,GL11.GL_POSITION, floatBuffer(0,25000000,50000000,1));
+        // distant point light with static attenuation, at position directly above
+        GL11.glLight(GL11.GL_LIGHT0,GL11.GL_POSITION, floatBuffer(0,50000000,0,1));
+        
         for (int i=Camera.visibleDownX; i<Camera.visibleUpX; i++) {
             for (int i2=Camera.visibleDownY; i2<Camera.visibleUpY; i2++) {
-                if (Mapper.y>=0) {
+                if (Mapper.getFloor()>=0 || Mapper.fpsView) {
                     renderGroundTile(Mapper.ground, i, i2);
                 }
                 else {
@@ -76,6 +104,10 @@ public class MiscRenderer {
                 }
             }
         }
+        
+        GL11.glDisable(GL11.GL_COLOR_MATERIAL);
+        GL11.glDisable(GL11.GL_LIGHT0);
+        GL11.glDisable(GL11.GL_LIGHTING);
     }
     
     private static FloatBuffer floatBuffer(float a, float b, float c, float d) {
@@ -105,37 +137,7 @@ public class MiscRenderer {
             return;
         }
         
-        if (!fpsView && Mapper.y<3) {
-            switch (Mapper.y) {
-                case 0: 
-                    GL11.glColor4f(1, 1, 1, 1);
-                    break;
-                case 1:
-                    GL11.glColor4f(1-0.4f, 1-0.4f, 1-0.4f, 1);
-                    break;
-                case 2:
-                    GL11.glColor4f(1-0.75f, 1-0.75f, 1-0.75f, 1);
-                    break;
-            }
-        }
-        else if (fpsView) {
-            GL11.glColor4f(1, 1, 1, 1);
-        }
-        else {
-            return;
-        }
-        
-        // setup light
-        GL11.glEnable(GL11.GL_LIGHTING);
-        GL11.glEnable(GL11.GL_LIGHT0);  
-        GL11.glLightModeli(GL11.GL_LIGHT_MODEL_LOCAL_VIEWER, GL11.GL_TRUE);
-        GL11.glEnable(GL11.GL_COLOR_MATERIAL);
-        GL11.glColorMaterial(GL11.GL_FRONT_AND_BACK, GL11.GL_AMBIENT_AND_DIFFUSE);
-        // distant point light with static attenuation, at the position of background "sun"
-        // GL11.glLight(GL11.GL_LIGHT0,GL11.GL_POSITION, floatBuffer(0,25000000,50000000,1));
-        // distant point light with static attenuation, at position directly above
-        GL11.glLight(GL11.GL_LIGHT0,GL11.GL_POSITION, floatBuffer(0,50000000,0,1));
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, source[x][y].tex.ID);
+        source[x][y].tex.use();
         
         // create tile corner vertices
         Vector3f TL = new Vector3f( (float)(x*4), Mapper.heightmap[x][y+1]/(35f/3f), (float)(y*4+4));
@@ -190,9 +192,6 @@ public class MiscRenderer {
             GL11.glTexCoord2f(0, 1);
             GL11.glVertex3f(BL.x, BL.y, BL.z);
         GL11.glEnd();
-        GL11.glDisable(GL11.GL_COLOR_MATERIAL);
-        GL11.glDisable(GL11.GL_LIGHT0);
-        GL11.glDisable(GL11.GL_LIGHTING);
     }
     
     private static void renderGrid() {
@@ -298,97 +297,97 @@ public class MiscRenderer {
         int listID = GL11.glGenLists(1);
         
         GL11.glNewList(listID, GL11.GL_COMPILE);
-            GL11.glBindTexture(GL11.GL_TEXTURE_2D, D.skybox.ID);
+            D.skybox.use();
             GL11.glBegin(GL11.GL_TRIANGLES);
                 //up
                 GL11.glTexCoord2f(0.25f, 0);
-                GL11.glVertex3d(-150, 149,-150);
+                GL11.glVertex3d(-250, 249,-250);
                 GL11.glTexCoord2f(0.25f, 1f/3f);
-                GL11.glVertex3d( 150, 149,-150);
+                GL11.glVertex3d( 250, 249,-250);
                 GL11.glTexCoord2f(0.5f, 1f/3f);
-                GL11.glVertex3d( 150, 149, 150);
+                GL11.glVertex3d( 250, 249, 250);
 
                 GL11.glTexCoord2f(0.25f, 0);
-                GL11.glVertex3d(-150, 149,-150);
+                GL11.glVertex3d(-250, 249,-250);
                 GL11.glTexCoord2f(0.5f, 0);
-                GL11.glVertex3d(-150, 149, 150);
+                GL11.glVertex3d(-250, 249, 250);
                 GL11.glTexCoord2f(0.5f, 1f/3f);
-                GL11.glVertex3d( 150, 149, 150);
+                GL11.glVertex3d( 250, 249, 250);
 
                 //down
                 GL11.glTexCoord2f(0.25f, 2f/3f);
-                GL11.glVertex3d(-150,-149,-150);
+                GL11.glVertex3d(-250,-249,-250);
                 GL11.glTexCoord2f(0.25f, 1);
-                GL11.glVertex3d( 150,-149,-150);
+                GL11.glVertex3d( 250,-249,-250);
                 GL11.glTexCoord2f(0.5f, 1);
-                GL11.glVertex3d( 150,-149, 150);
+                GL11.glVertex3d( 250,-249, 250);
 
                 GL11.glTexCoord2f(0.5f, 1);
-                GL11.glVertex3d(-150,-149,-150);
+                GL11.glVertex3d(-250,-249,-250);
                 GL11.glTexCoord2f(0.5f, 2f/3f);
-                GL11.glVertex3d(-150,-149, 150);
+                GL11.glVertex3d(-250,-249, 250);
                 GL11.glTexCoord2f(0.25f, 2f/3f);
-                GL11.glVertex3d( 150,-149, 150);
+                GL11.glVertex3d( 250,-249, 250);
 
                 //front
                 GL11.glTexCoord2f(0.25f, 2f/3f);
-                GL11.glVertex3d( 149,-150,-150);
+                GL11.glVertex3d( 249,-250,-250);
                 GL11.glTexCoord2f(0.5f, 2f/3f);
-                GL11.glVertex3d( 149,-150, 150);
+                GL11.glVertex3d( 249,-250, 250);
                 GL11.glTexCoord2f(0.5f, 1f/3f);
-                GL11.glVertex3d( 149, 150, 150);
+                GL11.glVertex3d( 249, 250, 250);
 
                 GL11.glTexCoord2f(0.25f, 2f/3f);
-                GL11.glVertex3d( 149,-150,-150);
+                GL11.glVertex3d( 249,-250,-250);
                 GL11.glTexCoord2f(0.25f, 1f/3f);
-                GL11.glVertex3d( 149, 150,-150);
+                GL11.glVertex3d( 249, 250,-250);
                 GL11.glTexCoord2f(0.5f, 1f/3f);
-                GL11.glVertex3d( 149, 150, 150);
+                GL11.glVertex3d( 249, 250, 250);
 
                 //back
                 GL11.glTexCoord2f(1, 2f/3f);
-                GL11.glVertex3d(-149,-150,-150);
+                GL11.glVertex3d(-249,-250,-250);
                 GL11.glTexCoord2f(0.75f, 2f/3f);
-                GL11.glVertex3d(-149,-150, 150);
+                GL11.glVertex3d(-249,-250, 250);
                 GL11.glTexCoord2f(0.75f, 1f/3f);
-                GL11.glVertex3d(-149, 150, 150);
+                GL11.glVertex3d(-249, 250, 250);
 
                 GL11.glTexCoord2f(1, 2f/3f);
-                GL11.glVertex3d(-149,-150,-150);
+                GL11.glVertex3d(-249,-250,-250);
                 GL11.glTexCoord2f(1, 1f/3f);
-                GL11.glVertex3d(-149, 150,-150);
+                GL11.glVertex3d(-249, 250,-250);
                 GL11.glTexCoord2f(0.75f, 1f/3f);
-                GL11.glVertex3d(-149, 150, 150);
+                GL11.glVertex3d(-249, 250, 250);
 
                 //left
                 GL11.glTexCoord2f(0, 2f/3f);
-                GL11.glVertex3d(-150,-150,-149);
+                GL11.glVertex3d(-250,-250,-249);
                 GL11.glTexCoord2f(0.25f, 2f/3f);
-                GL11.glVertex3d( 150,-150,-149);
+                GL11.glVertex3d( 250,-250,-249);
                 GL11.glTexCoord2f(0.25f, 1f/3f);
-                GL11.glVertex3d( 150, 150,-149);
+                GL11.glVertex3d( 250, 250,-249);
 
                 GL11.glTexCoord2f(0, 2f/3f);
-                GL11.glVertex3d(-150,-150,-149);
+                GL11.glVertex3d(-250,-250,-249);
                 GL11.glTexCoord2f(0f, 1f/3f);
-                GL11.glVertex3d(-150, 150,-149);
+                GL11.glVertex3d(-250, 250,-249);
                 GL11.glTexCoord2f(0.25f, 1f/3f);
-                GL11.glVertex3d( 150, 150,-149);
+                GL11.glVertex3d( 250, 250,-249);
 
                 //right
                 GL11.glTexCoord2f(0.75f, 2f/3f);
-                GL11.glVertex3d(-150,-150, 149);
+                GL11.glVertex3d(-250,-250, 249);
                 GL11.glTexCoord2f(0.5f, 2f/3f);
-                GL11.glVertex3d( 150,-150, 149);
+                GL11.glVertex3d( 250,-250, 249);
                 GL11.glTexCoord2f(0.5f, 1f/3f);
-                GL11.glVertex3d( 150, 150, 149);
+                GL11.glVertex3d( 250, 250, 249);
 
                 GL11.glTexCoord2f(0.75f, 2f/3f);
-                GL11.glVertex3d(-150,-150, 149);
+                GL11.glVertex3d(-250,-250, 249);
                 GL11.glTexCoord2f(0.75f, 1f/3f);
-                GL11.glVertex3d(-150, 150, 149);
+                GL11.glVertex3d(-250, 250, 249);
                 GL11.glTexCoord2f(0.5f, 1f/3f);
-                GL11.glVertex3d( 150, 150, 149);
+                GL11.glVertex3d( 250, 250, 249);
             GL11.glEnd();
         GL11.glEndList();
         
@@ -397,8 +396,8 @@ public class MiscRenderer {
     //</editor-fold>
     
     private static void renderWater() {
-        if (!fpsView && Mapper.y<3) {
-            switch (Mapper.y) {
+        if (!fpsView && Mapper.getFloor()<3) {
+            switch (Mapper.getFloor()) {
                 case 0: 
                     GL11.glColor4f(1, 1, 1, 0.5f);
                     break;
@@ -417,7 +416,7 @@ public class MiscRenderer {
             return;
         }
         
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, D.water.ID);
+        D.water.use();
         for (int i=Camera.visibleDownX; i<Camera.visibleUpX; i++) {
             for (int i2=Camera.visibleDownY; i2<Camera.visibleUpY; i2++) {
                 GL11.glBegin(GL11.GL_TRIANGLES);

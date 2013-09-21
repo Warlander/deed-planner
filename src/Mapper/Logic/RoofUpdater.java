@@ -1,15 +1,15 @@
 package Mapper.Logic;
 
 import Form.HouseCalc;
-import Lib.Object.Data;
+import Lib.Entities.Data;
 import Lib.Object.Type;
 import Mapper.Data.D;
 import Mapper.Mapper;
-import Mapper.MouseInput;
+import Mapper.Input.MouseInput;
 import Mapper.UpCamera;
 import org.lwjgl.opengl.Display;
 
-public class RoofUpdater {
+public final class RoofUpdater {
     
     private RoofUpdater() {}
     
@@ -20,7 +20,7 @@ public class RoofUpdater {
         int tileY = (int) ((MouseInput.y+UpCamera.y*tileSize)/((float)Display.getHeight()/UpCamera.scale));
         
         if (MouseInput.hold.left ^ MouseInput.hold.right) {
-            if (Mapper.y==0) {
+            if (Mapper.getFloor()==0) {
                 return;
             }
             
@@ -33,9 +33,9 @@ public class RoofUpdater {
                     realY = tileY+i2;
                     if (realX<2 || realY<1 || realX>Mapper.width-2 || tileY>Mapper.height-1) {}
                     else if (Mapper.ground[realX-1][realY].writ==null) {}
-                    else if (Mapper.deleting) Mapper.tiles[realX][Mapper.y][realY]=null;
-                    else if (MouseInput.hold.left) Mapper.tiles[realX][Mapper.y][realY]=Mapper.data.copy();
-                    else if (MouseInput.hold.right) Mapper.tiles[realX][Mapper.y][realY]=null;
+                    else if (Mapper.deleting) Mapper.tiles[realX][Mapper.getFloor()][realY]=null;
+                    else if (MouseInput.hold.left) Mapper.tiles[realX][Mapper.getFloor()][realY]=Mapper.data.copy();
+                    else if (MouseInput.hold.right) Mapper.tiles[realX][Mapper.getFloor()][realY]=null;
                 }
             }
         }
@@ -43,7 +43,7 @@ public class RoofUpdater {
         roofsRefit();
         
         if (tileX<2 || tileY<1 || tileX>Mapper.width-2 || tileY>Mapper.height-1) {return;}
-        HouseCalc.statusBar.setData(Mapper.tiles[tileX][Mapper.y][tileY]);
+        HouseCalc.statusBar.setData(Mapper.tiles[tileX][Mapper.getFloor()][tileY]);
     }
     
     public static void roofsRefit() {
@@ -144,21 +144,6 @@ public class RoofUpdater {
                         else if ((val=allCheck(i, i2, i3, spineEndUp2))!=4) {
                             Mapper.tiles[i][i2][i3].object = D.spineEndUp;
                             Mapper.tiles[i][i2][i3].facing = val;
-                            switch (val) {
-                                case 0:
-                                    Mapper.tiles[i][i2][i3].modX = -1;
-                                    break;
-                                case 1:
-                                    Mapper.tiles[i][i2][i3].modZ = -1;
-                                    break;
-                                case 2:
-                                    Mapper.tiles[i][i2][i3].modX = -1;
-                                    break;
-                                case 3:
-                                    Mapper.tiles[i][i2][i3].modZ = -1;
-                                    break;
-                            }
-                            
                         }
                     }
                 }

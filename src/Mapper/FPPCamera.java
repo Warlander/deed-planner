@@ -1,16 +1,17 @@
 package Mapper;
 
+import Mapper.Input.MouseInput;
 import Form.HouseCalc;
 import Lib.Utils.MatrixTools;
+import Mapper.Input.Keybindings;
 import java.nio.FloatBuffer;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
 
-public class FPPCamera {
+public final class FPPCamera {
     
     public static boolean fixedHeight = false;
     
@@ -57,10 +58,10 @@ public class FPPCamera {
     
     public static void update() {
         float fraction = FPPCamera.fraction;
-        if (KeyboardInput.hold[Keyboard.KEY_LSHIFT]) {
+        if (Keybindings.hold(Keybindings.FPP_SPEED_MOD1)) {
             fraction*=shiftMod;
         }
-        else if (KeyboardInput.hold[Keyboard.KEY_LCONTROL]) {
+        else if (Keybindings.hold(Keybindings.FPP_SPEED_MOD2)) {
             fraction*=controlMod;
         }
         
@@ -69,10 +70,10 @@ public class FPPCamera {
         
         int currX = (int)xDivine;
         int currZ = (int)zDivine;
-        Camera.visibleDownX = currX-40;
-        Camera.visibleUpX = currX+40;
-        Camera.visibleDownY = -currZ-40;
-        Camera.visibleUpY = -currZ+40;
+        Camera.visibleDownX = currX-65;
+        Camera.visibleUpX = currX+65;
+        Camera.visibleDownY = -currZ-65;
+        Camera.visibleUpY = -currZ+65;
         
         if (MouseInput.pressed.left) {
             Mouse.setGrabbed(true);
@@ -96,49 +97,49 @@ public class FPPCamera {
             MouseInput.setMouseGrabbed(false);
         }
         
-        if (KeyboardInput.hold[Keyboard.KEY_D]) {
+        if (Keybindings.hold(Keybindings.FPP_MOVE_RIGHT)) {
             posx += (float)(Math.cos(anglex+Math.PI/2))*fraction;
             posz += (float)(Math.sin(anglex+Math.PI/2))*fraction;
         }
-        if (KeyboardInput.hold[Keyboard.KEY_A]) {
+        if (Keybindings.hold(Keybindings.FPP_MOVE_LEFT)) {
             posx += (float)(Math.cos(anglex-Math.PI/2))*fraction;
             posz += (float)(Math.sin(anglex-Math.PI/2))*fraction;
         }
-        if (KeyboardInput.hold[Keyboard.KEY_W]) {
+        if (Keybindings.hold(Keybindings.FPP_MOVE_UP)) {
             posx += dirx*fraction;
             posy += diry*fraction;
             posz += dirz*fraction;
         }
-        if (KeyboardInput.hold[Keyboard.KEY_S]) {
+        if (Keybindings.hold(Keybindings.FPP_MOVE_DOWN)) {
             posx -= dirx*fraction;
             posy -= diry*fraction;
             posz -= dirz*fraction;
         }
         
-        if (KeyboardInput.hold[Keyboard.KEY_Q] || KeyboardInput.hold[Keyboard.KEY_J]) {
+        if (Keybindings.hold(Keybindings.FPP_CAMERA_LEFT) || Keybindings.hold(Keybindings.FPP_CAMERA_LEFT_ALT)) {
             anglex -= 5*rotate;
         }
-        if (KeyboardInput.hold[Keyboard.KEY_E] || KeyboardInput.hold[Keyboard.KEY_L]) {
+        if (Keybindings.hold(Keybindings.FPP_CAMERA_RIGHT) || Keybindings.hold(Keybindings.FPP_CAMERA_RIGHT_ALT)) {
             anglex += 5*rotate;
         }
-        if (KeyboardInput.hold[Keyboard.KEY_T] || KeyboardInput.hold[Keyboard.KEY_I]) {
+        if (Keybindings.hold(Keybindings.FPP_CAMERA_UP) || Keybindings.hold(Keybindings.FPP_CAMERA_UP_ALT)) {
             angley += 5*rotate;
         }
-        if (KeyboardInput.hold[Keyboard.KEY_G] || KeyboardInput.hold[Keyboard.KEY_K]) {
+        if (Keybindings.hold(Keybindings.FPP_CAMERA_DOWN) || Keybindings.hold(Keybindings.FPP_CAMERA_DOWN_ALT)) {
             angley -= 5*rotate;
         }
         
         if (!fixedHeight) {
-            if (KeyboardInput.hold[Keyboard.KEY_R]) {
+            if (Keybindings.hold(Keybindings.FPP_ELEVATION_UP)) {
                 posy += fraction;
             }
-            else if (KeyboardInput.hold[Keyboard.KEY_F]) {
+            else if (Keybindings.hold(Keybindings.FPP_ELEVATION_DOWN)) {
                 posy -= fraction;
             }
         }
         
         if (fixedHeight) {
-            if (KeyboardInput.hold[Keyboard.KEY_LSHIFT]) {
+            if (Keybindings.hold(Keybindings.FPP_SPEED_MOD1)) {
                 if (MouseInput.scrollUp) {
                     stickedHeight+=3;
                 }
@@ -146,7 +147,7 @@ public class FPPCamera {
                     stickedHeight-=3;
                 }
             }
-            else if (KeyboardInput.hold[Keyboard.KEY_LCONTROL]) {
+            else if (Keybindings.hold(Keybindings.FPP_SPEED_MOD2)) {
                 if (MouseInput.scrollUp) {
                     stickedHeight+=0.3;
                 }
@@ -158,34 +159,34 @@ public class FPPCamera {
             if (posx<=4.1) {
                 posx=4.1;
             }
-            else if (posx>=Mapper.height*4-4.1) {
-                posx=Mapper.height*4-4.1;
+            else if (posx>=Mapper.width*4-4.1) {
+                posx=Mapper.width*4-4.1;
             }
             
-            if (posz<=4.1) {
-                posz=4.1;
+            if (posz>=-4.1) {
+                posz=-4.1;
             }
-            else if (posz>=Mapper.width*4-4.1) {
-                posz=Mapper.width*4-4.1;
+            else if (posz<=-(Mapper.height*4-4.1)) {
+                posz=-(Mapper.height*4-4.1);
             }
             
             double xRatio = (posx%4d)/4d;
-            double zRatio = (posz%4d)/4d;
+            double zRatio = (Math.abs(posz)%4d)/4d;
             
             xDivine = posx/4d;
             zDivine = posz/4d;
         
             currX = (int)xDivine;
-            currZ = (int)zDivine;
+            currZ = -(int)zDivine;
             
-            float v00 = Mapper.heightmap[currZ][currX]/35f*3f;
-            float v10 = Mapper.heightmap[currZ+1][currX]/35f*3f;
-            float v01 = Mapper.heightmap[currZ][currX+1]/35f*3f;
-            float v11 = Mapper.heightmap[currZ+1][currX+1]/35f*3f;
+            double v00 = Mapper.heightmap[currX][currZ]/35f*3f;
+            double v10 = Mapper.heightmap[currX+1][currZ]/35f*3f;
+            double v01 = Mapper.heightmap[currX][currZ+1]/35f*3f;
+            double v11 = Mapper.heightmap[currX+1][currZ+1]/35f*3f;
             
-            double intX0 = v00*(1d-zRatio)+v10*zRatio;
-            double intX1 = v01*(1d-zRatio)+v11*zRatio;
-            double intY = intX0*(1d-xRatio)+intX1*xRatio;
+            double intX0 = v00*(1d-xRatio)+v10*xRatio;
+            double intX1 = v01*(1d-xRatio)+v11*xRatio;
+            double intY = intX0*(1d-zRatio)+intX1*zRatio;
             
             double height=intY;
             height+=stickedHeight;
@@ -217,7 +218,7 @@ public class FPPCamera {
         GL11.glLoadIdentity();
         float width = HouseCalc.programFrame.getWidth();
         float height = HouseCalc.programFrame.getHeight();
-        GLU.gluPerspective(70, width/height, 0.1f, 260.0f);
+        GLU.gluPerspective(70, width/height, 0.1f, 600.0f);
         GL11.glMatrixMode(GL11.GL_MODELVIEW);
         GL11.glLoadIdentity();
         GLU.gluLookAt((float)posx, (float)posy, (float)posz, (float)posx+dirx, (float)posy+diry, (float)posz+dirz, 0, 1, 0);

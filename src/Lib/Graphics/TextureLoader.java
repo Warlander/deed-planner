@@ -23,7 +23,6 @@ public class TextureLoader {
         InputStream in = null;
         PNGDecoder dec = null;
         ByteBuffer buf = null;
-        Tex tex = new Tex();
         in = new FileInputStream(filename);
         try {
         dec = new PNGDecoder(in);
@@ -77,10 +76,7 @@ public class TextureLoader {
             GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
         }
 
-        tex.ID = texId;
-        tex.width = dec.getWidth();
-        tex.height = dec.getHeight();
-        return tex;
+        return new Tex(texId);
     }
     
 }

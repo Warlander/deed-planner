@@ -1,9 +1,9 @@
 package Form;
 
 import Lib.Graphics.Ground;
-import Lib.Object.Data;
-import Lib.Object.Label;
-import Lib.Object.Structure;
+import Lib.Entities.Data;
+import Lib.Entities.Label;
+import Lib.Entities.Structure;
 import Mapper.Data.D;
 import Mapper.Logic.HeightUpdater;
 import Mapper.Mapper;

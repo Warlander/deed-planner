@@ -38,7 +38,7 @@ public class Properties {
     
     private static HashMap<String, Object> properties = new HashMap<>();
     
-    private static String br = System.getProperty("line.separator");
+    private static final String br = System.getProperty("line.separator");
     
     public static void setProperty(String name, Object value) {
         properties.put(name, value);

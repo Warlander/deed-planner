@@ -1,4 +1,4 @@
-package Mapper;
+package Mapper.Input;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -45,7 +45,7 @@ public class MouseInput {
     
     private MouseInput() {}
     
-    static void update() {
+    public static void update() {
         x = Mouse.getX();
         y = Mouse.getY();
         left();

@@ -1,4 +1,4 @@
-package Mapper;
+package Mapper.Input;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -7,9 +7,9 @@ import org.lwjgl.input.Keyboard;
 
 public final class KeyboardInput {
     
-    public static final boolean[] pressed = new boolean[256];
-    public static final boolean[] hold = new boolean[256];
-    public static final boolean[] released = new boolean[256];
+    static final boolean[] pressed = new boolean[256];
+    static final boolean[] hold = new boolean[256];
+    static final boolean[] released = new boolean[256];
     
     static {
         try {
@@ -21,7 +21,7 @@ public final class KeyboardInput {
     
     private KeyboardInput() {}
     
-    static void update() {
+    public static void update() {
         for (int i=0; i<256; i++) {
             if (Keyboard.isKeyDown(i)) {
                 if (!pressed[i] && !hold[i]) {

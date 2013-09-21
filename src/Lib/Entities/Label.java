@@ -1,4 +1,4 @@
-package Lib.Object;
+package Lib.Entities;
 
 import Lib.Graphics.TrueTypeFont;
 import Lib.Utils.MatrixTools;

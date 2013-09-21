@@ -1,13 +1,12 @@
 package Mapper.Logic;
 
 import Form.HouseCalc;
-import Form.SaveWindow;
 import Mapper.Mapper;
-import Mapper.MouseInput;
+import Mapper.Input.MouseInput;
 import Mapper.UpCamera;
 import org.lwjgl.opengl.Display;
 
-public class WallUpdater {
+public final class WallUpdater {
     
     private static int lockedVal = 0;
     private static boolean lockX = false;
@@ -93,7 +92,7 @@ public class WallUpdater {
     }
     
     private static void verticalSelect(int tileX, int tileY) {
-        HouseCalc.statusBar.setData(Mapper.bordersy[tileX][Mapper.y][tileY]);
+        HouseCalc.statusBar.setData(Mapper.bordersy[tileX][Mapper.getFloor()][tileY]);
     }
     
     private static void verticalBorder(int tileX, int tileY) {
@@ -101,10 +100,10 @@ public class WallUpdater {
             tileX = lockedVal;
         }
         if (!Mapper.deleting) {
-            Mapper.bordersy[tileX][Mapper.y][tileY] = Mapper.data.copy();
+            Mapper.bordersy[tileX][Mapper.getFloor()][tileY] = Mapper.data.copy();
         }
         else {
-            Mapper.bordersy[tileX][Mapper.y][tileY] = null;
+            Mapper.bordersy[tileX][Mapper.getFloor()][tileY] = null;
         }
     }
     
@@ -112,11 +111,11 @@ public class WallUpdater {
         if (lockY) {
             tileX = lockedVal;
         }
-        Mapper.bordersy[tileX][Mapper.y][tileY] = null;
+        Mapper.bordersy[tileX][Mapper.getFloor()][tileY] = null;
     }
     
     private static void horizontalSelect(int tileX, int tileY) {
-        HouseCalc.statusBar.setData(Mapper.bordersx[tileX][Mapper.y][tileY]);
+        HouseCalc.statusBar.setData(Mapper.bordersx[tileX][Mapper.getFloor()][tileY]);
     }
     
     private static void horizontalBorder(int tileX, int tileY) {
@@ -124,10 +123,10 @@ public class WallUpdater {
             tileY = lockedVal;
         }
         if (!Mapper.deleting) {
-            Mapper.bordersx[tileX][Mapper.y][tileY] = Mapper.data.copy();
+            Mapper.bordersx[tileX][Mapper.getFloor()][tileY] = Mapper.data.copy();
         }
         else {
-            Mapper.bordersx[tileX][Mapper.y][tileY] = null;
+            Mapper.bordersx[tileX][Mapper.getFloor()][tileY] = null;
         }
     }
     
@@ -135,7 +134,7 @@ public class WallUpdater {
         if (lockX) {
             tileY = lockedVal;
         }
-        Mapper.bordersx[tileX][Mapper.y][tileY] = null;
+        Mapper.bordersx[tileX][Mapper.getFloor()][tileY] = null;
     }
     
 }

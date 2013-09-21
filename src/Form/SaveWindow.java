@@ -2,7 +2,7 @@ package Form;
 
 import Lib.Files.FileManager;
 import Lib.Graphics.Ground;
-import Lib.Object.Writ;
+import Lib.Entities.Writ;
 import Mapper.Data.D;
 import Mapper.Logic.WritUpdater;
 import Mapper.Mapper;
@@ -35,8 +35,6 @@ public class SaveWindow extends javax.swing.JFrame {
     
     DefaultListModel list;
     
-    private String save;
-    
     public SaveWindow() {
         initComponents();
         if (FileManager.fileExists("Saves")) {
@@ -52,10 +50,9 @@ public class SaveWindow extends javax.swing.JFrame {
         else {
             FileManager.createDirectory("Saves/");
         }
-        saveMaker();
     }
     
-    private void saveMaker() {
+    private static String saveMaker() {
         StringBuilder maps = new StringBuilder();
         maps.append("1.1|").append(endl);
         maps.append(Mapper.width).append(" ").append(Mapper.height).append(endl);
@@ -141,7 +138,7 @@ public class SaveWindow extends javax.swing.JFrame {
                 saveWrit(maps, w);
             }
         }
-        save = maps.toString();
+        return maps.toString();
     }
     
     public static void saveHeight(StringBuilder builder, int x, int y) {
@@ -168,35 +165,19 @@ public class SaveWindow extends javax.swing.JFrame {
      * 9. Rotation
      */
     public static void saveObject(StringBuilder builder, int x, int y, int z) {
-        try {
-            builder.append("O ").append(x).append(" ").append(y).append(" ").append(z).append(" ").append(Mapper.objects[x][y][z].shortName).append(" ").append(Mapper.objects[x][y][z].rPaint).append(" ").append(Mapper.objects[x][y][z].gPaint).append(" ").append(Mapper.objects[x][y][z].bPaint).append(" ").append(Mapper.objects[x][y][z].rotation).append(endl);
-        } catch (NullPointerException ex) {
-            builder.append("DO ").append(x).append(" ").append(y).append(" ").append(z).append(endl);
-        }
+        builder.append("O ").append(x).append(" ").append(y).append(" ").append(z).append(" ").append(Mapper.objects[x][y][z].shortName).append(" ").append(Mapper.objects[x][y][z].rPaint).append(" ").append(Mapper.objects[x][y][z].gPaint).append(" ").append(Mapper.objects[x][y][z].bPaint).append(" ").append(Mapper.objects[x][y][z].rotation).append(endl);
     }
     
     public static void saveTile(StringBuilder builder, int x, int y, int z) {
-        try {
-            builder.append("T ").append(x).append(" ").append(y).append(" ").append(z).append(" ").append(Mapper.tiles[x][y][z].shortName).append(endl);
-        } catch (NullPointerException ex) {
-            builder.append("DT ").append(x).append(" ").append(y).append(" ").append(z).append(endl);
-        }
+        builder.append("T ").append(x).append(" ").append(y).append(" ").append(z).append(" ").append(Mapper.tiles[x][y][z].shortName).append(endl);
     }
     
     public static void saveBorderX(StringBuilder builder, int x, int y, int z) {
-        try {
-            builder.append("BX ").append(x).append(" ").append(y).append(" ").append(z).append(" ").append(Mapper.bordersx[x][y][z].shortName).append(" ").append(Mapper.bordersx[x][y][z].rPaint).append(" ").append(Mapper.bordersx[x][y][z].gPaint).append(" ").append(Mapper.bordersx[x][y][z].bPaint).append(endl);
-        } catch (NullPointerException ex) {
-            builder.append("DBX ").append(x).append(" ").append(y).append(" ").append(z).append(endl);
-        }
+        builder.append("BX ").append(x).append(" ").append(y).append(" ").append(z).append(" ").append(Mapper.bordersx[x][y][z].shortName).append(" ").append(Mapper.bordersx[x][y][z].rPaint).append(" ").append(Mapper.bordersx[x][y][z].gPaint).append(" ").append(Mapper.bordersx[x][y][z].bPaint).append(endl);
     }
     
     public static void saveBorderY(StringBuilder builder, int x, int y, int z) {
-        try {
-            builder.append("BY ").append(x).append(" ").append(y).append(" ").append(z).append(" ").append(Mapper.bordersy[x][y][z].shortName).append(" ").append(Mapper.bordersy[x][y][z].rPaint).append(" ").append(Mapper.bordersy[x][y][z].gPaint).append(" ").append(Mapper.bordersy[x][y][z].bPaint).append(endl);
-        } catch (NullPointerException ex) {
-            builder.append("DBY ").append(x).append(" ").append(y).append(" ").append(z).append(endl);
-        }
+        builder.append("BY ").append(x).append(" ").append(y).append(" ").append(z).append(" ").append(Mapper.bordersy[x][y][z].shortName).append(" ").append(Mapper.bordersy[x][y][z].rPaint).append(" ").append(Mapper.bordersy[x][y][z].gPaint).append(" ").append(Mapper.bordersy[x][y][z].bPaint).append(endl);
     }
     
     /**
@@ -213,19 +194,11 @@ public class SaveWindow extends javax.swing.JFrame {
      * 11. Cave
      */
     public static void saveLabel(StringBuilder builder, int x, int y) {
-        try {
-            builder.append("L ").append(x).append(" ").append(y).append(" ").append(Mapper.labels[x][y].text.replace(" ", "_").replace("\n", "\\n")).append(" ").append(Mapper.labels[x][y].font.getName().replace(" ", "_")).append(" ").append(Mapper.labels[x][y].font.getSize()).append(" ").append(Mapper.labels[x][y].color.getRed()).append(" ").append(Mapper.labels[x][y].color.getGreen()).append(" ").append(Mapper.labels[x][y].color.getBlue()).append(" ").append(Mapper.labels[x][y].color.getAlpha()).append(" ").append(false).append(endl);
-        } catch (NullPointerException ex) {
-            builder.append("DL ").append(x).append(" ").append(y).append(false).append(endl);
-        }
+        builder.append("L ").append(x).append(" ").append(y).append(" ").append(Mapper.labels[x][y].text.replace(" ", "_").replace("\n", "\\n")).append(" ").append(Mapper.labels[x][y].font.getName().replace(" ", "_")).append(" ").append(Mapper.labels[x][y].font.getSize()).append(" ").append(Mapper.labels[x][y].color.getRed()).append(" ").append(Mapper.labels[x][y].color.getGreen()).append(" ").append(Mapper.labels[x][y].color.getBlue()).append(" ").append(Mapper.labels[x][y].color.getAlpha()).append(" ").append(false).append(endl);
     }
     
     public static void saveCaveLabel(StringBuilder builder, int x, int y) {
-        try {
-            builder.append("L ").append(x).append(" ").append(y).append(" ").append(Mapper.caveLabels[x][y].text.replace(" ", "_").replace("\n", "\\n")).append(" ").append(Mapper.caveLabels[x][y].font.getName().replace(" ", "_")).append(" ").append(Mapper.caveLabels[x][y].font.getSize()).append(" ").append(Mapper.caveLabels[x][y].color.getRed()).append(" ").append(Mapper.caveLabels[x][y].color.getGreen()).append(" ").append(Mapper.caveLabels[x][y].color.getBlue()).append(" ").append(Mapper.caveLabels[x][y].color.getAlpha()).append(" ").append(true).append(endl);
-        } catch (NullPointerException ex) {
-            builder.append("DL ").append(x).append(" ").append(y).append(true).append(endl);
-        }
+        builder.append("L ").append(x).append(" ").append(y).append(" ").append(Mapper.caveLabels[x][y].text.replace(" ", "_").replace("\n", "\\n")).append(" ").append(Mapper.caveLabels[x][y].font.getName().replace(" ", "_")).append(" ").append(Mapper.caveLabels[x][y].font.getSize()).append(" ").append(Mapper.caveLabels[x][y].color.getRed()).append(" ").append(Mapper.caveLabels[x][y].color.getGreen()).append(" ").append(Mapper.caveLabels[x][y].color.getBlue()).append(" ").append(Mapper.caveLabels[x][y].color.getAlpha()).append(" ").append(true).append(endl);
     }
     
     public static void saveWrit(StringBuilder builder, Writ writ) {
@@ -234,10 +207,6 @@ public class SaveWindow extends javax.swing.JFrame {
             builder.append(" ").append(g.x).append(" ").append(g.y);
         }
         builder.append(endl);
-    }
-    
-    public static void saveWritDeletion(StringBuilder builder, String writ) {
-        builder.append("DW ").append(writ.replace(" ", "_")).append(" ").append(endl);
     }
 
     @SuppressWarnings("unchecked")
@@ -307,6 +276,11 @@ public class SaveWindow extends javax.swing.JFrame {
 
         jTextField1.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jTextField1.setText("Save name");
+        jTextField1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTextField1MouseClicked(evt);
+            }
+        });
 
         jButton5.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jButton5.setText("Overwrite selected");
@@ -340,19 +314,18 @@ public class SaveWindow extends javax.swing.JFrame {
                     .addComponent(jButton3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jScrollPane1)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                            .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jButton4)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jButton5)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jButton6))
-                        .addGroup(layout.createSequentialGroup()
-                            .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, 324, Short.MAX_VALUE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(pasteExpiration, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton4)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton5)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton6))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, 324, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(pasteExpiration, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -388,7 +361,7 @@ public class SaveWindow extends javax.swing.JFrame {
         try {
             String data;
             data = URLEncoder.encode("api_dev_key", "UTF-8") + "=" + URLEncoder.encode("24844c99ae9971a2da79a2f7d0da7642", "UTF-8");
-            data += "&" + URLEncoder.encode("api_paste_code", "UTF-8") + "=" + URLEncoder.encode(save, "UTF-8");
+            data += "&" + URLEncoder.encode("api_paste_code", "UTF-8") + "=" + URLEncoder.encode(saveMaker(), "UTF-8");
             data += "&" + URLEncoder.encode("api_option", "UTF-8") + "=" + URLEncoder.encode("paste", "UTF-8");
             switch ((String)pasteExpiration.getModel().getSelectedItem()) {
                 case "10 minutes":
@@ -445,29 +418,29 @@ public class SaveWindow extends javax.swing.JFrame {
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             File file = fc.getSelectedFile();
             saveToFile(file);
+            setVisible(false);
+            dispose();
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 
-    private void saveToFile(File file) {
+    public static void saveToFile(File file) {
         if (!file.getPath().contains(".MAP")) {
             file = new File(file.getPath()+".MAP");
         }
         try {
             file.createNewFile();
             PrintWriter out = new PrintWriter(new FileOutputStream(file));
-            out.print(save);
+            out.print(saveMaker());
             out.close();
             String ph = file.getPath();
             previousDir = ph.substring(0, ph.lastIndexOf(slash)+1);
-            setVisible(false);
-            dispose();
         } catch (IOException ex) {
             Logger.getLogger(SaveWindow.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        StringSelection select = new StringSelection(save);
+        StringSelection select = new StringSelection(saveMaker());
         Toolkit.getDefaultToolkit().getSystemClipboard().setContents(select, select);
         setVisible(false);
         dispose();
@@ -475,6 +448,8 @@ public class SaveWindow extends javax.swing.JFrame {
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         saveToFile(FileManager.getFile("Saves"+slash+jTextField1.getText()+".MAP"));
+        setVisible(false);
+        dispose();
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
@@ -490,6 +465,10 @@ public class SaveWindow extends javax.swing.JFrame {
             saveToFile(((FileWrapper)jList1.getSelectedValue()).file);
         }
     }//GEN-LAST:event_jButton5ActionPerformed
+
+    private void jTextField1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTextField1MouseClicked
+        jTextField1.setText("");
+    }//GEN-LAST:event_jTextField1MouseClicked
 
     private class ExtensionFileFilter extends FileFilter {
         String description;

@@ -2,10 +2,10 @@ package Form;
 
 import Lib.Files.FileManager;
 import Lib.Graphics.Ground;
-import Lib.Object.Data;
-import Lib.Object.Label;
-import Lib.Object.Structure;
-import Lib.Object.Writ;
+import Lib.Entities.Data;
+import Lib.Entities.Label;
+import Lib.Entities.Structure;
+import Lib.Entities.Writ;
 import Mapper.Data.D;
 import Mapper.FPPCamera;
 import Mapper.Logic.HeightUpdater;
@@ -34,7 +34,6 @@ import org.lwjgl.util.Color;
 public class LoadWindow extends javax.swing.JFrame {
 
     private final String endl = System.getProperty("line.separator");
-    private static String ver=null;
     
     DefaultListModel list;
     
@@ -58,7 +57,6 @@ public class LoadWindow extends javax.swing.JFrame {
     public static void loadManager(String load) {
         String version = readVersion(load);
         load = load.substring(load.indexOf("|")+1);
-        ver = version;
         HouseCalc.reset();
         switch(version) {
             case "1.1" :
@@ -75,23 +73,8 @@ public class LoadWindow extends javax.swing.JFrame {
                     Logger.getLogger(LoadWindow.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 break;
-            case "0.9":
-                load0_9(load);
-                break;
-            case "0.6":
-                load0_6(load);
-                break;
-            case "0.5":
-                load0_5(load);
-                break;
-            case "0.4":
-                load0_4(load);
-                break;
-            case "0.3":
-                load0_3(load);
-                break;
-            case "0.2":
-                load0_2(load);
+            default:
+                System.err.println("Unsupported/outdated save format: "+version);
                 break;
         }
         UpCamera.reset();
@@ -246,17 +229,18 @@ public class LoadWindow extends javax.swing.JFrame {
         
         Mapper.width = width;
         Mapper.height = height;
-        Mapper.heightmap = heightmap;
-        HeightUpdater.checkElevations();
-        Mapper.ground = ground;
-        Mapper.labels = labels;
-        Mapper.caveLabels = caveLabels;
-        Mapper.caveGround = caveGround;
-        Mapper.tiles = tiles;
-        RoofUpdater.roofsRefit();
         Mapper.objects = objects;
         Mapper.bordersx = bordersx;
         Mapper.bordersy = bordersy;
+        Mapper.tiles = tiles;
+        Mapper.ground = ground;
+        Mapper.caveGround = caveGround;
+        Mapper.labels = labels;
+        Mapper.caveLabels = caveLabels;
+        Mapper.heightmap = heightmap;
+        HeightUpdater.checkElevations();
+        RoofUpdater.roofsRefit();
+        
         
         int cap = WritUpdater.model.getSize()+1;
         HouseCalc.jTextField1.setText("Writ "+cap);
@@ -413,431 +397,11 @@ public class LoadWindow extends javax.swing.JFrame {
         out.addElement(w);
     }
     
-    private static void load0_9(String load) {
-        InputStream is = new ByteArrayInputStream(load.getBytes());
-	BufferedReader br = new BufferedReader(new InputStreamReader(is));
-        
-        WritUpdater.model.clear();
-        
-        int width = Integer.parseInt(readToChar(br, ','));
-        int height = Integer.parseInt(readToChar(br, ','));
-        
-        float[][] heightmap = new float[width+1][height+1];
-        Ground[][] ground = new Ground[width][height];
-        Ground[][] caveGround = new Ground[width][height];
-        Structure[][][] objects = new Structure[width*4][15][height*4];
-        Data[][][] tiles = new Data[width][15][height];
-        Data[][][] bordersx = new Data[width][15][height];
-        Data[][][] bordersy = new Data[width][15][height];
-        
-        for (int x=0; x<=width; x++) {
-            for (int y=0; y<=height; y++) {
-                heightmap[x][y] = Integer.parseInt(readToChar(br, ','));
-            }
-        }
-        
-        for (int x=0; x<width; x++) {
-            for (int y=0; y<height; y++) {
-                String name = readToChar(br, ',');
-                ground[x][y] = getGround(name, x, y);
-                name = readToChar(br, ',');
-                caveGround[x][y] = getCaveGround(name, x, y);
-            }
-        }
-        
-        for (int z=0; z<15; z++) {
-            for (int x=0; x<width*4; x++) {
-                for (int y=0; y<height*4; y++) {
-                    String name = readToChar(br, ',');
-                    objects[x][y][z] = getStructure(name);
-                }
-            }
-        }
-        
-        for (int z=0; z<15; z++) {
-            for (int x=0; x<width; x++) {
-                for (int y=0; y<height; y++) {
-                    String name = readToChar(br, ',');
-                    tiles[x][y][z] = getData(name);
-                    name = readToChar(br, ',');
-                    bordersx[x][y][z] = getData(name);
-                    name = readToChar(br, ',');
-                    bordersy[x][y][z] = getData(name);
-                }
-            }
-        }
-        
-        int writs = Integer.parseInt(readToChar(br, ','));
-        String writRead;
-        
-        for (int i=0; i<writs; i++) {
-            Writ w = new Writ(readToChar(br, ';'));
-            while (!(writRead=readToChar(br, ';')).equals("end")) {
-                int gx=Integer.parseInt(writRead.substring(0, writRead.indexOf(".")));
-                int gy=Integer.parseInt(writRead.substring(writRead.indexOf(".")+1));
-                w.tiles.add(ground[gx][gy]);
-                ground[gx][gy].writ = w;
-            }
-            WritUpdater.model.addElement(w);
-        }
-        
-        Mapper.width = width;
-        Mapper.height = height;
-        Mapper.heightmap = heightmap;
-        Mapper.ground = ground;
-        Mapper.labels = new Label[width][height];
-        Mapper.caveLabels = new Label[width][height];
-        Mapper.caveGround = caveGround;
-        Mapper.tiles = tiles;
-        Mapper.objects = objects;
-        Mapper.bordersx = bordersx;
-        Mapper.bordersy = bordersy;
-        
-        int cap = WritUpdater.model.getSize()+1;
-        HouseCalc.jTextField1.setText("Writ "+cap);
-        
-        RoofUpdater.roofsRefit();
-        HeightUpdater.checkElevations();
-    }
-    
-    private static void load0_6(String load) {
-        InputStream is = new ByteArrayInputStream(load.getBytes());
-	BufferedReader br = new BufferedReader(new InputStreamReader(is));
-        
-        WritUpdater.model.clear();
-        
-        int width = Integer.parseInt(readToChar(br, ','));
-        int height = Integer.parseInt(readToChar(br, ','));
-        
-        float[][] heightmap = new float[width+1][height+1];
-        Ground[][] ground = new Ground[width][height];
-        Ground[][] caveGround = new Ground[width][height];
-        Data[][][] tiles = new Data[width][15][height];
-        Data[][][] bordersx = new Data[width][15][height];
-        Data[][][] bordersy = new Data[width][15][height];
-        
-        for (int x=0; x<=width; x++) {
-            for (int y=0; y<=height; y++) {
-                heightmap[x][y] = Integer.parseInt(readToChar(br, ','));
-            }
-        }
-        
-        for (int x=0; x<width; x++) {
-            for (int y=0; y<height; y++) {
-                String name = readToChar(br, ',');
-                ground[x][y] = getGround(name, x, y);
-                caveGround[x][y] = D.caveGrounds.get(0).copy(x, y);
-            }
-        }
-        
-        for (int z=0; z<15; z++) {
-            for (int x=0; x<width; x++) {
-                for (int y=0; y<height; y++) {
-                    String name = readToChar(br, ',');
-                    tiles[x][y][z] = getData(name);
-                    name = readToChar(br, ',');
-                    bordersx[x][y][z] = getData(name);
-                    name = readToChar(br, ',');
-                    bordersy[x][y][z] = getData(name);
-                }
-            }
-        }
-        
-        int writs = Integer.parseInt(readToChar(br, ','));
-        String writRead;
-        
-        for (int i=0; i<writs; i++) {
-            Writ w = new Writ(readToChar(br, ';'));
-            while (!(writRead=readToChar(br, ';')).equals("end")) {
-                int gx=Integer.parseInt(writRead.substring(0, writRead.indexOf(".")));
-                int gy=Integer.parseInt(writRead.substring(writRead.indexOf(".")+1));
-                w.tiles.add(ground[gx][gy]);
-                ground[gx][gy].writ = w;
-            }
-            WritUpdater.model.addElement(w);
-        }
-        
-        Mapper.width = width;
-        Mapper.height = height;
-        Mapper.heightmap = heightmap;
-        Mapper.ground = ground;
-        Mapper.labels = new Label[width][height];
-        Mapper.caveLabels = new Label[width][height];
-        Mapper.caveGround = caveGround;
-        Mapper.objects = new Structure[width*4][height*4][15];
-        Mapper.tiles = tiles;
-        Mapper.bordersx = bordersx;
-        Mapper.bordersy = bordersy;
-        
-        int cap = WritUpdater.model.getSize()+1;
-        HouseCalc.jTextField1.setText("Writ "+cap);
-        
-        RoofUpdater.roofsRefit();
-        HeightUpdater.checkElevations();
-    }
-    
-    private static void load0_5(String load) {
-        InputStream is = new ByteArrayInputStream(load.getBytes());
-	BufferedReader br = new BufferedReader(new InputStreamReader(is));
-        
-        WritUpdater.model.clear();
-        
-        int width = Integer.parseInt(readToChar(br, ','));
-        int height = Integer.parseInt(readToChar(br, ','));
-        
-        Ground[][] ground = new Ground[width][height];
-        Ground[][] caveGround = new Ground[width][height];
-        Data[][][] tiles = new Data[width][height][15];
-        Data[][][] bordersx = new Data[width][height][15];
-        Data[][][] bordersy = new Data[width][height][15];
-        
-        for (int x=0; x<width; x++) {
-            for (int y=0; y<height; y++) {
-                String name = readToChar(br, ',');
-                ground[x][y] = getGround(name, x, y);
-                caveGround[x][y] = D.caveGrounds.get(0).copy(x, y);
-            }
-        }
-        
-        for (int z=0; z<15; z++) {
-            for (int x=0; x<width; x++) {
-                for (int y=0; y<height; y++) {
-                    String name = readToChar(br, ',');
-                    tiles[x][y][z] = getData(name);
-                    name = readToChar(br, ',');
-                    bordersx[x][y][z] = getData(name);
-                    name = readToChar(br, ',');
-                    bordersy[x][y][z] = getData(name);
-                }
-            }
-        }
-        
-        int writs = Integer.parseInt(readToChar(br, ','));
-        String writRead;
-        
-        for (int i=0; i<writs; i++) {
-            Writ w = new Writ(readToChar(br, ';'));
-            while (!(writRead=readToChar(br, ';')).equals("end")) {
-                int gx=Integer.parseInt(writRead.substring(0, writRead.indexOf(".")));
-                int gy=Integer.parseInt(writRead.substring(writRead.indexOf(".")+1));
-                w.tiles.add(ground[gx][gy]);
-                ground[gx][gy].writ = w;
-            }
-            WritUpdater.model.addElement(w);
-        }
-        
-        Mapper.width = width;
-        Mapper.height = height;
-        Mapper.heightmap = new float[width+1][height+1];
-        Mapper.labels = new Label[width][height];
-        Mapper.caveLabels = new Label[width][height];
-        Mapper.ground = ground;
-        Mapper.caveGround = caveGround;
-        Mapper.tiles = tiles;
-        Mapper.objects = new Structure[width*4][height*4][15];
-        Mapper.bordersx = bordersx;
-        Mapper.bordersy = bordersy;
-        
-        int cap = WritUpdater.model.getSize()+1;
-        HouseCalc.jTextField1.setText("Writ "+cap);
-        
-        RoofUpdater.roofsRefit();
-    }
-    
-    private static void load0_4(String load) {
-        InputStream is = new ByteArrayInputStream(load.getBytes());
-	BufferedReader br = new BufferedReader(new InputStreamReader(is));
-        
-        int width = Integer.parseInt(readToChar(br, ','));
-        int height = Integer.parseInt(readToChar(br, ','));
-        
-        Ground[][] ground = new Ground[width][height];
-        Ground[][] caveGround = new Ground[width][height];
-        Data[][][] tiles = new Data[width][height][15];
-        Data[][][] bordersx = new Data[width][height][15];
-        Data[][][] bordersy = new Data[width][height][15];
-        
-        for (int x=0; x<width; x++) {
-            for (int y=0; y<height; y++) {
-                String name = readToChar(br, ',');
-                ground[x][y] = getGround(name, x, y);
-                caveGround[x][y] = D.caveGrounds.get(0).copy(x, y);
-            }
-        }
-        
-        for (int z=0; z<15; z++) {
-            for (int x=0; x<width; x++) {
-                for (int y=0; y<height; y++) {
-                    String name = readToChar(br, ',');
-                    tiles[x][y][z] = getData(name);
-                    name = readToChar(br, ',');
-                    bordersx[x][y][z] = getData(name);
-                    name = readToChar(br, ',');
-                    bordersy[x][y][z] = getData(name);
-                }
-            }
-        }
-        
-        Mapper.width = width;
-        Mapper.height = height;
-        Mapper.heightmap = new float[width+1][height+1];
-        Mapper.labels = new Label[width][height];
-        Mapper.caveLabels = new Label[width][height];
-        Mapper.ground = ground;
-        Mapper.caveGround = caveGround;
-        Mapper.tiles = tiles;
-        Mapper.objects = new Structure[width*4][height*4][15];
-        Mapper.bordersx = bordersx;
-        Mapper.bordersy = bordersy;
-        Mapper.wData=null;
-        
-        RoofUpdater.roofsRefit();
-    }
-    
-    private static void load0_3(String load) {
-        int width = Integer.parseInt(load.substring(0, load.indexOf(",")));
-        load = load.substring(load.indexOf(",")+1);
-        int height = Integer.parseInt(load.substring(0, load.indexOf(",")));
-        load = load.substring(load.indexOf(",")+1);
-        
-        Ground[][] ground = new Ground[width][height];
-        Data[][][] tiles = new Data[width][height][15];
-        Data[][][] bordersx = new Data[width][height][15];
-        Data[][][] bordersy = new Data[width][height][15];
-        
-        for (int x=0; x<width; x++) {
-            for (int y=0; y<height; y++) {
-                String name = load.substring(0, load.indexOf(","));
-                load = load.substring(load.indexOf(",")+1);
-                ground[x][y] = getGround(name, x, y);
-            }
-        }
-        
-        for (int z=0; z<15; z++) {
-            for (int x=0; x<width; x++) {
-                for (int y=0; y<height; y++) {
-                    String name = load.substring(0, load.indexOf(","));
-                    load = load.substring(load.indexOf(",")+1);
-                    tiles[x][y][z] = getData(name);
-                    name = load.substring(0, load.indexOf(","));
-                    load = load.substring(load.indexOf(",")+1);
-                    bordersx[x][y][z] = getData(name);
-                    name = load.substring(0, load.indexOf(","));
-                    load = load.substring(load.indexOf(",")+1);
-                    bordersy[x][y][z] = getData(name);
-                }
-            }
-        }
-        
-        Mapper.heightmap = new float[width+1][height+1];
-        Mapper.labels = new Label[width][height];
-        Mapper.caveLabels = new Label[width][height];
-        Mapper.ground = ground;
-        Mapper.tiles = tiles;
-        Mapper.objects = new Structure[width*4][height*4][15];
-        Mapper.bordersx = bordersx;
-        Mapper.bordersy = bordersy;
-        Mapper.width = width;
-        Mapper.height = height;
-        
-        RoofUpdater.roofsRefit();
-    }
-    
-    private static void load0_2(String load) {
-        for (int z=0; z<15; z++) {
-            for (int x=0; x<25; x++) {
-                for (int y=0; y<25; y++) {
-                    String name = load.substring(0, load.indexOf(","));
-                    load = load.substring(load.indexOf(",")+1);
-                    Mapper.tiles[x][y][z] = getData(name);
-                    name = load.substring(0, load.indexOf(","));
-                    load = load.substring(load.indexOf(",")+1);
-                    Mapper.bordersx[x][y][z] = getData(name);
-                    name = load.substring(0, load.indexOf(","));
-                    load = load.substring(load.indexOf(",")+1);
-                    Mapper.bordersy[x][y][z] = getData(name);
-                }
-            }
-        }
-        RoofUpdater.roofsRefit();
-    }
-    
-    private static String readToChar(BufferedReader read, char toChar) {
-        char c;
-        String out="";
-        try {
-            while ((c=(char)read.read())!=toChar) {
-                out+=c;
-            }
-        } catch (IOException ex) {
-            Logger.getLogger(LoadWindow.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return out;
-    }
-    
-    private static Structure getStructure(String shortName) {
-        if (shortName.equals("0")) {
-            return null;
-        }
-        for (Structure s : D.objects) {
-            if (s.shortName.equals(shortName.substring(0, shortName.indexOf(";")))) {
-                shortName = shortName.substring(shortName.indexOf(";")+1);
-                double r = Double.parseDouble(shortName.substring(0, shortName.indexOf(";")));
-                shortName = shortName.substring(shortName.indexOf(";")+1);
-                double g = Double.parseDouble(shortName.substring(0, shortName.indexOf(";")));
-                shortName = shortName.substring(shortName.indexOf(";")+1);
-                double b = Double.parseDouble(shortName);
-                Structure data = s.copy();
-                data.rPaint = r;
-                data.gPaint = g;
-                data.bPaint = b;
-                return data;
-            }
-        }
-        return null;
-    }
-    
     private static Structure getLightweightStructure(String shortName) {
         for (Structure s : D.objects) {
             if (s.shortName.equals(shortName)) {
                 Structure data = s.copy();
                 return data;
-            }
-        }
-        return null;
-    }
-    
-    private static Data getData(String shortName) {
-        if (shortName.equals("0")) {
-            return null;
-        }
-        for (Data d : D.models) {
-            if (ver.equals("0.2") || ver.equals("0.3")) {
-                if (d.shortName.equals(shortName)) {
-                    return d.copy();
-                }
-            }
-            else {
-                if (shortName.contains(";")) {
-                    if (d.shortName.equals(shortName.substring(0, shortName.indexOf(";")))) {
-                        shortName = shortName.substring(shortName.indexOf(";")+1);
-                        double r = Double.parseDouble(shortName.substring(0, shortName.indexOf(";")));
-                        shortName = shortName.substring(shortName.indexOf(";")+1);
-                        double g = Double.parseDouble(shortName.substring(0, shortName.indexOf(";")));
-                        shortName = shortName.substring(shortName.indexOf(";")+1);
-                        double b = Double.parseDouble(shortName);
-                        Data data = d.copy();
-                        data.rPaint = r;
-                        data.gPaint = g;
-                        data.bPaint = b;
-                        return data;
-                    }
-                }
-                else {
-                    if (d.shortName.equals(shortName)) {
-                        return d.copy();
-                    }
-                }
             }
         }
         return null;
@@ -897,6 +461,11 @@ public class LoadWindow extends javax.swing.JFrame {
 
         codeField.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         codeField.setText("Enter code");
+        codeField.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                codeFieldMouseClicked(evt);
+            }
+        });
 
         codeButton.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         codeButton.setText("Load by code");
@@ -916,6 +485,11 @@ public class LoadWindow extends javax.swing.JFrame {
 
         urlField.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         urlField.setText("Enter URL");
+        urlField.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                urlFieldMouseClicked(evt);
+            }
+        });
 
         fileButton.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         fileButton.setText("Open from file");
@@ -1068,6 +642,14 @@ public class LoadWindow extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void urlFieldMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_urlFieldMouseClicked
+        urlField.setText("");
+    }//GEN-LAST:event_urlFieldMouseClicked
+
+    private void codeFieldMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_codeFieldMouseClicked
+        codeField.setText("");
+    }//GEN-LAST:event_codeFieldMouseClicked
 
     private class ExtensionFileFilter extends FileFilter {
         String description;

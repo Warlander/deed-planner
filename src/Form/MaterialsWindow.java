@@ -1,8 +1,9 @@
 package Form;
 
+import Lib.Entities.Data;
+import Lib.Entities.Writ;
 import Lib.Graphics.Ground;
-import Lib.Object.Data;
-import Lib.Object.Materials;
+import Lib.Object.*;
 import Mapper.Data.D;
 import java.util.HashMap;
 import Mapper.Mapper;
@@ -31,9 +32,8 @@ public class MaterialsWindow extends javax.swing.JFrame {
     private void writResult() {
         StringBuilder res=new StringBuilder();
         String br=System.getProperty("line.separator");
-        WritComponents writ = new WritComponents(Mapper.wData);
-        calculateMaterialsWrit(writ);
-        int carp = checkCarpentry(writ);
+        calculateMaterialsWrit(Mapper.wData);
+        int carp = checkCarpentry(Mapper.wData);
         
         res.append("WARNING - skill cost is based on both walls and floors, so calculations for structures without floors are wrong!").append(br).append(br);
         res.append("Results for the \"").append(Mapper.wData.name).append("\" writ:").append(br).append(br);
@@ -115,11 +115,11 @@ public class MaterialsWindow extends javax.swing.JFrame {
         result.setText(res.toString());
     }
     
-    private void calculateMaterialsWrit(WritComponents writ) {
+    private void calculateMaterialsWrit(Writ writ) {
         map = new HashMap<>();
         objects = new HashMap<>();
         
-        for (Data d : writ.data) {
+        for (Data d : writ.getAllData()) {
             addToMap(map, d.materials);
             addToMap(objects, d);
         }
@@ -179,36 +179,24 @@ public class MaterialsWindow extends javax.swing.JFrame {
         }
     }
     
-    private int checkCarpentry(WritComponents writ) {
-        int carp=0;
-        for (Data d : writ.data) {
-            switch (d.type) {
-                case floor:
-                    for (int i=0; i<Mapper.width; i++) {
-                        for (int i2=0; i2<Mapper.height; i2++) {
-                            if (d==Mapper.tiles[i][i2][0]) {
-                                carp++;
-                                break;
-                            }
+    private int checkCarpentry(Writ writ) {
+        int carp=writ.tiles.size();
+        for (Data d : writ.getAllData()) {
+            if (d.type==Lib.Object.Type.wall) {
+                for (int i=0; i<Mapper.width; i++) {
+                    for (int i2=0; i2<Mapper.height; i2++) {
+                        if ((d==Mapper.bordersx[i][0][i2] && outsideBorderX(i, i2)) || (d==Mapper.bordersy[i][0][i2] && outsideBorderY(i, i2))) {
+                            carp++;
+                            break;
                         }
                     }
-                    break;
-                case wall:
-                    for (int i=0; i<Mapper.width; i++) {
-                        for (int i2=0; i2<Mapper.height; i2++) {
-                            if (d==Mapper.bordersx[i][i2][0] || d==Mapper.bordersy[i][i2][0]) {
-                                carp++;
-                                break;
-                            }
-                        }
-                    }
-                    break;
+                }
             }
         }
-        for (int z=1; z<15; z++) {
+        for (int y=1; y<15; y++) {
             for (Ground g : Mapper.wData.tiles) {
-                if (Mapper.tiles[g.x+1][g.y][z]!=null && Mapper.tiles[g.x+1][g.y][z].type!=Lib.Object.Type.roof) {
-                    switch (z) {
+                if (Mapper.tiles[g.x+1][y][g.y]!=null && Mapper.tiles[g.x+1][y][g.y].type!=Lib.Object.Type.roof) {
+                    switch (y) {
                         case 1:
                             carp = Math.max(carp, 21);
                             break;
@@ -257,6 +245,20 @@ public class MaterialsWindow extends javax.swing.JFrame {
         }
         
         return carp;
+    }
+    
+    private boolean outsideBorderX(int i, int i2) {
+        if (Mapper.tiles[i][0][i2-1]!=null && Mapper.tiles[i][0][i2]!=null) {
+            return false;
+        }
+        return true;
+    }
+    
+    private boolean outsideBorderY(int i, int i2) {
+        if (Mapper.tiles[i][0][i2]!=null && Mapper.tiles[i+1][0][i2]!=null) {
+            return false;
+        }
+        return true;
     }
 
     @SuppressWarnings("unchecked")

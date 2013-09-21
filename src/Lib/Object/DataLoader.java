@@ -1,15 +1,12 @@
 package Lib.Object;
 
+import Lib.Entities.Data;
+import Lib.Entities.Structure;
 import Form.HouseCalc;
-import Lib.Graphics.Ground;
-import Lib.Graphics.Tex;
-import Lib.Graphics.TextureLoader;
+import Lib.Graphics.*;
 import Mapper.Data.D;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.awt.Font;
+import java.io.*;
 import java.util.ArrayList;
 import javax.swing.DefaultListModel;
 
@@ -25,6 +22,8 @@ public class DataLoader {
     private static DefaultListModel walls = new DefaultListModel();
     private static DefaultListModel roofs = new DefaultListModel();
     private static DefaultListModel objects = new DefaultListModel();
+    
+    private static final TrueTypeFont font = new TrueTypeFont(Font.decode("Arial 12"), true);
     
     private static Tex getTex(int id) {
         for (Tex tex : textures) {
@@ -74,6 +73,9 @@ public class DataLoader {
     }
     
     private static void preloader(File list) throws FileNotFoundException, IOException {
+        int allCommands = countCommands(list);
+        int currentCommand = 0;
+        
         floors.addElement("Delete");
         walls.addElement("Delete");
         roofs.addElement("Delete");
@@ -91,10 +93,14 @@ public class DataLoader {
         Structure structure;
         Ground ground;
         
+        long totalTime = System.currentTimeMillis();
+        
         BufferedReader reader = new BufferedReader(new FileReader(list));
         String line;
         while ((line=reader.readLine())!=null) {
             if (!line.equals("")) {
+                currentCommand++;
+                System.out.println("Processing line "+currentCommand+"/"+allCommands+": "+line);
                 String request = line.substring(0, line.indexOf(" "));
                 switch (request) {
                     case "Texture":
@@ -295,6 +301,20 @@ public class DataLoader {
         
         str = "Data"+slash+"Specials"+slash+"levelsCross.obj";
         D.levelsCross = ReadObject.read(new BufferedReader(new FileReader(str)));
+    }
+    
+    private static int countCommands(File file) throws FileNotFoundException, IOException {
+        int commands;
+        try (BufferedReader in = new BufferedReader(new FileReader(file))) {
+            String line;
+            commands = 0;
+            while ((line = in.readLine())!=null) {
+                if (!line.trim().isEmpty()) {
+                    commands++;
+                }
+            }
+        }
+        return commands;
     }
     
 }

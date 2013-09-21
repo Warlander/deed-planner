@@ -1,19 +1,20 @@
 package Mapper.Logic;
 
 import Form.HouseCalc;
-import Form.SaveWindow;
-import Mapper.KeyboardInput;
+import Form.SlopeInput;
+import Mapper.Input.Keybindings;
 import Mapper.Mapper;
-import Mapper.MouseInput;
+import Mapper.Input.MouseInput;
 import Mapper.UpCamera;
-import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.util.Point;
 
-public class HeightUpdater {
+public final class HeightUpdater {
+    
+    private static Point p2=null;
     
     static void update() {
-        if (KeyboardInput.hold[Keyboard.KEY_LSHIFT] && (MouseInput.scrollDown ^ MouseInput.scrollUp)) {
+        if (Keybindings.hold(Keybindings.UP_SPEED_MOD1) && (MouseInput.scrollDown ^ MouseInput.scrollUp)) {
             if (MouseInput.scrollDown) {
                 if (HouseCalc.elevationAdd>1) {
                     HouseCalc.elevationAdd--;
@@ -26,7 +27,7 @@ public class HeightUpdater {
             }
             HouseCalc.addSpinner.getModel().setValue(HouseCalc.elevationAdd);
         }
-        if (KeyboardInput.hold[Keyboard.KEY_LCONTROL] && (MouseInput.scrollDown ^ MouseInput.scrollUp)) {
+        if (Keybindings.hold(Keybindings.UP_SPEED_MOD2) && (MouseInput.scrollDown ^ MouseInput.scrollUp)) {
             if (MouseInput.scrollDown) {
                 HouseCalc.elevationSetLeft--;
             }
@@ -104,6 +105,10 @@ public class HeightUpdater {
                                 levelArea(point);
                             }
                             break;
+                        case "Edit slope":
+                            if ((MouseInput.pressed.left) && points.length==2) {
+                                editSlope(point);
+                            }
                     }
                 }
             }
@@ -227,8 +232,6 @@ public class HeightUpdater {
         Mapper.heightmap[point.getX()][point.getY()]=0;
     }
     
-    private static Point p2=null;
-    
     private static void smoothHeight(Point p1) {
         if (p2==null) {
             p2 = p1;
@@ -334,7 +337,24 @@ public class HeightUpdater {
         }
     }
     
-    private static float getHeight(Point p) {
+    private static void editSlope(Point p1) {
+        if (p2==null) {
+            p2 = p1;
+        }
+        else {
+            SlopeInput.p1 = p1;
+            SlopeInput.p2 = p2;
+            SlopeInput.main(null);
+            
+            p2=null;
+        }
+    }
+    
+    public static void setHeight(Point p, float height) {
+        Mapper.heightmap[p.getX()][p.getY()] = height;
+    }
+    
+    public static float getHeight(Point p) {
         return Mapper.heightmap[p.getX()][p.getY()];
     }
     

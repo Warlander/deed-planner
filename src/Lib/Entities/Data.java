@@ -1,7 +1,11 @@
-package Lib.Object;
+package Lib.Entities;
 
 import Form.HouseCalc;
 import Lib.Graphics.Tex;
+import Lib.Object.Materials;
+import Lib.Object.ObjectData;
+import Lib.Object.Rotation;
+import Lib.Object.Type;
 import Lib.Utils.MatrixTools;
 import Mapper.Mapper;
 import java.nio.FloatBuffer;
@@ -10,8 +14,8 @@ import org.lwjgl.opengl.GL11;
 
 public class Data {
     
-    private static final double floor1 = 0.4;
-    private static final double floor2 = 0.75;
+    protected static final double floor1 = 0.4;
+    protected static final double floor2 = 0.75;
     
     public float renderMultiplier=1;
     public int facing=up;
@@ -36,9 +40,6 @@ public class Data {
     public double r;
     public double g;
     public double b;
-    
-    public byte modX=1;
-    public byte modZ=1;
     
     public int roofLevel;
     
@@ -103,13 +104,13 @@ public class Data {
     }
     
     public void render(int sx, int sy, int sz, Rotation rotation) {
-        if (Mapper.fpsView || ((sy-Mapper.y)<=0 && (sy-Mapper.y)>-3)) {
-            GL11.glBindTexture(GL11.GL_TEXTURE_2D, texture.ID);
+        if (Mapper.fpsView || ((sy-Mapper.getFloor())<=0 && (sy-Mapper.getFloor())>-3)) {
+            texture.use();
             if (type==Type.wall && !Mapper.fpsView) {
                 double showR = 0;
                 double showG = 0;
                 double showB = 0;
-                switch (sy-Mapper.y) {
+                switch (sy-Mapper.getFloor()) {
                     case 0:
                         showR = r*Mapper.tick+rPaint*(1-Mapper.tick);
                         showG = g*Mapper.tick+gPaint*(1-Mapper.tick);
@@ -129,7 +130,7 @@ public class Data {
                 GL11.glColor3d(showR, showG, showB);
             }
             else if (!Mapper.fpsView) {
-                switch (sy-Mapper.y) {
+                switch (sy-Mapper.getFloor()) {
                     case 0:
                         GL11.glColor3d(1, 1, 1);
                         break;

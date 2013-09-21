@@ -2,18 +2,17 @@ package Mapper.Logic;
 
 import Mapper.Mapper;
 import Form.HouseCalc;
-import Form.SaveWindow;
 import Lib.Graphics.Ground;
-import Lib.Object.Data;
-import Lib.Object.Structure;
-import Lib.Object.Writ;
-import Mapper.MouseInput;
+import Lib.Entities.Data;
+import Lib.Entities.Structure;
+import Lib.Entities.Writ;
+import Mapper.Input.MouseInput;
 import Mapper.UpCamera;
 import java.util.ArrayList;
 import javax.swing.DefaultListModel;
 import org.lwjgl.opengl.Display;
 
-public class WritUpdater {
+public final class WritUpdater {
     
     public static final DefaultListModel model;
     private static Ground[][] ground;
