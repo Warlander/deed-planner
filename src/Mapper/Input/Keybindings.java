@@ -1,7 +1,6 @@
 package Mapper.Input;
 
 import Lib.Files.FileManager;
-import java.awt.event.KeyEvent;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -20,33 +19,33 @@ public final class Keybindings {
     private static final Map<Integer, Integer> defaults = new HashMap<>();
     private static final Map<Integer, Integer> bindToKey = new HashMap<>();
     
-    public static final int FPP_MOVE_UP = 1;
-    public static final int FPP_MOVE_LEFT = 2;
-    public static final int FPP_MOVE_DOWN = 3;
-    public static final int FPP_MOVE_RIGHT = 4;
-    public static final int FPP_ELEVATION_UP = 5;
-    public static final int FPP_ELEVATION_DOWN = 6;
-    public static final int FPP_CAMERA_UP = 7;
-    public static final int FPP_CAMERA_UP_ALT = 8;
-    public static final int FPP_CAMERA_DOWN = 9;
-    public static final int FPP_CAMERA_DOWN_ALT = 10;
-    public static final int FPP_CAMERA_LEFT = 11;
-    public static final int FPP_CAMERA_LEFT_ALT = 12;
-    public static final int FPP_CAMERA_RIGHT = 13;
-    public static final int FPP_CAMERA_RIGHT_ALT = 14;
-    public static final int FPP_SPEED_MOD1 = 15;
-    public static final int FPP_SPEED_MOD2 = 16;
-    public static final int UP_MOVE_UP = 17;
-    public static final int UP_MOVE_LEFT = 18;
-    public static final int UP_MOVE_DOWN = 19;
-    public static final int UP_MOVE_RIGHT = 20;
-    public static final int UP_ELEVATION_UP = 21;
-    public static final int UP_ELEVATION_DOWN = 22;
-    public static final int UP_SCALE_MORE = 23;
-    public static final int UP_SCALE_LESS = 24;
-    public static final int UP_SPEED_MOD1 = 25;
-    public static final int UP_SPEED_MOD2 = 26;
-    public static final int OTHER_SCREENSHOT = 27;
+    public static final int FPP_MOVE_UP = 1,
+                            FPP_MOVE_LEFT = 2,
+                            FPP_MOVE_DOWN = 3,
+                            FPP_MOVE_RIGHT = 4,
+                            FPP_ELEVATION_UP = 5,
+                            FPP_ELEVATION_DOWN = 6,
+                            FPP_CAMERA_UP = 7,
+                            FPP_CAMERA_UP_ALT = 8,
+                            FPP_CAMERA_DOWN = 9,
+                            FPP_CAMERA_DOWN_ALT = 10,
+                            FPP_CAMERA_LEFT = 11,
+                            FPP_CAMERA_LEFT_ALT = 12,
+                            FPP_CAMERA_RIGHT = 13,
+                            FPP_CAMERA_RIGHT_ALT = 14,
+                            FPP_SPEED_MOD1 = 15,
+                            FPP_SPEED_MOD2 = 16,
+                            UP_MOVE_UP = 17,
+                            UP_MOVE_LEFT = 18,
+                            UP_MOVE_DOWN = 19,
+                            UP_MOVE_RIGHT = 20,
+                            UP_ELEVATION_UP = 21,
+                            UP_ELEVATION_DOWN = 22,
+                            UP_SCALE_MORE = 23,
+                            UP_SCALE_LESS = 24,
+                            UP_SPEED_MOD1 = 25,
+                            UP_SPEED_MOD2 = 26,
+                            OTHER_SCREENSHOT = 27;
     
     private Keybindings() {}
     
@@ -137,8 +136,10 @@ public final class Keybindings {
         
         try {
             File file = FileManager.getFile("Properties/Keybindings.prop");
+            File path = FileManager.getFile("Properties");
             if (!file.exists()) {
                 try {
+                    path.mkdirs();
                     file.createNewFile();
                 } catch (IOException ex) {
                     Logger.getLogger(Keybindings.class.getName()).log(Level.SEVERE, null, ex);

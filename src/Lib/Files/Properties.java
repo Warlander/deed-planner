@@ -1,100 +1,114 @@
 package Lib.Files;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * List of all properties:
- * 
- * >>>Booleans:
- * 
- * allowWheel
- * checkVersion
- * javaCompile
- * showGrid
- * useMipmaps
- * 
- * >>>Integers:
- * 
- * cameraRotationFpp
- * scale
- * keyboardFractionUp
- * mod1Fpp
- * mod2Fpp
- * mouseFractionUp
- * mouseFractionFpp
- * antialiasing
- * 
- * >>>Strings:
- * 
- * 
- */
 public class Properties {
     
-    private static HashMap<String, Object> properties = new HashMap<>();
+    public static boolean allowWheel = false;
+    public static boolean checkVersion = true;
+    public static boolean showGrid = true;
+    public static boolean useMipmaps = true;
     
-    private static final String br = System.getProperty("line.separator");
+    public static int scale = 15;
+    public static int antialiasing = 4;
     
-    public static void setProperty(String name, Object value) {
-        properties.put(name, value);
-    }
+    public static double cameraRotationFpp = 0.015;
+    public static double keyboardFractionUp = 1;
+    public static double mod1Fpp = 5;
+    public static double mod2Fpp = 0.2;
+    public static double mouseFractionUp = 0.2;
+    public static double mouseFractionFpp = 0.2;
     
-    public static Object getProperty(String name) {
-        if (properties.containsKey(name)) {
-            String property = (String) properties.get(name);
-            if (property.equals("false") || property.equals("true")) {
-                return Boolean.parseBoolean(property);
-            }
-            boolean isNumber=true;
-            char[] prop = property.toCharArray();
-            for (char c : prop) {
-                switch (c) {
-                    case '0': case '1': case '2': case '3': case'4': case '5': case '6': case '7': case '8': case '9': case',': case '.':
-                        break;
-                    default:
-                        isNumber=false;
-                        break;
-                }
-                if (!isNumber) {
-                    break;
-                }
-            }
-            if (isNumber) {
-                return Float.parseFloat(property);
-            }
-            if (!property.isEmpty()) {
-                return property;
-            }
-        }
-        return null;
-    }
+    private static final transient String br = System.getProperty("line.separator");
     
-    public static void loadProperties() {
+    static {
         try {
-            if (FileManager.fileExists("Properties/Properties.prop")) {
-                BufferedReader read = new BufferedReader(new FileReader(FileManager.getFile("Properties/Properties.prop")));
-                String line;
-                properties = new HashMap<>();
-                while ((line=read.readLine())!=null) {
-                    properties.put(line.substring(0, line.indexOf('=')), line.substring(line.indexOf('=')+1));
-                }
-            }
-        } catch (IOException ex) {
+            loadProperties();
+            saveProperties();
+        } catch (FileNotFoundException | IllegalArgumentException | IllegalAccessException ex) {
             Logger.getLogger(Properties.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
-    public static void saveProperties() {
-        String result="";
-        for (Map.Entry mEntry : properties.entrySet()) {
-            result += mEntry.getKey()+"="+mEntry.getValue()+br;
+    public static void wake() {}
+    
+    private static void loadProperties() throws FileNotFoundException, IllegalArgumentException, IllegalAccessException {
+        if (FileManager.fileExists("Properties/Config.prop")) {
+            Scanner scan = new Scanner(new FileReader(FileManager.getFile("Properties/Config.prop")));
+            while (scan.hasNext()) {
+                String type = scan.next();
+                if (!scan.hasNext()) {
+                    System.err.println("Warning: corrupted config file");
+                    return;
+                }
+                String param = scan.next();
+                if (!scan.hasNext()) {
+                    System.err.println("Warning: corrupted config file");
+                    return;
+                }
+                scan.next();
+                if (!scan.hasNext()) {
+                    System.err.println("Warning: corrupted config file");
+                    return;
+                }
+                String value = scan.next();
+                
+                for (Field f : Properties.class.getDeclaredFields()) {
+                    f.setAccessible(true);
+                    
+                    if (f.getName().equals(param)) {
+                        switch (type) {
+                            case "boolean":
+                                f.setBoolean(null, Boolean.parseBoolean(value));
+                                break;
+                            case "byte":
+                                f.setByte(null, Byte.parseByte(value));
+                                break;
+                            case "short":
+                                f.setShort(null, Short.parseShort(value));
+                                break;
+                            case "int":
+                                f.setInt(null, Integer.parseInt(value));
+                                break;
+                            case "long":
+                                f.setLong(null, Long.parseLong(value));
+                                break;
+                            case "double":
+                                f.setDouble(null, Double.parseDouble(value));
+                                break;
+                            case "float":
+                                f.setFloat(null, Float.parseFloat(value));
+                                break;
+                            default:
+                                f.set(null, value);
+                                break;
+                        }
+                        break;
+                    }
+                }
+            }
+            scan.close();
         }
-        FileManager.saveToFile("Properties/Properties.prop", result);
+    }
+    
+    public static void saveProperties() {
+        StringBuilder build = new StringBuilder();
+        for (Field f : Properties.class.getDeclaredFields()) {
+            try {
+                f.setAccessible(true);
+                if (Modifier.isTransient(f.getModifiers())) continue;
+                build.append(f.getType().getCanonicalName()).append(" ").append(f.getName()).append(" = ").append(f.get(null));
+                build.append(br);
+            } catch (IllegalArgumentException | IllegalAccessException ex) {
+                Logger.getLogger(Properties.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        FileManager.saveToFile("Properties/Config.prop", build.toString());
     }
     
 }

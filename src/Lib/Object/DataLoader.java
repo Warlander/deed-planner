@@ -104,7 +104,7 @@ public class DataLoader {
                 String request = line.substring(0, line.indexOf(" "));
                 switch (request) {
                     case "Texture":
-                        Tex tex = TextureLoader.loadPNGTexture("Data"+slash+"Textures"+slash+line.substring(line.indexOf("source=\"")+8, line.lastIndexOf("\"")));
+                        Tex tex = new Tex("Data"+slash+"Textures"+slash+line.substring(line.indexOf("source=\"")+8, line.lastIndexOf("\"")));
                         temp = line.substring(line.indexOf("id=")+3);
                         tid = Integer.parseInt(spaceMax(temp));
                         tex.loadID = tid;
@@ -114,7 +114,7 @@ public class DataLoader {
                         String source = "Data"+slash+"Models"+slash+line.substring(line.indexOf("source=\"")+8, line.lastIndexOf("\""));
                         temp = line.substring(line.indexOf("id=")+3);
                         mid = Integer.parseInt(spaceMax(temp));
-                        ObjectData object = ReadObject.read(new BufferedReader(new FileReader(source)), mid);
+                        ObjectData object = new ObjectData(mid, source);
                         models.add(object);
                         break;
                     case "Materials":
@@ -256,51 +256,51 @@ public class DataLoader {
         String str;
         
         str = "Data"+slash+"Specials"+slash+"skybox.png";
-        D.skybox = TextureLoader.loadPNGTexture(str);
+        D.skybox = new Tex(str);
         
         str = "Data"+slash+"Specials"+slash+"water.png";
-        D.water = TextureLoader.loadPNGTexture(str);
+        D.water = new Tex(str);
         
         
         
         str = "Data"+slash+"Specials"+slash+"side.obj";
-        D.side = ReadObject.read(new BufferedReader(new FileReader(str)));
+        D.side = new ObjectData(str);
         
         str = "Data"+slash+"Specials"+slash+"sideCorner.obj";
-        D.sideCorner = ReadObject.read(new BufferedReader(new FileReader(str)));
+        D.sideCorner = new ObjectData(str);
         
         str = "Data"+slash+"Specials"+slash+"sideCut.obj";
-        D.sideCut = ReadObject.read(new BufferedReader(new FileReader(str)));
+        D.sideCut = new ObjectData(str);
         
         str = "Data"+slash+"Specials"+slash+"sideToSpine.obj";
-        D.sideToSpine = ReadObject.read(new BufferedReader(new FileReader(str)));
+        D.sideToSpine = new ObjectData(str);
         
         str = "Data"+slash+"Specials"+slash+"spine.obj";
-        D.spine = ReadObject.read(new BufferedReader(new FileReader(str)));
+        D.spine = new ObjectData(str);
         
         str = "Data"+slash+"Specials"+slash+"spineCorner.obj";
-        D.spineCorner = ReadObject.read(new BufferedReader(new FileReader(str)));
+        D.spineCorner = new ObjectData(str);
         
         str = "Data"+slash+"Specials"+slash+"spineCornerUp.obj";
-        D.spineCornerUp = ReadObject.read(new BufferedReader(new FileReader(str)));
+        D.spineCornerUp = new ObjectData(str);
         
         str = "Data"+slash+"Specials"+slash+"spineCross.obj";
-        D.spineCross = ReadObject.read(new BufferedReader(new FileReader(str)));
+        D.spineCross = new ObjectData(str);
         
         str = "Data"+slash+"Specials"+slash+"spineEnd.obj";
-        D.spineEnd = ReadObject.read(new BufferedReader(new FileReader(str)));
+        D.spineEnd = new ObjectData(str);
         
         str = "Data"+slash+"Specials"+slash+"spineEndUp.obj";
-        D.spineEndUp = ReadObject.read(new BufferedReader(new FileReader(str)));
+        D.spineEndUp = new ObjectData(str);
         
         str = "Data"+slash+"Specials"+slash+"spineTCross.obj";
-        D.spineTCross = ReadObject.read(new BufferedReader(new FileReader(str)));
+        D.spineTCross = new ObjectData(str);
         
         str = "Data"+slash+"Specials"+slash+"spineTip.obj";
-        D.spineTip = ReadObject.read(new BufferedReader(new FileReader(str)));
+        D.spineTip = new ObjectData(str);
         
         str = "Data"+slash+"Specials"+slash+"levelsCross.obj";
-        D.levelsCross = ReadObject.read(new BufferedReader(new FileReader(str)));
+        D.levelsCross = new ObjectData(str);
     }
     
     private static int countCommands(File file) throws FileNotFoundException, IOException {

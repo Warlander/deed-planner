@@ -1,6 +1,7 @@
 package Mapper.Logic;
 
 import Lib.Entities.Structure;
+import Lib.Files.Properties;
 import Mapper.Mapper;
 import Mapper.Input.MouseInput;
 import Mapper.UpCamera;
@@ -13,7 +14,7 @@ public final class StructureUpdater {
     private static float yPos;
     
     static void update() {
-        int scale = UpCamera.scale*4;
+        int scale = Properties.scale*4;
         float tileScaler = (float)Display.getWidth()/(float)Display.getHeight();
         float tileSize = (float)Display.getHeight()/scale;
         int tileX = (int) ((MouseInput.x+UpCamera.x*tileSize)/((float)Display.getWidth()/scale/tileScaler))+1;

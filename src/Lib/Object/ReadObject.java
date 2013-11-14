@@ -1,7 +1,6 @@
 package Lib.Object;
 
-import java.io.BufferedReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import org.lwjgl.opengl.GL11;
 
@@ -10,24 +9,15 @@ public class ReadObject {
     private ReadObject() {}
     
     /**
-     * Use this method ONLY for hardcoded models!
-     * 
-     * @param source BufferedReader from which you want to read data
-     * @return ObjectData with loadID = 0
-     * @throws IOException when directory cannot be found
-     */
-    static ObjectData read(BufferedReader source) throws IOException {
-        return read(source, 0);
-    }
-    
-    /**
      * Method to load external models.
      * 
      * @param source BufferedReader from which you want to read data
      * @return ObjectData
      * @throws IOException when directory cannot be found
      */
-    static ObjectData read(BufferedReader source, int loadID) throws IOException {
+    static int read(String file) throws IOException {
+        BufferedReader source = new BufferedReader(new FileReader(file));
+        
         String line;
         ArrayList<Float> x = new ArrayList();
         ArrayList<Float> y = new ArrayList();
@@ -78,9 +68,8 @@ public class ReadObject {
             GL11.glEnd();
         GL11.glEndList();
         
-        ObjectData data = new ObjectData(loadID, listID);
-        
-        return data;
+        System.out.println("Model at: "+file+" loaded.");
+        return listID;
     }
     
 }

@@ -1,6 +1,6 @@
 package Lib.Utils;
 
-public class Repeater {
+public abstract class Repeater {
 
     private long time = System.currentTimeMillis();
     private final int repeatMillis;
@@ -16,6 +16,6 @@ public class Repeater {
         }
     }
     
-    protected void action() {}
+    protected abstract void action();
     
 }

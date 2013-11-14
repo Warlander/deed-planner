@@ -2,6 +2,7 @@ package Mapper.Logic;
 
 import Form.DrawMode;
 import Form.HouseCalc;
+import Lib.Files.Properties;
 import Lib.Graphics.Ground;
 import Mapper.Data.D;
 import Mapper.Mapper;
@@ -14,9 +15,9 @@ public final class CaveUpdater {
     static void update() {
         if (MouseInput.hold.left ^ MouseInput.hold.right) {
             float tileScaler = (float)Display.getWidth()/(float)Display.getHeight();
-            float tileSize = (float)Display.getHeight()/UpCamera.scale/4;
-            int tileX = (int) ((MouseInput.x+UpCamera.x*tileSize)/((float)Display.getWidth()/UpCamera.scale/tileScaler));
-            int tileY = (int) ((MouseInput.y+UpCamera.y*tileSize)/((float)Display.getHeight()/UpCamera.scale));
+            float tileSize = (float)Display.getHeight()/Properties.scale/4;
+            int tileX = (int) ((MouseInput.x+UpCamera.x*tileSize)/((float)Display.getWidth()/Properties.scale/tileScaler));
+            int tileY = (int) ((MouseInput.y+UpCamera.y*tileSize)/((float)Display.getHeight()/Properties.scale));
             
             switch (HouseCalc.drawMode) {
                 case pencil:

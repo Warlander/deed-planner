@@ -2,6 +2,7 @@ package Mapper;
 
 import Mapper.Input.MouseInput;
 import Form.HouseCalc;
+import Lib.Files.Properties;
 import Lib.Utils.MatrixTools;
 import Mapper.Input.Keybindings;
 import java.nio.FloatBuffer;
@@ -18,15 +19,8 @@ public final class UpCamera {
     public static float x=0;
     public static float y=0;
     
-    public static int scale=10;
-    
     private static int pastMousex;
     private static int pastMousey;
-    
-    public static float mouseFraction = 0.2f;
-    public static float keyboardFraction = 1;
-    public static boolean showGrid=true;
-    public static boolean allowWheel=true;
     
     private static final FloatBuffer matrix;
     
@@ -39,41 +33,41 @@ public final class UpCamera {
     }
     
     static void update() {
-        float keyboardFraction = UpCamera.keyboardFraction;
+        double keyboardFraction = Properties.keyboardFractionUp;
         if (Keybindings.hold(Keybindings.UP_SPEED_MOD1)) {
-            keyboardFraction*=FPPCamera.shiftMod;
+            keyboardFraction*=Properties.mod1Fpp;
         }
         else if (Keybindings.hold(Keybindings.UP_SPEED_MOD2)) {
-            keyboardFraction*=FPPCamera.controlMod;
+            keyboardFraction*=Properties.mod2Fpp;
         }
         
         int currX = (int)(x/4);
         int currZ = (int)(y/4);
         Camera.visibleDownX = currX-5;
-        Camera.visibleUpX = currX+scale*2;
+        Camera.visibleUpX = currX+Properties.scale*2;
         Camera.visibleDownY = currZ-5;
-        Camera.visibleUpY = currZ+scale*2;
+        Camera.visibleUpY = currZ+Properties.scale*2;
         
         if (Keybindings.pressed(Keybindings.UP_SCALE_MORE)) {
-            if (scale>5) {
-                scale--;
+            if (Properties.scale>5) {
+                Properties.scale--;
             }
         }
         else if (Keybindings.pressed(Keybindings.UP_SCALE_LESS)) {
-            if (scale<40) {
-                scale++;
+            if (Properties.scale<40) {
+                Properties.scale++;
             }
         }
         
-        if (allowWheel) {
+        if (Properties.allowWheel) {
             if (MouseInput.scrollUp) {
-                if (scale>5) {
-                    scale--;
+                if (Properties.scale>5) {
+                    Properties.scale--;
                 }
             }
             else if (MouseInput.scrollDown) {
-                if (scale<40) {
-                    scale++;
+                if (Properties.scale<40) {
+                    Properties.scale++;
                 }
             }
         }
@@ -106,8 +100,8 @@ public final class UpCamera {
             float diffx = MouseInput.x - pastMousex;
             float diffy = MouseInput.y - pastMousey;
             
-            x-=diffx*mouseFraction;
-            y-=diffy*mouseFraction;
+            x-=diffx*Properties.mouseFractionUp;
+            y-=diffy*Properties.mouseFractionUp;
             
             Mouse.setCursorPosition(Display.getWidth()/2, Display.getHeight()/2);
             pastMousex = Display.getWidth()/2;
@@ -138,18 +132,18 @@ public final class UpCamera {
             x=0;
         }
         
-        if (y>4*(Mapper.height-scale)) {
-            y=4*(Mapper.height-scale);
+        if (y>4*(Mapper.height-Properties.scale)) {
+            y=4*(Mapper.height-Properties.scale);
         }
-        if (x>4*(Mapper.width-scale)) {
-            x=4*(Mapper.width-scale);
+        if (x>4*(Mapper.width-Properties.scale)) {
+            x=4*(Mapper.width-Properties.scale);
         }
     }
     
     public static void set() {
         GL11.glMatrixMode(GL11.GL_PROJECTION);
         GL11.glLoadIdentity();
-        GL11.glOrtho(0, scale*4*Display.getWidth()/Display.getHeight(), 0, scale*4, 0.001f, 600);
+        GL11.glOrtho(0, Properties.scale*4*Display.getWidth()/Display.getHeight(), 0, Properties.scale*4, 0.001f, 600);
         MatrixTools.multMatrix(matrix);
         GL11.glTranslatef(-x, -300, -y);
         GL11.glMatrixMode(GL11.GL_MODELVIEW);

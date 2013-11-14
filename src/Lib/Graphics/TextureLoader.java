@@ -17,7 +17,7 @@ import org.lwjgl.opengl.GLContext;
 
 public class TextureLoader {
     
-    public static Tex loadPNGTexture(String filename) throws FileNotFoundException {
+    public static int loadPNGTexture(String filename) throws FileNotFoundException {
         boolean modern = GLContext.getCapabilities().OpenGL30;
         
         InputStream in = null;
@@ -46,10 +46,8 @@ public class TextureLoader {
 
         GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, dec.getWidth(), dec.getHeight(), 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buf);
         if (modern) {
-            if (Properties.getProperty("useMipmaps")!=null) {
-                if ((boolean)Properties.getProperty("useMipmaps")) {
-                    GL30.glGenerateMipmap(GL11.GL_TEXTURE_2D);
-                }
+            if (Properties.useMipmaps) {
+                GL30.glGenerateMipmap(GL11.GL_TEXTURE_2D);
             }
             else {
                 GL30.glGenerateMipmap(GL11.GL_TEXTURE_2D);
@@ -60,11 +58,9 @@ public class TextureLoader {
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL12.GL_CLAMP_TO_EDGE);
 
         if (modern) {
-            if (Properties.getProperty("useMipmaps")!=null) {
-                if ((boolean)Properties.getProperty("useMipmaps")) {
-                    GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
-                    GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR_MIPMAP_LINEAR);
-                }
+            if (Properties.useMipmaps) {
+                GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+                GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR_MIPMAP_LINEAR);
             }
             else {
                 GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
@@ -76,7 +72,8 @@ public class TextureLoader {
             GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
         }
 
-        return new Tex(texId);
+        System.out.println("Texture at: "+filename+" loaded.");
+        return texId;
     }
     
 }

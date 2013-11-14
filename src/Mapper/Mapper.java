@@ -84,12 +84,7 @@ public final class Mapper {
     public static void run() {
         Thread engine = new Thread() {
             public void run() {
-                if (Properties.getProperty("antialiasing")!=null) {
-                    GLInit.initDisplay((int)((float)Properties.getProperty("antialiasing")));
-                }
-                else {
-                    GLInit.initDisplay(4);
-                }
+                GLInit.initDisplay(Properties.antialiasing);
                 GLInit.initOpenGL();
                 System.out.println("Initializing program rendering engine");
                 System.out.println("Done!");

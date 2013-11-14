@@ -12,7 +12,6 @@ import Mapper.Logic.HeightUpdater;
 import Mapper.Logic.MapUpdater;
 import Mapper.Logic.WritUpdater;
 import Mapper.Mapper;
-import Mapper.UpCamera;
 import java.awt.Component;
 import java.awt.Container;
 import java.io.BufferedReader;
@@ -54,23 +53,9 @@ public class HouseCalc extends javax.swing.JFrame {
     private final boolean debug = false;
     private int version;
     private String visualVersion;
-    private boolean checkVersion = true;
     
     public HouseCalc() {
-        getProperties();
-        BufferedReader reader=null;
-        BufferedReader webReader=null;
-        
-        try {
-            reader = new BufferedReader(new FileReader("version.txt"));
-            version = Integer.parseInt(reader.readLine());
-            visualVersion = reader.readLine();
-            webReader = WebTools.siteToReader(reader.readLine());
-        } catch(IOException ex) {
-            ex.printStackTrace();
-        }
-        
-        if (release) {
+        if (release || debug) {
             try {
                 System.setOut(new PrintStream("InfoLog.txt"));
                 System.setErr(new PrintStream(new FileOutputStream("ErrorLog.txt") {
@@ -90,7 +75,25 @@ public class HouseCalc extends javax.swing.JFrame {
             } catch (FileNotFoundException ex) {
                 Logger.getLogger(HouseCalc.class.getName()).log(Level.SEVERE, null, ex);
             }
-            if (checkVersion) {
+        }
+        Properties.wake();
+        
+        initComponents();
+        
+        BufferedReader reader=null;
+        BufferedReader webReader=null;
+        
+        try {
+            reader = new BufferedReader(new FileReader("version.txt"));
+            version = Integer.parseInt(reader.readLine());
+            visualVersion = reader.readLine();
+            webReader = WebTools.siteToReader(reader.readLine());
+        } catch(IOException ex) {
+            ex.printStackTrace();
+        }
+        
+        if (release) {
+            if (Properties.checkVersion) {
                 try {
                     int verNew;
                     if (webReader!=null) {
@@ -122,7 +125,6 @@ public class HouseCalc extends javax.swing.JFrame {
                 }
             }
         }
-        initComponents();
         colorablePane.setVisible(false);
         writCreatorPane.setVisible(false);
         System.out.println("Mapper form initialized");
@@ -139,50 +141,6 @@ public class HouseCalc extends javax.swing.JFrame {
         }
         setTitle("DeedPlanner "+visualVersion);
         elevationList.setSelectedIndex(0);
-    }
-
-    private void getProperties() {
-        Properties.loadProperties();
-        if (Properties.getProperty("javaCompile")!=null && (boolean)Properties.getProperty("javaCompile")) {
-            System.setProperty("XX:CompileThreshold", "1");
-        }
-        if (Properties.getProperty("checkVersion")!=null) {
-            checkVersion = (boolean)Properties.getProperty("checkVersion");
-        }
-        
-        cameraProperties();
-    }
-    
-    private void cameraProperties() {
-        if (Properties.getProperty("allowWheel")!=null) {
-            UpCamera.allowWheel = (boolean)Properties.getProperty("allowWheel");
-        }
-        if (Properties.getProperty("keyboardFractionUp")!=null) {
-            UpCamera.keyboardFraction = (float)Properties.getProperty("keyboardFractionUp");
-        }
-        if (Properties.getProperty("mouseFractionUp")!=null) {
-            UpCamera.mouseFraction = (float)Properties.getProperty("mouseFractionUp");
-        }
-        if (Properties.getProperty("showGrid")!=null) {
-            UpCamera.showGrid = (boolean)Properties.getProperty("showGrid");
-        }
-        if (Properties.getProperty("scale")!=null) {
-            String propString = Properties.getProperty("scale").toString();
-            UpCamera.scale = Integer.parseInt(propString.substring(0, propString.indexOf(".")));
-        }
-        
-        if (Properties.getProperty("mouseFractionFpp")!=null) {
-            FPPCamera.fraction = (float)Properties.getProperty("mouseFractionFpp");
-        }
-        if (Properties.getProperty("cameraRotationFpp")!=null) {
-            FPPCamera.rotate = (float)Properties.getProperty("cameraRotationFpp");
-        }
-        if (Properties.getProperty("mod1Fpp")!=null) {
-            FPPCamera.shiftMod = (float)Properties.getProperty("mod1Fpp");
-        }
-        if (Properties.getProperty("mod2Fpp")!=null) {
-            FPPCamera.controlMod = (float)Properties.getProperty("mod2Fpp");
-        }
     }
     
     @SuppressWarnings("unchecked")
@@ -1596,6 +1554,7 @@ public class HouseCalc extends javax.swing.JFrame {
     }//GEN-LAST:event_structuresListValueChanged
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        Properties.saveProperties();
         ExitMessage.main(null);
     }//GEN-LAST:event_formWindowClosing
 

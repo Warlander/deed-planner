@@ -2,6 +2,8 @@ package Lib.Graphics;
 
 import Form.HouseCalc;
 import Lib.Files.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
@@ -52,11 +54,12 @@ public class GLInit {
             System.err.println("Failed to create display!");
             if (anti==0) {
                 System.err.println("DISPLAY CREATION FAILED");
+                Logger.getLogger(GLInit.class.getName()).log(Level.SEVERE, null, ex);
                 System.exit(-1);
             }
             System.out.println("Another try with lower antialiasing: "+anti+" samples");
             System.err.println("Another try with lower antyaliasing: "+anti+" samples");
-            Properties.setProperty("antialiasing", anti);
+            Properties.antialiasing = anti;
             Properties.saveProperties();
             initDisplay(anti);
         }

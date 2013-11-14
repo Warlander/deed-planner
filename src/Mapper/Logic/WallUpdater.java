@@ -1,6 +1,7 @@
 package Mapper.Logic;
 
 import Form.HouseCalc;
+import Lib.Files.Properties;
 import Mapper.Mapper;
 import Mapper.Input.MouseInput;
 import Mapper.UpCamera;
@@ -14,11 +15,11 @@ public final class WallUpdater {
     
     static void update() {
         double tileScaler = (double)Display.getWidth()/(double)Display.getHeight();
-        double realSize = (double)Display.getHeight()/(double)UpCamera.scale/4d;
-        double tileSize = ((double)Display.getHeight()/(double)UpCamera.scale);
+        double realSize = (double)Display.getHeight()/(double)Properties.scale/4d;
+        double tileSize = ((double)Display.getHeight()/(double)Properties.scale);
 
-        int tileX = (int) (((double)MouseInput.x+(double)UpCamera.x*realSize)/((double)Display.getWidth()/(double)UpCamera.scale/tileScaler))+1;
-        int tileY = (int) (((double)MouseInput.y+(double)UpCamera.y*realSize)/((double)Display.getHeight()/(double)UpCamera.scale));
+        int tileX = (int) (((double)MouseInput.x+(double)UpCamera.x*realSize)/((double)Display.getWidth()/(double)Properties.scale/tileScaler))+1;
+        int tileY = (int) (((double)MouseInput.y+(double)UpCamera.y*realSize)/((double)Display.getHeight()/(double)Properties.scale));
         
         if (tileX<2 || tileY<1 || tileX>=Mapper.width || tileY>=Mapper.height-1) {
             return;

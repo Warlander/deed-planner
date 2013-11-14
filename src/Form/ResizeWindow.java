@@ -165,15 +165,15 @@ public class ResizeWindow extends javax.swing.JFrame {
             return;
         }
         
-        Structure[][][] objects = new Structure[(Mapper.width+right+left)*4][15][(Mapper.height+up+down)*4];
-        Data[][][] tiles = new Data[Mapper.width+right+left][15][Mapper.height+up+down];
-        Data[][][] bordersx = new Data[Mapper.width+right+left][15][Mapper.height+up+down];
-        Data[][][] bordersy = new Data[Mapper.width+right+left][15][Mapper.height+up+down];
-        Ground[][] ground = new Ground[Mapper.width+right+left][Mapper.height+up+down];
-        Ground[][] caveGround = new Ground[Mapper.width+right+left][Mapper.height+up+down];
-        Label[][] labels = new Label[Mapper.width+right+left][Mapper.height+up+down];
-        Label[][] caveLabels = new Label[Mapper.width+right+left][Mapper.height+up+down];
-        float[][] heightmap = new float[Mapper.width+right+left+1][Mapper.height+up+down+1];
+        Structure[][][] objects = new Structure[width*4][15][height*4];
+        Data[][][] tiles = new Data[width][15][height];
+        Data[][][] bordersx = new Data[width][15][height];
+        Data[][][] bordersy = new Data[width][15][height];
+        Ground[][] ground = new Ground[width][height];
+        Ground[][] caveGround = new Ground[width][height];
+        Label[][] labels = new Label[width][height];
+        Label[][] caveLabels = new Label[width][height];
+        float[][] heightmap = new float[width+1][height+1];
         
         int xReg = 0;
         int yReg = 0;

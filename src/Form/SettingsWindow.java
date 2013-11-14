@@ -12,56 +12,27 @@ public class SettingsWindow extends javax.swing.JFrame {
     }
     
     private void getProperties() {
-        Properties.loadProperties();
-        if (Properties.getProperty("javaCompile")!=null) {
-            forceJavaCompileBox.setSelected((boolean)Properties.getProperty("javaCompile"));
-        }
-        if (Properties.getProperty("checkVersion")!=null) {
-            checkUpdatesBox.setSelected((boolean)Properties.getProperty("checkVersion"));
-        }
+        checkUpdatesBox.setSelected(Properties.checkVersion);
         
-        if (Properties.getProperty("allowWheel")!=null) {
-            wheelScaleBox.setSelected((boolean)Properties.getProperty("allowWheel"));
-        }
-        if (Properties.getProperty("keyboardFractionUp")!=null) {
-            keyboardFractionUpSelect.getModel().setValue((float)Properties.getProperty("keyboardFractionUp"));
-        }
-        if (Properties.getProperty("mouseFractionUp")!=null) {
-            mouseFractionUpSelect.getModel().setValue((float)Properties.getProperty("mouseFractionUp"));
-        }
-        if (Properties.getProperty("showGrid")!=null) {
-            showGridBox.setSelected((boolean)Properties.getProperty("showGrid"));
-        }
-        if (Properties.getProperty("scale")!=null) {
-            String propString = Properties.getProperty("scale").toString();
-            scaleUpSelect.getModel().setValue(Integer.parseInt(propString.substring(0, propString.indexOf("."))));
-        }
+            wheelScaleBox.setSelected(Properties.allowWheel);
+            keyboardFractionUpSelect.getModel().setValue(Properties.keyboardFractionUp);
+            mouseFractionUpSelect.getModel().setValue(Properties.mouseFractionUp);
+            showGridBox.setSelected(Properties.showGrid);
+            scaleUpSelect.getModel().setValue(Properties.scale);
         
-        if (Properties.getProperty("mouseFractionFpp")!=null) {
-            mouseFractionFppSelect.getModel().setValue((float)Properties.getProperty("mouseFractionFpp"));
-        }
-        if (Properties.getProperty("cameraRotationFpp")!=null) {
-            cameraRotationFppSelect.getModel().setValue((float)Properties.getProperty("cameraRotationFpp"));
-        }
-        if (Properties.getProperty("mod1Fpp")!=null) {
-            mod1FppSelect.getModel().setValue((float)Properties.getProperty("mod1Fpp"));
-        }
-        if (Properties.getProperty("mod2Fpp")!=null) {
-            mod2FppSelect.getModel().setValue((float)Properties.getProperty("mod2Fpp"));
-        }
+            mouseFractionFppSelect.getModel().setValue(Properties.mouseFractionFpp);
+            cameraRotationFppSelect.getModel().setValue(Properties.cameraRotationFpp);
+            mod1FppSelect.getModel().setValue(Properties.mod1Fpp);
+            mod2FppSelect.getModel().setValue(Properties.mod2Fpp);
         
-        if (Properties.getProperty("antialiasing")!=null) {
             for (int i=0; i<antialiasingCombo.getItemCount(); i++) {
                 int integer = Integer.parseInt((String)antialiasingCombo.getItemAt(i));
-                if (integer==(int)((float)Properties.getProperty("antialiasing"))) {
+                if (integer==Properties.antialiasing) {
                     antialiasingCombo.setSelectedIndex(i);
                 }
             }
-        }
-        
-        if (Properties.getProperty("useMipmaps")!=null) {
-            mipmapToggle.setSelected((boolean)Properties.getProperty("useMipmaps"));
-        }
+
+            mipmapToggle.setSelected(Properties.useMipmaps);
     }
 
     @SuppressWarnings("unchecked")
@@ -86,7 +57,6 @@ public class SettingsWindow extends javax.swing.JFrame {
         mod1FppSelect = new javax.swing.JSpinner();
         jLabel8 = new javax.swing.JLabel();
         mod2FppSelect = new javax.swing.JSpinner();
-        forceJavaCompileBox = new javax.swing.JCheckBox();
         checkUpdatesBox = new javax.swing.JCheckBox();
         antialiasingCombo = new javax.swing.JComboBox();
         jLabel9 = new javax.swing.JLabel();
@@ -156,10 +126,6 @@ public class SettingsWindow extends javax.swing.JFrame {
         mod2FppSelect.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         mod2FppSelect.setModel(new javax.swing.SpinnerNumberModel(Float.valueOf(0.2f), Float.valueOf(0.1f), Float.valueOf(10.0f), Float.valueOf(0.1f)));
 
-        forceJavaCompileBox.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        forceJavaCompileBox.setText("<html>Force Java to compile program on run<br>(slows down startup, but gives performance boost<br>\nmay cause instability, so is disabled by default)");
-        forceJavaCompileBox.setToolTipText("");
-
         checkUpdatesBox.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         checkUpdatesBox.setSelected(true);
         checkUpdatesBox.setText("Check for updates");
@@ -184,7 +150,6 @@ public class SettingsWindow extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(checkUpdatesBox)
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                                     .addComponent(keyboardFractionUpSelect)
@@ -195,7 +160,6 @@ public class SettingsWindow extends javax.swing.JFrame {
                                     .addComponent(jLabel6)
                                     .addComponent(jLabel3)
                                     .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.TRAILING)))
-                            .addComponent(forceJavaCompileBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(wheelScaleBox)
                             .addComponent(jLabel1)
                             .addComponent(showGridBox)
@@ -211,15 +175,16 @@ public class SettingsWindow extends javax.swing.JFrame {
                                     .addComponent(jLabel5)
                                     .addComponent(jLabel7)
                                     .addComponent(jLabel4)))
+                            .addComponent(checkUpdatesBox)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(antialiasingCombo, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jLabel9)))
-                        .addGap(0, 0, Short.MAX_VALUE))
+                        .addGap(0, 8, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(mipmapToggle, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(mipmapToggle, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jButton1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addContainerGap())))
         );
         layout.setVerticalGroup(
@@ -257,52 +222,40 @@ public class SettingsWindow extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(mod2FppSelect, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addComponent(forceJavaCompileBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(checkUpdatesBox)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(antialiasingCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel9))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(mipmapToggle)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel1)
-                .addContainerGap())
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        Properties.setProperty("allowWheel", wheelScaleBox.isSelected());
-        UpCamera.allowWheel=wheelScaleBox.isSelected();
-        Properties.setProperty("showGrid", showGridBox.isSelected());
-        UpCamera.showGrid=showGridBox.isSelected();
-        Properties.setProperty("keyboardFractionUp", keyboardFractionUpSelect.getModel().getValue());
-        UpCamera.keyboardFraction=(float)keyboardFractionUpSelect.getModel().getValue();
-        Properties.setProperty("mouseFractionUp", mouseFractionUpSelect.getModel().getValue());
-        UpCamera.mouseFraction=(float)mouseFractionUpSelect.getModel().getValue();
-        Properties.setProperty("scale", scaleUpSelect.getModel().getValue());
-        UpCamera.scale=(int)scaleUpSelect.getModel().getValue();
+        Properties.allowWheel = wheelScaleBox.isSelected();
+        Properties.showGrid = showGridBox.isSelected();
+        Properties.keyboardFractionUp = (double) keyboardFractionUpSelect.getModel().getValue();
+        Properties.mouseFractionUp = (double) mouseFractionUpSelect.getModel().getValue();
+        Properties.scale = (int) scaleUpSelect.getModel().getValue();
         
-        Properties.setProperty("mouseFractionFpp", mouseFractionFppSelect.getModel().getValue());
-        FPPCamera.fraction=(float)mouseFractionFppSelect.getModel().getValue();
-        Properties.setProperty("cameraRotationFpp", cameraRotationFppSelect.getModel().getValue());
-        FPPCamera.rotate=(float)cameraRotationFppSelect.getModel().getValue();
-        Properties.setProperty("mod1Fpp", mod1FppSelect.getModel().getValue());
-        FPPCamera.shiftMod=(float)mod1FppSelect.getModel().getValue();
-        Properties.setProperty("mod2Fpp", mod2FppSelect.getModel().getValue());
-        FPPCamera.controlMod=(float)mod2FppSelect.getModel().getValue();
+        Properties.mouseFractionFpp = (double) mouseFractionFppSelect.getModel().getValue();
+        Properties.cameraRotationFpp = (double) cameraRotationFppSelect.getModel().getValue();
+        Properties.mod1Fpp = (double) mod1FppSelect.getModel().getValue();
+        Properties.mod2Fpp = (double) mod2FppSelect.getModel().getValue();
         
-        Properties.setProperty("javaCompile", forceJavaCompileBox.isSelected());
-        Properties.setProperty("checkVersion", checkUpdatesBox.isSelected());
+        Properties.checkVersion = checkUpdatesBox.isSelected();
         
-        Properties.setProperty("antialiasing", (Integer.parseInt((String)antialiasingCombo.getSelectedItem())));
-        Properties.setProperty("useMipmaps", mipmapToggle.isSelected());
+        Properties.antialiasing = Integer.parseInt((String)antialiasingCombo.getSelectedItem());
+        Properties.useMipmaps = mipmapToggle.isSelected();
         
         Properties.saveProperties();
         setVisible(false);
@@ -344,7 +297,6 @@ public class SettingsWindow extends javax.swing.JFrame {
     private javax.swing.JComboBox antialiasingCombo;
     private javax.swing.JSpinner cameraRotationFppSelect;
     private javax.swing.JCheckBox checkUpdatesBox;
-    private javax.swing.JCheckBox forceJavaCompileBox;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;

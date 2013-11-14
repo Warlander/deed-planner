@@ -1,6 +1,7 @@
 package Mapper.Graphics;
 
 import Form.HouseCalc;
+import Lib.Files.Properties;
 import Lib.Graphics.Ground;
 import Lib.Object.Type;
 import Mapper.Camera;
@@ -8,7 +9,6 @@ import Mapper.Mapper;
 import Mapper.Data.D;
 import Mapper.FPPCamera;
 import static Mapper.Mapper.fpsView;
-import Mapper.UpCamera;
 import java.nio.FloatBuffer;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
@@ -28,7 +28,7 @@ public class MiscRenderer {
         GL11.glPushMatrix();
             renderGround();
             GL11.glColor3f(1, 1, 1);
-            if (!fpsView && UpCamera.showGrid) {
+            if (!fpsView && Properties.showGrid) {
                 if (Mapper.getFloor()>=0) {
                     renderGrid();
                 }
@@ -294,6 +294,8 @@ public class MiscRenderer {
     
     //<editor-fold defaultstate="collapsed" desc="Skybox rendering code">
     private static int prerenderSkybox() {
+        D.skybox.load();
+        
         int listID = GL11.glGenLists(1);
         
         GL11.glNewList(listID, GL11.GL_COMPILE);

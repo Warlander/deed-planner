@@ -2,6 +2,7 @@ package Mapper.Logic;
 
 import Form.HouseCalc;
 import Form.SlopeInput;
+import Lib.Files.Properties;
 import Mapper.Input.Keybindings;
 import Mapper.Mapper;
 import Mapper.Input.MouseInput;
@@ -38,11 +39,11 @@ public final class HeightUpdater {
         }
         
         double tileScaler = (double)Display.getWidth()/(double)Display.getHeight();
-        double realSize = (double)Display.getHeight()/(double)UpCamera.scale/4d;
-        double tileSize = ((double)Display.getHeight()/(double)UpCamera.scale);
+        double realSize = (double)Display.getHeight()/(double)Properties.scale/4d;
+        double tileSize = ((double)Display.getHeight()/(double)Properties.scale);
 
-        int tileX = (int) (((double)MouseInput.x+(double)UpCamera.x*realSize)/((double)Display.getWidth()/(double)UpCamera.scale/tileScaler))+1;
-        int tileY = (int) (((double)MouseInput.y+(double)UpCamera.y*realSize)/((double)Display.getHeight()/(double)UpCamera.scale));
+        int tileX = (int) (((double)MouseInput.x+(double)UpCamera.x*realSize)/((double)Display.getWidth()/(double)Properties.scale/tileScaler))+1;
+        int tileY = (int) (((double)MouseInput.y+(double)UpCamera.y*realSize)/((double)Display.getHeight()/(double)Properties.scale));
 
         if (tileX<0 || tileY<0 || tileX>Mapper.width || tileY>Mapper.height) {
             return;
@@ -192,7 +193,7 @@ public final class HeightUpdater {
         
         Point[] points = new Point[]{p1,p2,p3,p4};
         for (Point point : points) {
-            if (point.getX()<0 || point.getY()<0 || point.getY()>Mapper.width || point.getY()>Mapper.height) {
+            if (point.getX()<0 || point.getY()<0 || point.getX()>Mapper.width || point.getY()>Mapper.height) {
                 return null;
             }
         }

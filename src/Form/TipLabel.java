@@ -5,7 +5,7 @@ import javax.swing.JLabel;
 
 public class TipLabel extends JLabel {
     
-    private ArrayList<String> tipsList;
+    private final ArrayList<String> tipsList;
     private int currentTip=0;
     
     private final int ticks = 450;

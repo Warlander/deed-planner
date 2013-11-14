@@ -2,6 +2,7 @@ package Mapper;
 
 import Mapper.Input.MouseInput;
 import Form.HouseCalc;
+import Lib.Files.Properties;
 import Lib.Utils.MatrixTools;
 import Mapper.Input.Keybindings;
 import java.nio.FloatBuffer;
@@ -18,12 +19,6 @@ public final class FPPCamera {
     private static int pastMousex;
     private static int pastMousey;
     
-    public static float fraction = 0.2f;
-    public static float rotate = 0.015f;
-    
-    public static float shiftMod = 5;
-    public static float controlMod = 0.2f;
-    
     public static double posx=0;
     public static double posy=2;
     public static double posz=0;
@@ -35,7 +30,7 @@ public final class FPPCamera {
     private static float anglex=-(float)Math.PI/4;
     private static float angley=(float)Math.PI/2;
     
-    private static double stickedHeight = 2;
+    private static double stickedHeight = 1.7;
     
     private static final FloatBuffer matrix;
     
@@ -52,17 +47,17 @@ public final class FPPCamera {
     }
     
     public static void setSpeed(float speed, float rotation) {
-        fraction=speed;
-        rotate=rotation;
+        Properties.mouseFractionFpp=speed;
+        Properties.cameraRotationFpp=rotation;
     }
     
     public static void update() {
-        float fraction = FPPCamera.fraction;
+        double fraction = Properties.mouseFractionFpp;
         if (Keybindings.hold(Keybindings.FPP_SPEED_MOD1)) {
-            fraction*=shiftMod;
+            fraction*=Properties.mod1Fpp;
         }
         else if (Keybindings.hold(Keybindings.FPP_SPEED_MOD2)) {
-            fraction*=controlMod;
+            fraction*=Properties.mod2Fpp;
         }
         
         double xDivine = posx/4d;
@@ -85,9 +80,9 @@ public final class FPPCamera {
             float diffx = MouseInput.x - pastMousex;
             float diffy = MouseInput.y - pastMousey;
             
-            anglex += diffx*rotate;
+            anglex += diffx*Properties.cameraRotationFpp;
             
-            angley += diffy*rotate;
+            angley += diffy*Properties.cameraRotationFpp;
             
             Mouse.setCursorPosition(Display.getWidth()/2, Display.getHeight()/2);
             pastMousex = Display.getWidth()/2;
@@ -117,16 +112,16 @@ public final class FPPCamera {
         }
         
         if (Keybindings.hold(Keybindings.FPP_CAMERA_LEFT) || Keybindings.hold(Keybindings.FPP_CAMERA_LEFT_ALT)) {
-            anglex -= 5*rotate;
+            anglex -= 5*Properties.cameraRotationFpp;
         }
         if (Keybindings.hold(Keybindings.FPP_CAMERA_RIGHT) || Keybindings.hold(Keybindings.FPP_CAMERA_RIGHT_ALT)) {
-            anglex += 5*rotate;
+            anglex += 5*Properties.cameraRotationFpp;
         }
         if (Keybindings.hold(Keybindings.FPP_CAMERA_UP) || Keybindings.hold(Keybindings.FPP_CAMERA_UP_ALT)) {
-            angley += 5*rotate;
+            angley += 5*Properties.cameraRotationFpp;
         }
         if (Keybindings.hold(Keybindings.FPP_CAMERA_DOWN) || Keybindings.hold(Keybindings.FPP_CAMERA_DOWN_ALT)) {
-            angley -= 5*rotate;
+            angley -= 5*Properties.cameraRotationFpp;
         }
         
         if (!fixedHeight) {
